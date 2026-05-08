@@ -1,3 +1,5 @@
+componentes a instalar
+
 npx expo install expo-dev-client 'permite añadir funciones nativas personalizadas'
 npx expo install @expo-google-fonts/nunito expo-font 'Sirven para que la app no use la letra genérica del sistema'
 npx expo install expo-haptics 'Hace que el móvil vibre suavemente cuando el usuario añade un producto al carrito, confirmando la acción sin que tenga que mirar fijamente la pantalla'
@@ -5,3 +7,8 @@ npx expo install @expo/ui 'es una librería experimental de componentes, tal vez
 npm install zustand 'Es el gestor de estado. Su única función es que toda la app sepa qué hay en el carrito de compras en todo momento'
 npx expo install react-native-mmkv react-native-nitro-modules || mmkv: 'Es tu base de datos de alta velocidad Es el. Permite que MMKV se comunique con el hardware del teléfono de forma casi instantánea' y  nitro-modules: Es el "acelerador". Permite que MMKV se comunique con el hardware del teléfono de forma casi instantánea, asegurando que la app del restaurante no tenga retrasos (lag) al guardar datos.
 npm add @tanstack/react-query 'React Query se encarga de ir a buscar el menú o los precios a un servidor en internet, cachearlos para que la app no vaya lenta y reintentar la conexión si el Wi-Fi falla'
+
+pre construccion de la app
+
+npx expo prebuild --platform android (crear el entorno pre construdio de android)
+px expo run:android (activar el codigo nativo)
