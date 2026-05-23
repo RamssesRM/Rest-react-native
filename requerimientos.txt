@@ -16,3 +16,5 @@ px expo run:android (activar el codigo nativo)
 Se necesita instalar JDK 17, para que pueda funcionar el android studio y probar backend 
 (si se tiene otra puede dar fallas en la ruta de node.js al cambiar los entornos de configuracion
 avanzada por lo que se tendria que reinstalar otra vez node.js)
+
+npx expo install expo-linear-gradient
