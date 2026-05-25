@@ -1,15 +1,25 @@
-import { Text, View } from "react-native";
+import { StyleSheet, Text, View, Image } from "react-native";
 
 export default function Index() {
   return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <Text>Hola mundo!</Text>
+    <View style={styles.container}>
+      <View style={styles.infiniteScrollContainer}></View>
+      
+      <View style={styles.contentContainer}>
+        <Image source={require('@/assets/images/wolt-logo.png')} style={styles.brandLogo} />
+      </View>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  contentContainer: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  brandLogo: {},
+  infiniteScrollContainer: {}
+});
