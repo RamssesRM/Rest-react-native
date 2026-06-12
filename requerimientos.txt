@@ -11,7 +11,7 @@ npm add @tanstack/react-query 'React Query se encarga de ir a buscar el menú o 
 pre construccion de la app
 
 npx expo prebuild --platform android (crear el entorno pre construdio de android)
-px expo run:android (activar el codigo nativo)
+npx expo run:android (activar el codigo nativo)
 
 Se necesita instalar JDK 17, para que pueda funcionar el android studio y probar backend 
 (si se tiene otra puede dar fallas en la ruta de node.js al cambiar los entornos de configuracion
