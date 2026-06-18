@@ -34,3 +34,7 @@ Paso 2: Presiona luego presiona el boton "Variables de entorno"
 Paso 3: Presionas en el boton "Nuevo" y agregas los siguiente
 Nombre: ANDROID_HOME
 Ruta: C:\Usuarios\TU_USUARIO\AppData\Local\Android\Sdk
+
+recomendaciones:
+
+ES7+ React/Redux/React-Native snippets (extension que autocompleta codigo y genera bloques de pre-build)
