@@ -1,17 +1,29 @@
 import GoogleAutenBoton from "@/componentes/auten/GoogleAutenBoton";
+import ScrollInfinitoSuave from "@/componentes/ScrollinfinitoSuave"; // O la ruta exacta donde guardaste el componente
 import { Fonts } from "@/constants/theme";
-import { Image, Linking, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  Image,
+  Linking,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 
 // Pantalla de bienvenida con animación de fade-in para el logo y el texto
 
 export default function Index() {
   const openWebBrowser = () => {
-    Linking.openURL('https://galaxies.dev')
-  }
+    Linking.openURL("https://galaxies.dev");
+  };
   return (
     <View style={styles.container}>
-      <View style={styles.infiniteScrollContainer}></View>
+      <View style={styles.infiniteScrollContainer}>
+        <ScrollInfinitoSuave scrollDirection="down" iconSet="set1" />
+        <ScrollInfinitoSuave scrollDirection="up" iconSet="set2" />
+        <ScrollInfinitoSuave scrollDirection="down" iconSet="set3" />
+      </View>
 
       <View style={styles.contentContainer}>
         <Image
@@ -29,7 +41,7 @@ export default function Index() {
             <GoogleAutenBoton />
           </Animated.View>
           <Animated.View entering={FadeInDown.delay(200)}>
-            <TouchableOpacity style={styles.otherButton} >
+            <TouchableOpacity style={styles.otherButton}>
               <Text style={styles.otherButtonText}>
                 Otro método de autenticación
               </Text>
@@ -37,15 +49,16 @@ export default function Index() {
           </Animated.View>
         </View>
 
-        <Animated.View style={styles.privacyContainer} entering={FadeInDown.delay(400)}>
+        <Animated.View
+          style={styles.privacyContainer}
+          entering={FadeInDown.delay(400)}
+        >
           <Text style={styles.privacyText}>
             Por favor visita{" "}
-            <Text style={styles.privacyLink} onPress = {openWebBrowser}>
+            <Text style={styles.privacyLink} onPress={openWebBrowser}>
               Términos de Servicio
-            </Text> y{" "}
-            <Text style={styles.privacyLink}>
-              Política de Privacidad
-            </Text>
+            </Text>{" "}
+            y <Text style={styles.privacyLink}>Política de Privacidad</Text>
           </Text>
         </Animated.View>
       </View>
@@ -111,8 +124,13 @@ const styles = StyleSheet.create({
     textDecorationLine: "underline",
   },
 
-
   infiniteScrollContainer: {
     flex: 0.5,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 4,
+    position: "relative",
+    overflow: "hidden",
   },
 });
