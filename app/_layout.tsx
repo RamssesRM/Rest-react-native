@@ -8,7 +8,14 @@ import { useFonts } from "expo-font";
 import { Slot } from "expo-router";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5 minutos
+      retry: 1, // Reintentar una vez en caso de error
+    }
+  }
+});
 
 export default function RootLayout() {
   let [fontsLoaded] = useFonts({

@@ -1,6 +1,9 @@
+import { Link } from "expo-router";
+
 import GoogleAutenBoton from "@/componentes/auten/GoogleAutenBoton";
 import ScrollInfinitoSuave from "@/componentes/ScrollinfinitoSuave"; // O la ruta exacta donde guardaste el componente
 import { Fonts } from "@/constants/theme";
+import { LinearGradient } from "expo-linear-gradient";
 import {
   Image,
   Linking,
@@ -20,9 +23,25 @@ export default function Index() {
   return (
     <View style={styles.container}>
       <View style={styles.infiniteScrollContainer}>
-        <ScrollInfinitoSuave scrollDirection="down" iconSet="set1" />
-        <ScrollInfinitoSuave scrollDirection="up" iconSet="set2" />
-        <ScrollInfinitoSuave scrollDirection="down" iconSet="set3" />
+        <View> 
+          <ScrollInfinitoSuave scrollDirection="down" iconSet="set1" />
+        </View>
+        <View>
+          <ScrollInfinitoSuave scrollDirection="up" iconSet="set2" />
+        </View>
+        <View>
+          <ScrollInfinitoSuave scrollDirection="down" iconSet="set3" />
+        </View>
+        <LinearGradient 
+          colors={['transparent', '#fff']}
+          style={{
+            position: 'absolute',
+            height: 200,
+            left: 0,
+            bottom: 0,
+            right: 0,
+          }}
+        />
       </View>
 
       <View style={styles.contentContainer}>
@@ -30,28 +49,30 @@ export default function Index() {
           source={require("@/assets/images/LOGO332.png")}
           style={styles.brandLogo}
         />
-        <Animated.Text entering={FadeInDown.delay(300)} style={styles.tagline}>
+        <Animated.Text entering={FadeInDown.delay(200)} style={styles.tagline}>
           {" "}
           Bienvenido a Helus Resto-Bar{" "}
         </Animated.Text>
 
         {/* botones de logeo */}
         <View style={styles.buttonContainer}>
-          <Animated.View entering={FadeInDown.delay(100)}>
+          <Animated.View entering={FadeInDown.delay(300)}>
             <GoogleAutenBoton />
           </Animated.View>
-          <Animated.View entering={FadeInDown.delay(200)}>
-            <TouchableOpacity style={styles.otherButton}>
-              <Text style={styles.otherButtonText}>
-                Otro método de autenticación
-              </Text>
-            </TouchableOpacity>
+          <Animated.View entering={FadeInDown.delay(400)}>
+            <Link href={"/(app)/(publico)/otras-opciones"} asChild>
+              <TouchableOpacity style={styles.otherButton}>
+                <Text style={styles.otherButtonText}>
+                  Otro método de autenticación
+                </Text>
+              </TouchableOpacity>
+            </Link>
           </Animated.View>
         </View>
 
         <Animated.View
           style={styles.privacyContainer}
-          entering={FadeInDown.delay(400)}
+          entering={FadeInDown.delay(500)}
         >
           <Text style={styles.privacyText}>
             Por favor visita{" "}
@@ -74,7 +95,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     paddingHorizontal: 30,
-    paddingVertical: 20,
+    paddingVertical: 0,
   },
   brandLogo: {
     width: "100%",
@@ -125,7 +146,7 @@ const styles = StyleSheet.create({
   },
 
   infiniteScrollContainer: {
-    flex: 0.5,
+    flex: 0.57,
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",

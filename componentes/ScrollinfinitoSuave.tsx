@@ -1,10 +1,10 @@
 import { useEffect } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import Animated, {
-    scrollTo,
-    useAnimatedReaction,
-    useAnimatedRef,
-    useSharedValue,
+  scrollTo,
+  useAnimatedReaction,
+  useAnimatedRef,
+  useSharedValue,
 } from "react-native-reanimated";
 
 const iconDataSets = {
@@ -70,21 +70,20 @@ const ScrollInfinitoSuave = ({
   useAnimatedReaction(
     () => scrollY.value,
     (y) => {
-        if (scrollDirection === 'down') {
-            if (y >= totalContentHeight) {
-                scrollY.value = 0;
-                scrollTo(scrollRef, 0, 0, false);
+      if (scrollDirection === 'down') {
+        if (y >= totalContentHeight) {
+          scrollY.value = 0;
+          scrollTo(scrollRef, 0, 0, false);
         } else {
-                scrollTo(scrollRef, 0, y, false);
-        }
-      } else {
+          scrollTo(scrollRef, 0, y, false);
+      }} else {
         if (y <= 0) {
-            scrollY.value = totalContentHeight;
-            scrollTo(scrollRef, 0, totalContentHeight, false);
+          scrollY.value = totalContentHeight;
+          scrollTo(scrollRef, 0, totalContentHeight, false);
         } else {
-            scrollTo(scrollRef, 0, y, false);
+          scrollTo(scrollRef, 0, y, false);
         }
-        }
+      }
     }
   )
 
