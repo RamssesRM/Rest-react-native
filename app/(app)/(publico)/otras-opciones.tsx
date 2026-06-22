@@ -1,5 +1,5 @@
+import FacebookAutenBoton from "@/componentes/auten/FacebookAutenButon";
 import GoogleAutenBoton from "@/componentes/auten/GoogleAutenBoton";
-import FacebookAutenBoton from "@/componentes/auten/facebookButon";
 import { Colors, Fonts } from "@/constants/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
