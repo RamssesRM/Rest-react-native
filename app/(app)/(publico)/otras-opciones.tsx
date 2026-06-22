@@ -1,6 +1,7 @@
 import FacebookAutenBoton from "@/componentes/auten/FacebookAutenButon";
 import GoogleAutenBoton from "@/componentes/auten/GoogleAutenBoton";
 import { Colors, Fonts } from "@/constants/theme";
+import useUserStore from "@/hooks/use-userstore";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
@@ -8,6 +9,12 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 
 const Page = () =>{
     const router = useRouter();
+    const { setIsGuest, setUser } = useUserStore();
+    const continueAsGuest = () => {
+        setIsGuest(true);
+        setUser(null);
+        router.replace('/(app)/(autenticado)');
+    };
     return(
         <View style={styles.container}>
             <TouchableOpacity style={styles.closeBtn} onPress={() => router.dismiss()}>
@@ -26,7 +33,7 @@ const Page = () =>{
 
                     <TouchableOpacity
                         style={styles.otherButton}
-                        onPress={() => router.push('/(app)/(autenticado)/index')}
+                        onPress={continueAsGuest}
                     >
                         <Text style={styles.otherButtonText} >Continuar como invitado</Text>
                     </TouchableOpacity>
