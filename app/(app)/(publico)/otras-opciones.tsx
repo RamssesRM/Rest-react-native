@@ -13,7 +13,7 @@ const Page = () => {
   const continueAsGuest = () => {
     setIsGuest(true);
     setUser(null);
-    router.replace("/(app)/(autenticado)");
+    router.replace("/descubrir");
   };
   return (
     <View style={styles.container}>

@@ -3,6 +3,7 @@ import ScrollInfinitoSuave from "@/componentes/ScrollinfinitoSuave"; // O la rut
 import { Fonts } from "@/constants/theme";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import { LinearGradient } from "expo-linear-gradient";
+import { useRouter } from "expo-router";
 import React, { useMemo, useRef } from "react";
 import {
   Image,
@@ -13,7 +14,6 @@ import {
   View,
 } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
-import { Link, useRouter } from "expo-router";
 
 // Pantalla de bienvenida con animación de fade-in para el logo y el texto
 
@@ -111,10 +111,13 @@ export default function Index() {
 
           <GoogleAutenBoton />
 
-          <TouchableOpacity style={styles.guestButton} onPress={() => {
-            bottomSheetRef.current?.close();
-            router.push("/(app)/(autenticado)");}}
-            >
+          <TouchableOpacity
+            style={styles.guestButton}
+            onPress={() => {
+              bottomSheetRef.current?.close();
+              router.push("/descubrir");
+            }}
+          >
             <Text style={styles.guestButtonText}>Continuar como invitado</Text>
           </TouchableOpacity>
         </BottomSheetView>
