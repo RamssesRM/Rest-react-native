@@ -38,3 +38,7 @@ Ruta: C:\Usuarios\TU_USUARIO\AppData\Local\Android\Sdk
 recomendaciones:
 
 ES7+ React/Redux/React-Native snippets (extension que autocompleta codigo y genera bloques de pre-build)
+npx expo install expo-linear-gradient (complemento necesario)
+
+npm install axios
+npx expo install @gorhom/bottom-sheet react-native-reanimated react-native-gesture-handler ()

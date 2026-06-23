@@ -1,9 +1,9 @@
-import { Link } from "expo-router";
-
 import GoogleAutenBoton from "@/componentes/auten/GoogleAutenBoton";
 import ScrollInfinitoSuave from "@/componentes/ScrollinfinitoSuave"; // O la ruta exacta donde guardaste el componente
 import { Fonts } from "@/constants/theme";
+import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import { LinearGradient } from "expo-linear-gradient";
+import React, { useMemo, useRef } from "react";
 import {
   Image,
   Linking,
@@ -13,6 +13,7 @@ import {
   View,
 } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
+import { Link, useRouter } from "expo-router";
 
 // Pantalla de bienvenida con animación de fade-in para el logo y el texto
 
@@ -20,10 +21,19 @@ export default function Index() {
   const openWebBrowser = () => {
     Linking.openURL("https://galaxies.dev");
   };
+
+  const bottomSheetRef = useRef<BottomSheet>(null);
+  const snapPoints = useMemo(() => ["50%"], []);
+
+  const handleOpenBottomSheet = () => {
+    bottomSheetRef.current?.expand(); // Esto lo levanta de forma fluida
+  };
+
+  const router = useRouter(); // <-- AGREGA ESTA LÍNEA
   return (
     <View style={styles.container}>
       <View style={styles.infiniteScrollContainer}>
-        <View> 
+        <View>
           <ScrollInfinitoSuave scrollDirection="down" iconSet="set1" />
         </View>
         <View>
@@ -32,10 +42,10 @@ export default function Index() {
         <View>
           <ScrollInfinitoSuave scrollDirection="down" iconSet="set3" />
         </View>
-        <LinearGradient 
-          colors={['transparent', '#fff']}
+        <LinearGradient
+          colors={["transparent", "#fff"]}
           style={{
-            position: 'absolute',
+            position: "absolute",
             height: 200,
             left: 0,
             bottom: 0,
@@ -60,13 +70,15 @@ export default function Index() {
             <GoogleAutenBoton />
           </Animated.View>
           <Animated.View entering={FadeInDown.delay(400)}>
-            <Link href={"/(app)/(publico)/otras-opciones"} asChild>
-              <TouchableOpacity style={styles.otherButton}>
-                <Text style={styles.otherButtonText}>
-                  Otro método de autenticación
-                </Text>
-              </TouchableOpacity>
-            </Link>
+            {/* Quitamos el <Link> y le pasamos el trigger directo al botón */}
+            <TouchableOpacity
+              style={styles.otherButton}
+              onPress={handleOpenBottomSheet}
+            >
+              <Text style={styles.otherButtonText}>
+                Otro método de autenticación
+              </Text>
+            </TouchableOpacity>
           </Animated.View>
         </View>
 
@@ -83,6 +95,30 @@ export default function Index() {
           </Text>
         </Animated.View>
       </View>
+      {/* 4. EL COMPONENTE BOTTOM SHEET (Metido correctamente dentro del contenedor padre) */}
+      <BottomSheet
+        ref={bottomSheetRef}
+        index={-1}
+        snapPoints={snapPoints}
+        enablePanDownToClose={true}
+        backgroundStyle={styles.sheetBackground}
+        handleIndicatorStyle={{ backgroundColor: "#fff" }}
+      >
+        <BottomSheetView style={styles.sheetContent}>
+          <Text style={styles.sheetTitle}>
+            Inicia Sesión o crea una cuenta Helus
+          </Text>
+
+          <GoogleAutenBoton />
+
+          <TouchableOpacity style={styles.guestButton} onPress={() => {
+            bottomSheetRef.current?.close();
+            router.push("/(app)/(autenticado)");}}
+            >
+            <Text style={styles.guestButtonText}>Continuar como invitado</Text>
+          </TouchableOpacity>
+        </BottomSheetView>
+      </BottomSheet>
     </View>
   );
 }
@@ -143,6 +179,37 @@ const styles = StyleSheet.create({
   privacyLink: {
     color: "#4285F4",
     textDecorationLine: "underline",
+  },
+
+  sheetBackground: {
+    backgroundColor: "#f0f0f0", // Fondo oscuro que tenías en el modal
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+  },
+  sheetContent: {
+    flex: 1,
+    alignItems: "stretch",
+    paddingHorizontal: 30, // Usa 30 para mantener la misma simetría de la pantalla de atrás
+    paddingTop: 10,
+    gap: 16,
+  },
+
+  sheetTitle: {
+    color: "#1c1c1e",
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 40,
+    textAlign: "center",
+  },
+  guestButton: {
+    marginTop: 10,
+  },
+  guestButtonText: {
+    color: "#007AFF",
+    fontSize: 18,
+    fontWeight: "600",
+    alignItems: "center",
+    textAlign: "center",
   },
 
   infiniteScrollContainer: {
