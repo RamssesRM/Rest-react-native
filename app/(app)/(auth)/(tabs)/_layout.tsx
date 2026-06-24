@@ -1,3 +1,4 @@
+import { FontAwesome5, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
 
 const Layout = () => {
@@ -9,14 +10,43 @@ const Layout = () => {
         fontWeight:'600'
       }
     }}>
-      <Tabs.Screen name="descubrir" options={{ title: "Descubrir" }} />
       {/* 1. Esta pantalla mapea el archivo index.tsx de la raíz de (tabs) y será "Comidas" */}
-      <Tabs.Screen name="index" options={{ title: "Comidas" }} />
       {/* 2. Rutas directas sin el '/index' para que coincidan con lo que busca Expo */}
-      <Tabs.Screen name="tiendas" options={{ title: "Tiendas" }} />
-      <Tabs.Screen name="buscar" options={{ title: "Buscar" }} />
-      <Tabs.Screen name="comandas" options={{ title: "Comandas", headerShown: false }} />
-      <Tabs.Screen name="perfil" options={{ title: "Perfil" }} />
+      <Tabs.Screen name="descubrir" options={{ 
+        title: "Descubrir",
+        headerShown: false,
+        tabBarIcon:({color, size, focused}) => (
+          <Ionicons name={focused ? "compass" : 'compass-outline'} color={color} size={size} />
+        ),
+      }} />
+      <Tabs.Screen name="comidas" options={{ 
+        title: "Comidas",
+        headerShown: false,
+        tabBarIcon:({color, size}) => (
+          <MaterialIcons name="restaurant" color={color} size={size} />
+        ),
+      }} />
+      <Tabs.Screen name="comandas" options={{ 
+        title: "Comandas", 
+        headerShown: false,
+        tabBarIcon:({color, size, focused}) => (
+          <FontAwesome5 name={focused ? "receipt" : 'clipboard-list'} color={color} size={size} />
+        ),
+      }} />
+      <Tabs.Screen name="buscar" options={{ 
+        title: "Buscar",
+        headerShown: false,
+        tabBarIcon:({color, size, focused}) => (
+          <FontAwesome5 name={focused ? "search-location" : 'search'} color={color} size={size} />
+        ),
+      }} />
+      <Tabs.Screen name="perfil" options={{ 
+        title: "Perfil",
+        headerShown: false,
+        tabBarIcon:({color, size}) => (
+          <Ionicons name='person' color={color} size={size} />
+        ),
+      }} />
     </Tabs>
   );
 };
