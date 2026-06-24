@@ -14,8 +14,6 @@ const Page = () => {
         title='Inicia Sesion'
         onPress={() => {
           setIsGuest(false);
-          setUser(null);
-          router.replace('/(app)/(publico)');
         }}
       />
     </View>

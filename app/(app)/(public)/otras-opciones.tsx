@@ -12,8 +12,6 @@ const Page = () => {
   const { setIsGuest, setUser } = useUserStore();
   const continueAsGuest = () => {
     setIsGuest(true);
-    setUser(null);
-    router.replace("/descubrir");
   };
   return (
     <View style={styles.container}>

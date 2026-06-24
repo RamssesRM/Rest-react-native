@@ -1,4 +1,5 @@
-import { View, Text, ScrollView, StyleSheet } from 'react-native';const Perfil = () => {
+import { ScrollView, StyleSheet, Text } from 'react-native';
+const Perfil = () => {
   return (
     <ScrollView contentInsetAdjustmentBehavior='automatic' contentContainerStyle={styles.container}>
       {/* Creamos nuestro propio Large Title que se verá igual en iOS y Android */}

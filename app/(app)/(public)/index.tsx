@@ -1,6 +1,8 @@
+import FacebookAutenBoton from "@/componentes/auten/FacebookAutenButon";
 import GoogleAutenBoton from "@/componentes/auten/GoogleAutenBoton";
 import ScrollInfinitoSuave from "@/componentes/ScrollinfinitoSuave"; // O la ruta exacta donde guardaste el componente
 import { Fonts } from "@/constants/theme";
+import useUserStore from "@/hooks/use-userstore";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
@@ -30,6 +32,13 @@ export default function Index() {
   };
 
   const router = useRouter(); // <-- AGREGA ESTA LÍNEA
+
+  const { setIsGuest, setUser } = useUserStore();
+  const continueAsGuest = () => {
+    setIsGuest(true);
+    setUser(null)
+    router.replace('/descubrir')
+  };
   return (
     <View style={styles.container}>
       <View style={styles.infiniteScrollContainer}>
@@ -110,13 +119,11 @@ export default function Index() {
           </Text>
 
           <GoogleAutenBoton />
-
+          <FacebookAutenBoton />
+          
           <TouchableOpacity
             style={styles.guestButton}
-            onPress={() => {
-              bottomSheetRef.current?.close();
-              router.push("/descubrir");
-            }}
+            onPress={continueAsGuest}
           >
             <Text style={styles.guestButtonText}>Continuar como invitado</Text>
           </TouchableOpacity>

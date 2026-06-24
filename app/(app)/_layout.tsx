@@ -6,11 +6,11 @@ const RootNav = () => {
   return (
     <Stack>
       <Stack.Protected guard = {isGuest || user}>
-        <Stack.Screen name="(autenticado)/index" options={{ headerShown: false }} />
+        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
       </Stack.Protected>
       
       <Stack.Protected guard = {!isGuest && !user}>
-        <Stack.Screen name="(publico)/index" options={{ headerShown: false }} />
+        <Stack.Screen name="(public)" options={{ headerShown: false }} />
       </Stack.Protected>
     </Stack>
   );

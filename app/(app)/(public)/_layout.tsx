@@ -15,7 +15,7 @@ const Layout = () => {
           headerShown: false,
           presentation: 'formSheet',
           title: '',
-          sheetAllowedDetents: [0.6, 1.0],
+          sheetAllowedDetents: [0.6],
           sheetGrabberVisible: true,
           sheetCornerRadius: 16,
           headerShadowVisible: false,
