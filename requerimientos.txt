@@ -11,10 +11,34 @@ npm add @tanstack/react-query 'React Query se encarga de ir a buscar el menú o 
 pre construccion de la app
 
 npx expo prebuild --platform android (crear el entorno pre construdio de android)
-px expo run:android (activar el codigo nativo)
+npx expo run:android (activar el codigo nativo)
 
 Se necesita instalar JDK 17, para que pueda funcionar el android studio y probar backend 
 (si se tiene otra puede dar fallas en la ruta de node.js al cambiar los entornos de configuracion
 avanzada por lo que se tendria que reinstalar otra vez node.js)
 
 npx expo install expo-linear-gradient
+
+<---------SUPER IMPORTANTE PARA QUE EJECUTE ------>
+
+En la carpeta de proyecto agregar el siguiente archivo en la siguiente ruta
+Ruta: C:\Rest-react-native\android
+Nombre: local.properties
+Linea de codigo: sdk.dir=C:\\Usuarios\\TU_USUARIO\\AppData\\Local\\Android\\Sdk
+Reemplaza segun tu idioma del sistema por Users o Usuarios y "TU_USUARIO" por el nombre del usuario de tu pc, si no encuentras la carpeta AppData es pq es un archivo oculto en el navegador de archivos, tienes que activar lo de ver archivos ocultos
+
+
+Crear una variable de entorno
+Paso 1: Busca el apartado de variables de entorno en windows
+Paso 2: Presiona luego presiona el boton "Variables de entorno"
+Paso 3: Presionas en el boton "Nuevo" y agregas los siguiente
+Nombre: ANDROID_HOME
+Ruta: C:\Usuarios\TU_USUARIO\AppData\Local\Android\Sdk
+
+recomendaciones:
+
+ES7+ React/Redux/React-Native snippets (extension que autocompleta codigo y genera bloques de pre-build)
+npx expo install expo-linear-gradient (complemento necesario)
+
+npm install axios
+npx expo install @gorhom/bottom-sheet react-native-reanimated react-native-gesture-handler ()
