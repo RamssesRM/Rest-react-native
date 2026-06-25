@@ -70,7 +70,7 @@ export default function Index() {
         />
         <Animated.Text entering={FadeInDown.delay(200)} style={styles.tagline}>
           {" "}
-          Bienvenido a Helus Resto-Bar{" "}
+          Bienvenidos a Helus Restobar {" "}
         </Animated.Text>
 
         {/* botones de logeo */}
@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 50,
     lineHeight: 30,
-    color: "#ffff",
+    color: "#e4ba30",
   },
   buttonContainer: {
     gap: 12,
@@ -194,9 +194,11 @@ const styles = StyleSheet.create({
   },
 
   sheetBackground: {
-    backgroundColor: "#f0f0f0", // Fondo oscuro que tenías en el modal
+    backgroundColor: "#382f2f", // <-- Cambiado de '#f0f0f0' a negro premium mate
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
+    borderWidth: 1,
+    borderColor: "#262626"
   },
   sheetContent: {
     flex: 1,
