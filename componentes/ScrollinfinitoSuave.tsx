@@ -1,5 +1,11 @@
 import { useEffect } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import {
+  Image,
+  ImageSourcePropType,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import Animated, {
   scrollTo,
   useAnimatedReaction,
@@ -7,27 +13,34 @@ import Animated, {
   useSharedValue,
 } from "react-native-reanimated";
 
-const iconDataSets = {
+interface IconItem {
+  color: string;
+  isImage?: boolean;
+  image?: ImageSourcePropType;
+  emoji?: string;
+}
+
+const iconDataSets: Record<"set1" | "set2" | "set3", IconItem[]> = {
   set1: [
-    { emoji: "🍕", color: "#FFE5CC" },
-    { emoji: "🍔", color: "#F4D03F" },
-    { emoji: "🍟", color: "#F8D7DA" },
-    { emoji: "🌮", color: "#D5EDDA" },
-    { emoji: "🍗", color: "#FADBD8" },
+    { image: require("../assets/images/190.png"), isImage: true, color: "#transparent" },
+    { image: require("../assets/images/189.png"), isImage: true, color: "#transparent" },
+    { image: require("../assets/images/188.png"), isImage: true, color: "#transparent" },
+    { image: require("../assets/images/187.png"), isImage: true, color: "#transparent" },
+    { image: require("../assets/images/186.png"), isImage: true, color: "#transparent" },
   ],
   set2: [
-    { emoji: "🎮", color: "#D1ECF1" },
-    { emoji: "🎧", color: "#E2E3E5" },
-    { emoji: "☕", color: "#F4D03F" },
-    { emoji: "🍿", color: "#FFE5CC" },
-    { emoji: "🥤", color: "#F8D7DA" },
+    { image: require("../assets/images/181.png"), isImage: true, color: "#transparent" },
+    { image: require("../assets/images/182.png"), isImage: true, color: "#transparent" },
+    { image: require("../assets/images/183.png"), isImage: true, color: "#transparent" },
+    { image: require("../assets/images/184.png"), isImage: true, color: "#transparent" },
+    { image: require("../assets/images/185.png"), isImage: true, color: "#transparent" },
   ],
   set3: [
-    { emoji: "🍰", color: "#FADBD8" },
-    { emoji: "🍦", color: "#D1ECF1" },
-    { emoji: "🍪", color: "#FFE5CC" },
-    { emoji: "🎲", color: "#D5EDDA" },
-    { emoji: "🕹️", color: "#E2E3E5" },
+    { image: require("../assets/images/176.png"), isImage: true, color: "#transparent" },
+    { image: require("../assets/images/177.png"), isImage: true, color: "#transparent" },
+    { image: require("../assets/images/178.png"), isImage: true, color: "#transparent" },
+    { image: require("../assets/images/179.png"), isImage: true, color: "#transparent" },
+    { image: require("../assets/images/180.png"), isImage: true, color: "#transparent" },
   ],
 };
 
@@ -70,13 +83,14 @@ const ScrollInfinitoSuave = ({
   useAnimatedReaction(
     () => scrollY.value,
     (y) => {
-      if (scrollDirection === 'down') {
+      if (scrollDirection === "down") {
         if (y >= totalContentHeight) {
           scrollY.value = 0;
           scrollTo(scrollRef, 0, 0, false);
         } else {
           scrollTo(scrollRef, 0, y, false);
-      }} else {
+        }
+      } else {
         if (y <= 0) {
           scrollY.value = totalContentHeight;
           scrollTo(scrollRef, 0, totalContentHeight, false);
@@ -84,8 +98,8 @@ const ScrollInfinitoSuave = ({
           scrollTo(scrollRef, 0, y, false);
         }
       }
-    }
-  )
+    },
+  );
 
   return (
     <Animated.ScrollView
@@ -99,7 +113,16 @@ const ScrollInfinitoSuave = ({
           key={idx}
           style={[styles.iconContainer, { backgroundColor: item.color }]}
         >
-          <Text style={{ fontSize: 40 }}>{item.emoji}</Text>
+          {/* 2. Condicional inteligente: si tiene la propiedad 'isImage', renderiza la imagen. Si no, renderiza el emoji */}
+          {item.isImage ? (
+            <Image
+              source={item.image}
+              style={styles.imageStyle}
+              resizeMode="cover"
+            />
+          ) : (
+            <Text style={{ fontSize: 40 }}>{item.emoji}</Text>
+          )}
         </View>
       ))}
     </Animated.ScrollView>
@@ -122,5 +145,10 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
     boxShadow: "0 -2px 10px rgba(0, 0, 0, 0.1)",
   },
+  imageStyle: {
+  width: '100%',          // Ocupa todo el ancho del contenedor (160)
+  height: '100%',         // Ocupa todo el alto del contenedor (ITEM_HEIGHT)
+  borderRadius: 20,       // El mismo borde del contenedor para que encaje perfecto
+},
 });
 export default ScrollInfinitoSuave;
