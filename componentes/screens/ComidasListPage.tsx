@@ -29,7 +29,7 @@ const styles = StyleSheet.create({
     },
     pageTitle:{
         fontFamily: Fonts.brandBlack,
-        fontSize: 30,
+        fontSize: 25,
         marginBottom: 16,
         paddingHorizontal: 16
     },
