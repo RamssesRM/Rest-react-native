@@ -1,10 +1,10 @@
-import { Text, View } from 'react-native';
-const Comandas = () => {
-  return (
-    <View>
-      <Text>Comandas</Text>
-    </View>
-  )
-}
+// import { Text, View } from 'react-native';
+// const Comandas = () => {
+//   return (
+//     <View>
+//       <Text>Comandas</Text>
+//     </View>
+//   )
+// }
 
-export default Comandas;
+export { default } from '@/src/db/MenuScreen';
