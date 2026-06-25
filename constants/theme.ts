@@ -1,6 +1,6 @@
 // temas de las constantes de la aplicacion
 export const Colors = {
-  background: "#fff",
+  background: "#ffffff",
   text: "#FFE81F",
   primary: "#01BEE5",
   secondary: "#0094DD",

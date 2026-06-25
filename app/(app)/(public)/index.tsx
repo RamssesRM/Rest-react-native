@@ -36,8 +36,8 @@ export default function Index() {
   const { setIsGuest, setUser } = useUserStore();
   const continueAsGuest = () => {
     setIsGuest(true);
-    setUser(null)
-    router.replace('/descubrir')
+    setUser(null);
+    router.replace("/descubrir");
   };
   return (
     <View style={styles.container}>
@@ -52,7 +52,7 @@ export default function Index() {
           <ScrollInfinitoSuave scrollDirection="down" iconSet="set3" />
         </View>
         <LinearGradient
-          colors={["transparent", "#fff"]}
+          colors={["transparent", "#382f2f"]}
           style={{
             position: "absolute",
             height: 200,
@@ -65,7 +65,7 @@ export default function Index() {
 
       <View style={styles.contentContainer}>
         <Image
-          source={require("@/assets/images/LOGO332.png")}
+          source={require("../../../assets/images/Helus_restaurant4.png")}
           style={styles.brandLogo}
         />
         <Animated.Text entering={FadeInDown.delay(200)} style={styles.tagline}>
@@ -111,7 +111,7 @@ export default function Index() {
         snapPoints={snapPoints}
         enablePanDownToClose={true}
         backgroundStyle={styles.sheetBackground}
-        handleIndicatorStyle={{ backgroundColor: "#fff" }}
+        handleIndicatorStyle={{ backgroundColor: "#D4AF37" }}
       >
         <BottomSheetView style={styles.sheetContent}>
           <Text style={styles.sheetTitle}>
@@ -120,7 +120,7 @@ export default function Index() {
 
           <GoogleAutenBoton />
           <FacebookAutenBoton />
-          
+
           <TouchableOpacity
             style={styles.guestButton}
             onPress={continueAsGuest}
@@ -136,6 +136,7 @@ export default function Index() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#382f2f",
   },
   contentContainer: {
     flex: 1,
@@ -156,6 +157,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 50,
     lineHeight: 30,
+    color: "#ffff",
   },
   buttonContainer: {
     gap: 12,
@@ -205,7 +207,7 @@ const styles = StyleSheet.create({
   },
 
   sheetTitle: {
-    color: "#1c1c1e",
+    color: "#ffffff",
     fontSize: 20,
     fontWeight: "bold",
     marginBottom: 40,
