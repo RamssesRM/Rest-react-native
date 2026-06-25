@@ -1,6 +1,6 @@
-import { useEffect } from "react";
+import { Image } from 'expo-image';
+import { useEffect, useState } from "react";
 import {
-  Image,
   ImageSourcePropType,
   StyleSheet,
   Text,
@@ -22,25 +22,25 @@ interface IconItem {
 
 const iconDataSets: Record<"set1" | "set2" | "set3", IconItem[]> = {
   set1: [
-    { image: require("../assets/images/190.png"), isImage: true, color: "#transparent" },
-    { image: require("../assets/images/189.png"), isImage: true, color: "#transparent" },
-    { image: require("../assets/images/188.png"), isImage: true, color: "#transparent" },
-    { image: require("../assets/images/187.png"), isImage: true, color: "#transparent" },
-    { image: require("../assets/images/186.png"), isImage: true, color: "#transparent" },
+    { image: require("../assets/images/imageWebp/190.webp"), isImage: true, color: "#transparent" },
+    { image: require("../assets/images/imageWebp/189.webp"), isImage: true, color: "#transparent" },
+    { image: require("../assets/images/imageWebp/188.webp"), isImage: true, color: "#transparent" },
+    { image: require("../assets/images/imageWebp/187.webp"), isImage: true, color: "#transparent" },
+    { image: require("../assets/images/imageWebp/186.webp"), isImage: true, color: "#transparent" },
   ],
   set2: [
-    { image: require("../assets/images/181.png"), isImage: true, color: "#transparent" },
-    { image: require("../assets/images/182.png"), isImage: true, color: "#transparent" },
-    { image: require("../assets/images/183.png"), isImage: true, color: "#transparent" },
-    { image: require("../assets/images/184.png"), isImage: true, color: "#transparent" },
-    { image: require("../assets/images/185.png"), isImage: true, color: "#transparent" },
+    { image: require("../assets/images/imageWebp/181.webp"), isImage: true, color: "#transparent" },
+    { image: require("../assets/images/imageWebp/182.webp"), isImage: true, color: "#transparent" },
+    { image: require("../assets/images/imageWebp/183.webp"), isImage: true, color: "#transparent" },
+    { image: require("../assets/images/imageWebp/184.webp"), isImage: true, color: "#transparent" },
+    { image: require("../assets/images/imageWebp/185.webp"), isImage: true, color: "#transparent" },
   ],
   set3: [
-    { image: require("../assets/images/176.png"), isImage: true, color: "#transparent" },
-    { image: require("../assets/images/177.png"), isImage: true, color: "#transparent" },
-    { image: require("../assets/images/178.png"), isImage: true, color: "#transparent" },
-    { image: require("../assets/images/179.png"), isImage: true, color: "#transparent" },
-    { image: require("../assets/images/180.png"), isImage: true, color: "#transparent" },
+    { image: require("../assets/images/imageWebp/176.webp"), isImage: true, color: "#transparent" },
+    { image: require("../assets/images/imageWebp/177.webp"), isImage: true, color: "#transparent" },
+    { image: require("../assets/images/imageWebp/178.webp"), isImage: true, color: "#transparent" },
+    { image: require("../assets/images/imageWebp/179.webp"), isImage: true, color: "#transparent" },
+    { image: require("../assets/images/imageWebp/180.webp"), isImage: true, color: "#transparent" },
   ],
 };
 
@@ -100,7 +100,7 @@ const ScrollInfinitoSuave = ({
       }
     },
   );
-
+  const [loaded, setLoaded] = useState(false)
   return (
     <Animated.ScrollView
       contentContainerStyle={styles.container}
@@ -115,10 +115,13 @@ const ScrollInfinitoSuave = ({
         >
           {/* 2. Condicional inteligente: si tiene la propiedad 'isImage', renderiza la imagen. Si no, renderiza el emoji */}
           {item.isImage ? (
+            
             <Image
               source={item.image}
               style={styles.imageStyle}
-              resizeMode="cover"
+              contentFit='cover'
+              placeholder={null}
+              transition={200}
             />
           ) : (
             <Text style={{ fontSize: 40 }}>{item.emoji}</Text>
