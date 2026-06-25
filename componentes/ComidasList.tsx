@@ -4,7 +4,7 @@ import React from 'react';
 import { ActivityIndicator, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 const ComidasList = () => {
-  const { data:restaurants ,  isLoading, error } = useRestaurants();
+  const { data:restaurants , isLoading, error } = useRestaurants();
 
   if (isLoading){
     return(
