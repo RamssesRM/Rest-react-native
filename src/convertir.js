@@ -2,7 +2,7 @@ const sharp = require('sharp');
 const path = require('path');
 const fs = require('fs');
 
-const CARPETA = './assets/images/imageWebp';
+const CARPETA = './assets/images';
 
 async function convertir(nombreImagen) {
   const rutaPNG = path.join(CARPETA, nombreImagen);
@@ -12,7 +12,7 @@ async function convertir(nombreImagen) {
     return;
   }
 
-  const nombreWebP = nombreImagen.replace('.png', '.webp');
+  const nombreWebP = nombreImagen.replace('.jpg', '.webp');
   const rutaWebP = path.join(CARPETA, nombreWebP);
 
   try {
@@ -27,7 +27,9 @@ async function convertir(nombreImagen) {
 }
 
 // ========== USO ==========
-convertir('ejemplo.png');
+for(var i=0; i<=7;i++){
+  convertir(`${i}.jpg`);
+}
 // convertir('despues.png');
 // convertir('otra.png');
 
