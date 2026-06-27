@@ -61,7 +61,7 @@ export const getLocalProductos = async () => {
         const productos = await db.getAllAsync(`
             SELECT p.id, p.nombre, p.descripcion, p.precio, p.imagen, c.nombre as categoria_nombre
             FROM Productos p
-            JOIN Categorias c ON p.categoria_id = c.id
+            LEFT JOIN Categorias c ON p.categoria_id = c.id
         `);
         console.log(`📦 ${productos.length} productos cargados desde SQLite`);
         return productos;
