@@ -17,33 +17,58 @@ const MenuScreen = () => {
                 setDebugMsg('✅ Base de datos abierta');
 
                 // 2. Intentar conectar a Django
+                // 2. Intentar conectar a Django
                 try {
                     setDebugMsg('Conectando a Django...');
-                    const response = await fetch('http://10.0.2.2:8000/api/productos/');
-                    
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+                    // --- PASO A: Traer las Categorías primero ---
+                    const resCategorias = await fetch('http://10.0.2.2:8000/api/categorias/', {
+                        signal: controller.signal
+                    });
+                    // console.log(resCategorias)
+                    if (resCategorias.ok) {
+                        const cats = await resCategorias.json();
+                        if (cats.length > 0) {
+                            await saveCategorias(cats); // Ahora sí, con sus nombres reales
+                        }
+                    }
+                    // console.log(saveCategorias)
+                    clearTimeout(timeoutId); // Limpiamos el tiempo
+
+                    // --- PASO B: Traer los Productos ---
+                    setDebugMsg('Descargando productos...');
+                    const controller2 = new AbortController();
+                    const timeoutId2 = setTimeout(() => controller2.abort(), 10000);
+
+                    const response = await fetch('http://10.0.2.2:8000/api/productos/', {
+                        signal: controller2.signal
+                    });
+                    // console.log(response)
+                    clearTimeout(timeoutId2);
+
                     if (response.ok) {
                         const data = await response.json();
-                        setDebugMsg('Datos recibidos, guardando...');
+                        const productosToSave = data || [];
                         
-                        // Guardar categorías si existen
-                        if (data.categorias && data.categorias.length > 0) {
-                            await saveCategorias(data.categorias);
-                        }
-                        
-                        // Guardar productos
-                        const productosToSave = data.productos || data || [];
                         if (productosToSave.length > 0) {
                             await saveProductos(productosToSave);
                         }
                         
                         setDebugMsg('✅ Datos sincronizados desde Django');
                     } else {
-                        console.warn('El servidor respondió con error:', response.status);
-                        setDebugMsg(`⚠️ Servidor respondió: ${response.status}`);
+                        setDebugMsg(`⚠️ Error al traer productos: ${response.status}`);
                     }
+
                 } catch (fetchError) {
-                    console.log('No hay conexión con Django:', fetchError.message);
-                    setDebugMsg('📡 Modo offline - usando datos locales');
+                    if (fetchError.name === 'AbortError') {
+                        console.log('⏱️ Servidor tardó demasiado');
+                        setDebugMsg('📡 Servidor lento/offline - usando datos locales');
+                    } else {
+                        console.log('No hay conexión con Django:', fetchError.message);
+                        setDebugMsg('📡 Modo offline - usando datos locales');
+                    }
                 }
 
                 // 3. Leer de SQLite
@@ -51,7 +76,6 @@ const MenuScreen = () => {
                 const localData = await getLocalProductos();
                 setProductos(localData);
                 setDebugMsg(`✅ ${localData.length} productos cargados`);
-
             } catch (error) {
                 console.error('❌ Error general:', error);
                 setDebugMsg(`❌ Error: ${error.message}`);
