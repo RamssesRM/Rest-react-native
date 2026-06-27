@@ -76,7 +76,6 @@ const MenuScreen = () => {
                 const localData = await getLocalProductos();
                 setProductos(localData);
                 setDebugMsg(`✅ ${localData.length} productos cargados`);
-
             } catch (error) {
                 console.error('❌ Error general:', error);
                 setDebugMsg(`❌ Error: ${error.message}`);
