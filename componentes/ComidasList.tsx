@@ -1,5 +1,6 @@
 import { Colors } from "@/constants/theme";
 import { useRestaurants } from "@/hooks/useRestaurants";
+import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import {
   ActivityIndicator,
@@ -30,9 +31,17 @@ const ComidasList = () => {
             <Image source={item.image!} style={styles.image} />
             <View style={styles.info}>
           <Text style={styles.name}>{item.name}</Text>
-          <Text style={styles.descripcion} numberOfLines={2}>
-            {item.descripcion}
+          <Text style={styles.description} numberOfLines={2}>
+            {item.description}
           </Text>
+            </View>
+            <View style={styles.metadata}>
+              <Ionicons name="bicycle-outline" size={16} color={'#666'} />
+              <Text style={styles.metadataText}>€{item.deliveryFee.toFixed(2)}</Text>
+              <Text style={styles.dot}>•</Text>
+              <Text style={styles.metadataText}>€€€€</Text>
+              <Text style={styles.dot}>•</Text>
+              <Ionicons name="happy-outline" size={16} color={'#666'} />
             </View>
           </TouchableOpacity>
           {/* </Link> */}
@@ -63,7 +72,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     marginBottom: 4,
   },
-  descripcion:{
+  description:{
     fontSize: 14,
     color: '#666',
   },
@@ -76,6 +85,22 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 180,
   },
+  metadata: {
+    borderTopColor: Colors.light,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    padding: 10,
+  },
+  metadataText: {
+    fontSize: 13,
+    color: '#666'
+  },
+  dot: {
+    color: '#666',
+    fontSize: 13
+  }
 });
 
 export default ComidasList;
