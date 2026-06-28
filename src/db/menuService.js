@@ -1,19 +1,19 @@
 import { getDB } from "./database";
 
 export const saveCategorias = async (categorias) => {
-    // ✅ CORREGIDO: Agregué los paréntesis ()
     const db = getDB();
     if (!db) throw new Error('DB no inicializada');
 
     try {
+        // ✅ CAMBIO 1: Usamos OR IGNORE para no borrar categorías que ya existen
         const statement = await db.prepareAsync(
-            `INSERT OR REPLACE INTO Categorias (id, nombre) VALUES (?, ?)`
+            `INSERT OR IGNORE INTO categorias (id, nombre, estatus) VALUES (?, ?, ?)`
         );
         try {
             for (const cat of categorias) {
-                await statement.executeAsync([cat.id, cat.nombre]);
+                await statement.executeAsync([cat.id, cat.nombre, cat.estatus ? 1 : 0]);
             }
-            console.log(`✅ ${categorias.length} categorías guardadas`);
+            console.log(`✅ ${categorias.length} categorías guardadas/ignoradas`);
         } finally {
             await statement.finalizeAsync();
         }
@@ -28,8 +28,9 @@ export const saveProductos = async (productos) => {
     if (!db) throw new Error('DB no inicializada');
 
     try {
+        // ✅ CAMBIO 2: Tabla en minúscula y OR IGNORE (más seguro)
         const statement = await db.prepareAsync(
-            `INSERT OR REPLACE INTO Productos (id, nombre, descripcion, precio, categoria_id, imagen) VALUES (?, ?, ?, ?, ?, ?);`
+            `INSERT OR REPLACE INTO productos (id, nombre, descripcion, precio, estatus, categoria_id, imagen) VALUES (?, ?, ?, ?, ?, ?, ?);`
         );
         try {
             for (const prod of productos) {
@@ -38,7 +39,8 @@ export const saveProductos = async (productos) => {
                     prod.nombre,
                     prod.descripcion,
                     parseFloat(prod.precio),
-                    prod.categoria_fk, // Asegúrate que coincida con tu API
+                    prod.estatus ? 1 : 0,
+                    prod.categoria_fk, 
                     prod.imagen
                 ]);
             }
@@ -47,7 +49,6 @@ export const saveProductos = async (productos) => {
             await statement.finalizeAsync();
         }
     } catch (error) {
-        // ✅ CORREGIDO: Ahora 'error' sí existe en este catch
         console.error('❌ Error guardando productos:', error);
         throw error;
     }
@@ -75,9 +76,16 @@ export const getLocalProductos = async () => {
 
     try {
         const productos = await db.getAllAsync(`
-            SELECT p.id, p.nombre, p.descripcion, p.precio, p.imagen, c.nombre as categoria_nombre
-            FROM Productos p
-            LEFT JOIN Categorias c ON p.categoria_id = c.id
+            SELECT 
+                p.id, 
+                p.nombre, 
+                p.descripcion, 
+                p.precio, 
+                p.imagen, 
+                c.nombre as categoria_nombre, 
+                p.estatus  -- ✅ CAMBIO 3: ESPECIFICAR 'p.estatus' PARA EVITAR EL ERROR AMBIGUO
+            FROM productos p  -- ✅ Tabla en minúscula
+            LEFT JOIN categorias c ON p.categoria_id = c.id -- ✅ Tabla en minúscula
         `);
         console.log(`📦 ${productos.length} productos cargados desde SQLite`);
         return productos;
