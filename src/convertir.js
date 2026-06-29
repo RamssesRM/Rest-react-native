@@ -12,7 +12,7 @@ async function convertir(nombreImagen) {
     return;
   }
 
-  const nombreWebP = nombreImagen.replace('.jpg', '.webp');
+  const nombreWebP = nombreImagen.replace('.png', '.webp');
   const rutaWebP = path.join(CARPETA, nombreWebP);
 
   try {
@@ -27,8 +27,8 @@ async function convertir(nombreImagen) {
 }
 
 // ========== USO ==========
-for(var i=0; i<=7;i++){
-  convertir(`${i}.jpg`);
+for(var i=9; i<15;i++){
+  convertir(`${i}.png`);
 }
 // convertir('despues.png');
 // convertir('otra.png');
