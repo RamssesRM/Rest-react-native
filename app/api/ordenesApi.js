@@ -1,13 +1,10 @@
-import { BASE_URL } from "./apiConfig";
-import * as SecureStore from 'expo-secure-store';
+import { BASE_URL, getHeaders } from "./apiConfig";
 
 // Esta funcion trae todas las categorias de django
 export const tomarOrdenes = async () => {
     try{
-        const headers = await getAuthHeaders();
-        const response = await fetch(`${BASE_URL}/ordenes/`, { headers });
+        const response = await fetch(`${BASE_URL}/ordenes/`);
         if (!response.ok) throw new Error('Error al traer las ordenes 6');
-        return await response.json();
     }catch (error){
         console.log('Error al traer todas las ordenes 8', error);
         throw error;
@@ -17,10 +14,8 @@ export const tomarOrdenes = async () => {
 // Esta funcion trae la categoria cuando se inserte un id, se utiliza más que todo cuando se vaya a editar para llenar los campos que se van a modificar y hacerla más dinámica
 export const tomarOrdenConId = async (id) => {
     try{
-        const headers = await getAuthHeaders();
-        const response = await fetch(`${BASE_URL}/ordenes/${id}/`, { headers });
+        const response = await fetch(`${BASE_URL}/ordenes/${id}/`);
         if (!response.ok) throw new Error('Error al traer la orden 18');
-        return await response.json();
     }catch (error){
         console.log('Error al traer la orden 20', error);
         throw error;
@@ -29,10 +24,8 @@ export const tomarOrdenConId = async (id) => {
 
 export const tomarOrdenConMesero = async (mesero_id) => {
     try{
-        const headers = await getAuthHeaders();
-        const response = await fetch(`${BASE_URL}/ordenes/?mesero_id=${mesero_id}`, { headers });
-        if (!response.ok) throw new Error ('Error trayendo la orden del mesero');
-        return await response.json();
+        const response = fetch(`${BASE_URL}/ordenes/?mesero_id=${mesero_id}`)
+        if (!response.ok) throw new Error ('Error trayendo la ')
     }catch (error){
         console.log('Error al tomar la orden con el usuario que lo agregó', error)
         throw error
@@ -41,10 +34,8 @@ export const tomarOrdenConMesero = async (mesero_id) => {
 
 export const tomarOrdenConCliente = async (cliente_id) => {
     try{
-        const headers = await getAuthHeaders();
-        const response = await fetch(`${BASE_URL}/ordenes/?cliente_id=${cliente_id}`, { headers });
-        if (!response.ok) throw new Error ('Error trayendo la orden del cliente');
-        return await response.json();
+        const response = fetch(`${BASE_URL}/ordenes/?cliente_id=${cliente_id}`)
+        if (!response.ok) throw new Error ('Error trayendo la ')
     }catch (error){
         console.log('Error al tomar la orden con el usuario que lo agregó', error)
         throw error
@@ -53,10 +44,8 @@ export const tomarOrdenConCliente = async (cliente_id) => {
 
 export const tomarOrdenConMesa = async (mesa_id) => {
     try{
-        const headers = await getAuthHeaders();
-        const response = await fetch(`${BASE_URL}/ordenes/?mesa_fk_id=${mesa_id}`, { headers });
-        if (!response.ok) throw new Error ('Error trayendo la orden de la mesa');
-        return await response.json();
+        const response = fetch(`${BASE_URL}/ordenes/?mesa_fk_id=${mesa_id}`)
+        if (!response.ok) throw new Error ('Error trayendo la ')
     }catch (error){
         console.log('Error al tomar la orden con el usuario que lo agregó', error)
         throw error
@@ -66,10 +55,9 @@ export const tomarOrdenConMesa = async (mesa_id) => {
 // Esto guarda la categoria al momento de pasarle un objeto que el django acepte, si no lo acepta o no cumple con los modelos y los serializadores de django no va a guardar la informacion
 export const crearOrden = async (Data) => {
     try{
-        const headers = await getAuthHeaders();
         const response = await fetch(`${BASE_URL}/ordenes/`, {
             method: 'POST',
-            headers,
+            headers: getHeaders(),
             body: JSON.stringify(Data),
         });
         if (!response.ok) throw new Error('Error al guardar la orden 32')
@@ -82,14 +70,13 @@ export const crearOrden = async (Data) => {
 
 export const actualizarOrden = async (id, Data) => {
     try{
-        const headers = await getAuthHeaders();
         const response = await fetch(`${BASE_URL}/ordenes/${id}/`, {
             method : 'PUT',
-            headers,
+            headers: getHeaders,
             body:JSON.stringify(Data),
         })
         if (!response.ok) throw new Error('Error actualizando la orden 48')
-        return await response.json()
+        return await response.json
     }catch (error){
         console.log('Error al momento de actualizar la orden 50', error);
         throw error
@@ -98,10 +85,9 @@ export const actualizarOrden = async (id, Data) => {
 
 export const patchOrden = async (id, dataParcial) => {
     try {
-        const headers = await getAuthHeaders();
         const response = await fetch(`${BASE_URL}/ordenes/${id}/`, {
             method: 'PATCH',
-            headers,
+            headers: getHeaders(),
             body: JSON.stringify(dataParcial),
         });
         if (!response.ok) throw new Error('Error al modificar la orden');
@@ -114,10 +100,9 @@ export const patchOrden = async (id, dataParcial) => {
 
 export const eliminarOrden = async (id) => {
     try{
-        const headers = await getAuthHeaders();
-        const response = await fetch(`${BASE_URL}/ordenes/${id}/`,{
+        const response = fetch(`${BASE_URL}/ordenes/${id}`,{
             method: 'DELETE',
-            headers,
+            headers:getHeaders(),
         })
         if (!response.ok) throw new Error('Error al eliminar fisicamente la orden')
         return true
@@ -126,142 +111,3 @@ export const eliminarOrden = async (id) => {
         throw error
     }
 }
-
-// --- AUTH HEADERS ---
-const getAuthHeaders = async () => {
-    const token = await SecureStore.getItemAsync('jwt_access');
-    return {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-    };
-};
-
-// --- CLIENTE ---
-export const getMisOrdenes = async () => {
-    const headers = await getAuthHeaders();
-    // Limpio, sin enviarle datos falsos por la URL
-    const response = await fetch(`${BASE_URL}/ordenes/`, { headers }); 
-    
-    if (!response.ok) throw new Error('Error al traer mis órdenes');
-    return response.json();
-};
-
-// --- MESERO ---
-export const getOrdenesActivas = async () => {
-    const headers = await getAuthHeaders();
-    // Traer todas y el frontend filtra las que no sean 'pagado' o 'eliminado', o modifica tu viewset en django
-    const response = await fetch(`${BASE_URL}/ordenes/`, { headers });
-    if (!response.ok) throw new Error('Error al traer órdenes activas');
-    return response.json();
-};
-
-// --- CAJERO (cocinando + finalizado) ---
-export const getOrdenesCajero = async () => {
-    const headers = await getAuthHeaders();
-    const [resCocinando, resFinalizado] = await Promise.all([
-        fetch(`${BASE_URL}/ordenes/?estatus=cocinando`, { headers }),
-        fetch(`${BASE_URL}/ordenes/?estatus=finalizado`, { headers }),
-    ]);
-    if (!resCocinando.ok || !resFinalizado.ok) throw new Error('Error al traer órdenes para cajero');
-    const cocinando = await resCocinando.json();
-    const finalizado = await resFinalizado.json();
-    return [...cocinando, ...finalizado];
-};
-
-// --- ADMIN ---
-export const getTodasLasOrdenes = async (filtro = '', busqueda = '') => {
-    const headers = await getAuthHeaders();
-    let url = `${BASE_URL}/ordenes/?`;
-    if (filtro) url += `estatus=${filtro}&`;
-    if (busqueda) url += `search=${busqueda}`; // Requiere configurar esto en tu ViewSet de Django
-    const response = await fetch(url, { headers });
-    if (!response.ok) throw new Error('Error al traer todas las órdenes');
-    return response.json();
-};
-
-// --- ACCIONES (Para todos los roles) ---
-export const cambiarEstadoOrden = async (ordenId, nuevoEstado, datosExtra = {}) => {
-    const headers = await getAuthHeaders();
-    const response = await fetch(`${BASE_URL}/ordenes/${ordenId}/`, {
-        method: 'PATCH',
-        headers,
-        body: JSON.stringify({ estatus: nuevoEstado, ...datosExtra }),
-    });
-    if (!response.ok) throw new Error('Error al actualizar el estado');
-    return response.json();
-};
-
-// --- PAGO (Cajero) ---
-export const registrarPago = async (ordenId, { metodo_pago, referencia_pago, comprobante }) => {
-    const token = await SecureStore.getItemAsync('jwt_access');
-    const formData = new FormData();
-    formData.append('metodo_pago', metodo_pago);
-    if (referencia_pago) formData.append('referencia_pago', referencia_pago);
-    if (comprobante) {
-        formData.append('comprobante_pago', {
-            uri: comprobante,
-            type: 'image/jpeg',
-            name: 'comprobante.jpg',
-        });
-    }
-
-    const response = await fetch(`${BASE_URL}/ordenes/${ordenId}/`, {
-        method: 'PATCH',
-        headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'multipart/form-data',
-        },
-        body: formData,
-    });
-    if (!response.ok) throw new Error('Error al registrar el pago');
-    return response.json();
-};
-
-export const eliminarOrdenCliente = async (ordenId) => {
-    const headers = await getAuthHeaders();
-    const response = await fetch(`${BASE_URL}/ordenes/${ordenId}/`, {
-        method: 'PATCH',
-        headers,
-        body: JSON.stringify({ estatus: 'eliminado' }) // Eliminación lógica
-    });
-    if (!response.ok) throw new Error('Error al eliminar la orden');
-};
-
-// --- MESAS ---
-export const getMesas = async () => {
-    const headers = await getAuthHeaders();
-    const response = await fetch(`${BASE_URL}/mesas/`, { headers });
-    if (!response.ok) throw new Error('Error al traer mesas');
-    return response.json();
-};
-
-// --- CATEGORÍAS ---
-export const getCategorias = async () => {
-    const headers = await getAuthHeaders();
-    const response = await fetch(`${BASE_URL}/categorias/`, { headers });
-    if (!response.ok) throw new Error('Error al traer categorías');
-    return response.json();
-};
-
-// --- PRODUCTOS ---
-export const getProductos = async () => {
-    const headers = await getAuthHeaders();
-    const response = await fetch(`${BASE_URL}/productos/`, { headers });
-    if (!response.ok) throw new Error('Error al traer productos');
-    return response.json();
-};
-
-// --- DETALLES ---
-export const crearDetalle = async (data) => {
-    const headers = await getAuthHeaders();
-    const response = await fetch(`${BASE_URL}/detalles/`, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify(data),
-    });
-    if (!response.ok) {
-        const error = await response.json();
-        throw new Error(JSON.stringify(error));
-    }
-    return response.json();
-};
