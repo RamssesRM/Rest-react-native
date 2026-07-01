@@ -19,12 +19,14 @@ export const openDatabase = async () => {
 const createTables = async (db) => {
     try {
         await db.execAsync(`
-            PRAGMA journal_mode = ON;
+            PRAGMA journal_mode = WAL;
+            PRAGMA foreign_keys = ON;
             
             CREATE TABLE IF NOT EXISTS categorias (
                 id TEXT PRIMARY KEY NOT NULL,
                 nombre TEXT NOT NULL,
-                estatus INTEGER DEFAULT 1
+                estatus INTEGER DEFAULT 1,
+                imagen TEXT
             );
 
             CREATE TABLE IF NOT EXISTS productos (

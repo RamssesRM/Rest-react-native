@@ -11,43 +11,35 @@ import React, { useEffect, useState } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { ThemeProvider } from "@/hooks/use-theme";
 
-
-
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 5 * 60 * 1000, // 5 minutos
       retry: 1, // Reintentar una vez en caso de error
-    }
-  }
+    },
+  },
 });
 
 export default function RootLayout() {
-  let [fontsLoaded] = useFonts({
+  const [fontsLoaded] = useFonts({
     Nunito_400Regular,
     Nunito_700Bold_Italic,
     Nunito_900Black,
   });
 
-  // ✅ 3. Creamos el estado para saber si la BD está lista
+  // Estado para saber si la base de datos está lista
   const [dbReady, setDbReady] = useState(false);
 
-  // ✅ 4. Abrimos la base de datos una sola vez al arrancar la app
+  // Inicializar SQLite al arrancar la app
   useEffect(() => {
-    const initDB = async () => {
-      try {
-        await openDatabase();
-        setDbReady(true);
-      } catch (error) {
-        console.error("Error al inicializar BD en _layout:", error);
-      }
-    };
-    initDB();
+    openDatabase()
+      .then(() => setDbReady(true))
+      .catch((error) => console.error("Error al inicializar BD en _layout:", error));
   }, []);
 
-  // ✅ 5. Esperamos tanto a las fuentes como a la Base de Datos
+  // Esperar a que carguen fuentes y base de datos local
   if (!fontsLoaded || !dbReady) {
-    return null; 
+    return null;
   }
 
   return (

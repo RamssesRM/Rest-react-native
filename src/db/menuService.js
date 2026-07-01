@@ -5,15 +5,18 @@ export const saveCategorias = async (categorias) => {
     if (!db) throw new Error('DB no inicializada');
 
     try {
-        // ✅ CAMBIO 1: Usamos OR IGNORE para no borrar categorías que ya existen
-        const statement = await db.prepareAsync(
-            `INSERT OR IGNORE INTO categorias (id, nombre, estatus) VALUES (?, ?, ?)`
-        );
+        const statement = await db.prepareAsync(`
+            INSERT INTO categorias (id, nombre, estatus, imagen) VALUES (?, ?, ?, ?)
+            ON CONFLICT(id) DO UPDATE SET 
+                nombre=excluded.nombre, 
+                estatus=excluded.estatus,
+                imagen=excluded.imagen
+        `);
         try {
             for (const cat of categorias) {
-                await statement.executeAsync([cat.id, cat.nombre, cat.estatus ? 1 : 0]);
+                await statement.executeAsync([cat.id, cat.nombre, cat.estatus ? 1 : 0, cat.imagen]);
             }
-            console.log(`✅ ${categorias.length} categorías guardadas/ignoradas`);
+            console.log(`✅ Categorías sincronizadas`);
         } finally {
             await statement.finalizeAsync();
         }
@@ -28,10 +31,17 @@ export const saveProductos = async (productos) => {
     if (!db) throw new Error('DB no inicializada');
 
     try {
-        // ✅ CAMBIO 2: Tabla en minúscula y OR IGNORE (más seguro)
-        const statement = await db.prepareAsync(
-            `INSERT OR REPLACE INTO productos (id, nombre, descripcion, precio, estatus, categoria_id, imagen) VALUES (?, ?, ?, ?, ?, ?, ?);`
-        );
+        const statement = await db.prepareAsync(`
+            INSERT INTO productos (id, nombre, descripcion, precio, estatus, categoria_id, imagen) 
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT(id) DO UPDATE SET 
+                nombre=excluded.nombre, 
+                descripcion=excluded.descripcion, 
+                precio=excluded.precio, 
+                estatus=excluded.estatus, 
+                categoria_id=excluded.categoria_id, 
+                imagen=excluded.imagen
+        `);
         try {
             for (const prod of productos) {
                 await statement.executeAsync([
@@ -44,7 +54,7 @@ export const saveProductos = async (productos) => {
                     prod.imagen
                 ]);
             }
-            console.log(`✅ ${productos.length} productos guardados`);
+            console.log(`✅ Productos sincronizados`);
         } finally {
             await statement.finalizeAsync();
         }
@@ -83,14 +93,33 @@ export const getLocalProductos = async () => {
                 p.precio, 
                 p.imagen, 
                 c.nombre as categoria_nombre, 
-                p.estatus  -- ✅ CAMBIO 3: ESPECIFICAR 'p.estatus' PARA EVITAR EL ERROR AMBIGUO
-            FROM productos p  -- ✅ Tabla en minúscula
-            LEFT JOIN categorias c ON p.categoria_id = c.id -- ✅ Tabla en minúscula
+                p.estatus
+            FROM productos p 
+            LEFT JOIN categorias c ON p.categoria_id = c.id
+            WHERE p.estatus = 1
         `);
         console.log(`📦 ${productos.length} productos cargados desde SQLite`);
         return productos;
     } catch (error) {
         console.error('❌ Error obteniendo productos locales:', error);
+        return [];
+    }
+};
+
+export const getLocalCategorias = async () => {
+    const db = getDB();
+    if (!db) throw new Error('DB no inicializada');
+
+    try {
+        const categorias = await db.getAllAsync(`
+            SELECT id, nombre, imagen 
+            FROM categorias 
+            WHERE estatus = 1
+        `);
+        console.log(`📦 ${categorias.length} categorías cargadas desde SQLite`);
+        return categorias;
+    } catch (error) {
+        console.error('❌ Error obteniendo categorías locales:', error);
         return [];
     }
 };
