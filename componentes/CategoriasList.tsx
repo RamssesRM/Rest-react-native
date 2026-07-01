@@ -1,6 +1,8 @@
 import { Colors } from "@/constants/theme";
-import { categories } from "@/data/categories";
+import { getLocalCategorias } from "@/src/db/menuService"; // ✅ Nuevo import
+import React, { useEffect, useState } from "react"; // ✅ Hooks añadidos
 import {
+  ActivityIndicator,
   FlatList,
   Image,
   StyleSheet,
@@ -9,23 +11,59 @@ import {
   View,
 } from "react-native";
 
+// ✅ Nuevo tipo TypeScript para que no te marque error rojo
+type CategoriaLocal = {
+  id: string;
+  nombre: string;
+  imagen: string | null;
+};
+
 export const CategoriasList = () => {
-  const renderCategory = ({ item }: { item: (typeof categories)[0] }) => (
+  const [categorias, setCategorias] = useState<CategoriaLocal[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // ✅ Cargamos desde SQLite
+  useEffect(() => {
+    const cargarCategorias = async () => {
+      try {
+        const data = await getLocalCategorias();
+        setCategorias(data);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    cargarCategorias();
+  }, []);
+
+  const renderCategory = ({ item }: { item: CategoriaLocal }) => (
     <TouchableOpacity style={styles.categoryCard}>
-      <View
-        style={[
-          styles.categoryImageContainer,
-          { backgroundColor: item.backgroundColor },
-        ]}
-      >
-        <Image source={item.image} style={styles.categoryImage} />
+      <View style={[styles.categoryImageContainer]}>
+        {/* ✅ Si hay imagen de la BD la pone, si no, muestra un gris */}
+        {item.imagen ? (
+          <Image source={{ uri: item.imagen }} style={styles.categoryImage} />
+        ) : (
+          <View style={[styles.categoryImage, styles.placeholderImage]} />
+        )}
       </View>
       <View style={styles.categoryInfo}>
-        <Text style={styles.categoryName}>{item.name}</Text>
-        <Text style={styles.categoryPlaces}>{item.placesCount} places</Text>
+        {/* ✅ Cambiado de item.name a item.nombre */}
+        <Text style={styles.categoryName}>{item.nombre}</Text>
+        {/* Cambié el "placesCount" por algo más útil para un restaurante */}
+        <Text style={styles.categoryPlaces}>Ver menú</Text>
       </View>
     </TouchableOpacity>
   );
+
+  // ✅ Loader mientras carga
+  if (isLoading) {
+    return (
+      <View style={styles.categoriesSection}>
+        <ActivityIndicator size="small" color={Colors.secondary} />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.categoriesSection}>
@@ -37,7 +75,7 @@ export const CategoriasList = () => {
       </View>
       <FlatList
         horizontal
-        data={categories}
+        data={categorias}
         renderItem={renderCategory}
         keyExtractor={(item) => item.id}
         showsHorizontalScrollIndicator={false}
@@ -84,16 +122,25 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     backgroundColor: "#fff",
     marginVertical: 8,
-    boxShadow: "0px 4px 2px -2px rgba(0, 0, 0, 0.2)",
-    elevation: 2,
+    // Sombra cross-platform mejorada
+    elevation: 3, 
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
   categoryImageContainer: {
     padding: 12,
+    // Quito el backgroundColor dinámico porque SQLite no lo tiene
+    backgroundColor: "#f9f9f9", 
   },
   categoryImage: {
     width: 106,
     height: 106,
     borderRadius: 8,
+  },
+  placeholderImage: {
+    backgroundColor: "#e0e0e0", // Color gris si no hay imagen
   },
   categoryInfo: {
     backgroundColor: "#fff",
