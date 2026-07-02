@@ -20,20 +20,24 @@ const createTables = async (db) => {
     try {
         await db.execAsync(`
             PRAGMA journal_mode = WAL;
+            PRAGMA foreign_keys = ON;
             
-            CREATE TABLE IF NOT EXISTS Categorias (
+            CREATE TABLE IF NOT EXISTS categorias (
                 id TEXT PRIMARY KEY NOT NULL,
-                nombre TEXT NOT NULL
+                nombre TEXT NOT NULL,
+                estatus INTEGER DEFAULT 1,
+                imagen TEXT
             );
 
-            CREATE TABLE IF NOT EXISTS Productos (
+            CREATE TABLE IF NOT EXISTS productos (
                 id TEXT PRIMARY KEY NOT NULL,
                 nombre TEXT NOT NULL,
                 descripcion TEXT,
                 precio REAL,
+                estatus INTEGER DEFAULT 1,
                 categoria_id TEXT NOT NULL,
                 imagen TEXT,
-                FOREIGN KEY (categoria_id) REFERENCES Categorias (id) ON DELETE CASCADE
+                FOREIGN KEY (categoria_id) REFERENCES categorias (id) ON DELETE CASCADE
             );
         `);
         console.log("✅ Tablas creadas con éxito");

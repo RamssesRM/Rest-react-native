@@ -6,8 +6,8 @@ import {
   ActivityIndicator,
   Image,
   StyleSheet,
-  TouchableOpacity,
   Text,
+  TouchableOpacity,
   View,
 } from "react-native";
 
@@ -30,18 +30,20 @@ const ComidasList = () => {
           <TouchableOpacity style={styles.card}>
             <Image source={item.image!} style={styles.image} />
             <View style={styles.info}>
-          <Text style={styles.name}>{item.name}</Text>
-          <Text style={styles.description} numberOfLines={2}>
-            {item.description}
-          </Text>
+              <Text style={styles.name}>{item.name}</Text>
+              <Text style={styles.description} numberOfLines={2}>
+                {item.description}
+              </Text>
             </View>
             <View style={styles.metadata}>
-              <Ionicons name="bicycle-outline" size={16} color={'#666'} />
-              <Text style={styles.metadataText}>€{item.deliveryFee.toFixed(2)}</Text>
+              <Ionicons name="bicycle-outline" size={16} color={"#666"} />
+              <Text style={styles.metadataText}>
+                €{item.deliveryFee.toFixed(2)}
+              </Text>
               <Text style={styles.dot}>•</Text>
               <Text style={styles.metadataText}>€€€€</Text>
               <Text style={styles.dot}>•</Text>
-              <Ionicons name="happy-outline" size={16} color={'#666'} />
+              <Ionicons name="happy-outline" size={16} color={"#666"} />
             </View>
           </TouchableOpacity>
           {/* </Link> */}
@@ -64,17 +66,17 @@ const styles = StyleSheet.create({
     boxShadow: "0px 4px 2px -2px rgba(0, 0, 0, 0.2)",
     //elevation: 2, // eso pone feo la app, pero hay que averiguar como adaptarlo a Android
   },
-  info:{
+  info: {
     padding: 12,
   },
-  name:{
+  name: {
     fontSize: 16,
     fontWeight: "600",
     marginBottom: 4,
   },
-  description:{
+  description: {
     fontSize: 14,
-    color: '#666',
+    color: "#666",
   },
   center: {
     flex: 1,
@@ -88,19 +90,19 @@ const styles = StyleSheet.create({
   metadata: {
     borderTopColor: Colors.light,
     borderTopWidth: StyleSheet.hairlineWidth,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 4,
     padding: 10,
   },
   metadataText: {
     fontSize: 13,
-    color: '#666'
+    color: "#666",
   },
   dot: {
-    color: '#666',
-    fontSize: 13
-  }
+    color: "#666",
+    fontSize: 13,
+  },
 });
 
 export default ComidasList;
