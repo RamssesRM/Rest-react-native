@@ -26,7 +26,6 @@ export default function HelusLogin() {
   const { setUser } = useUserStore();
 
   const handleLogin = async () => {
-    // Validación básica
     if (!email.trim() || !password.trim()) {
       Alert.alert("Error", "Ingresa correo y contraseña");
       return;
@@ -37,30 +36,19 @@ export default function HelusLogin() {
     try {
       const data = await loginUser(email, password);
 
-      // guardamos tokens
       await SecureStore.setItemAsync('jwt_access', data.access);
       await SecureStore.setItemAsync('jwt_refresh', data.refresh);
 
-      // hay que guardar el token de la sesion en zustand
       setUser({
         id: data.user.id,
         email: data.user.email,
         name: data.user.first_name,
         role: data.user.role
       });
-      // Alert.alert('¡Bienvenido!', `Hola ${data.user.first_name}`)
       router.replace('/descubrir')
 
-      // Simulación de login exitoso
-      // setTimeout(() => {
-      //   setIsLoading(false);
-      //   // Redirigir a la app principal
-      //   router.replace("/descubrir");
-      // }, 1500);
     } catch (error) {
       setIsLoading(false);
-      // console.error('Error detallado: ', error)
-      // Alert.alert("Error", "Credenciales incorrectas");
       Alert.alert("Error de inicio de sesión", (error as any).message || "Error desconocido");
     }
   };
@@ -75,7 +63,6 @@ export default function HelusLogin() {
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-          {/* Header con botón de regreso */}
           <View style={styles.header}>
             <TouchableOpacity
               onPress={() => router.back()}
@@ -85,7 +72,6 @@ export default function HelusLogin() {
             </TouchableOpacity>
           </View>
 
-          {/* Logo y título */}
           <View style={styles.titleContainer}>
             <View style={styles.logoContainer}>
               <Text style={styles.logoText}>HL</Text>
@@ -96,9 +82,7 @@ export default function HelusLogin() {
             </Text>
           </View>
 
-          {/* Formulario */}
           <View style={styles.formContainer}>
-            {/* Campo de email/usuario */}
             <View style={styles.inputContainer}>
               <Ionicons
                 name="person-outline"
@@ -117,7 +101,6 @@ export default function HelusLogin() {
               />
             </View>
 
-            {/* Campo de contraseña */}
             <View style={styles.inputContainer}>
               <Ionicons
                 name="lock-closed-outline"
@@ -145,14 +128,12 @@ export default function HelusLogin() {
               </TouchableOpacity>
             </View>
 
-            {/* ¿Olvidaste tu contraseña? */}
             <TouchableOpacity style={styles.forgotPasswordContainer}>
               <Text style={styles.forgotPasswordText}>
                 ¿Olvidaste tu contraseña?
               </Text>
             </TouchableOpacity>
 
-            {/* Botón de inicio de sesión */}
             <TouchableOpacity
               style={[
                 styles.loginButton,
@@ -168,14 +149,12 @@ export default function HelusLogin() {
               )}
             </TouchableOpacity>
 
-            {/* Separador */}
             <View style={styles.separatorContainer}>
               <View style={styles.separatorLine} />
               <Text style={styles.separatorText}>o</Text>
               <View style={styles.separatorLine} />
             </View>
 
-            {/* Botón de registro */}
             <TouchableOpacity
               style={styles.registerButton}
               onPress={() => router.push("./helus-registro")}
@@ -187,7 +166,6 @@ export default function HelusLogin() {
             </TouchableOpacity>
           </View>
 
-          {/* Espacio al final */}
           <View style={{ height: 40 }} />
         </ScrollView>
       </LinearGradient>

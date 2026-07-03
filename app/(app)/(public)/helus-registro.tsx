@@ -30,7 +30,6 @@ export default function HelusRegister() {
   const { setUser } = useUserStore();
 
   const handleRegister = async () => {
-    // Validaciones
     if (!name.trim()) {
       Alert.alert("Error", "Ingresa tu nombre completo");
       return;
@@ -76,15 +75,6 @@ export default function HelusRegister() {
       Alert.alert('¡Bienvenido!', `Hola ${data.user.first_name} te has registrado exitosamente`)
       router.replace('/descubrir')
 
-      // Simulación de registro exitoso
-      // setTimeout(() => {
-      //   setIsLoading(false);
-      //   Alert.alert(
-      //     "¡Éxito!",
-      //     "Cuenta creada correctamente. Ahora puedes iniciar sesión.",
-      //     [{ text: "OK", onPress: () => router.back() }],
-      //   );
-      // }, 1500);
     } catch (error) {
       Alert.alert("Error al registrarse", (error as any).message);
     }finally{
@@ -102,7 +92,6 @@ export default function HelusRegister() {
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-          {/* Header */}
           <View style={styles.header}>
             <TouchableOpacity
               onPress={() => router.back()}
@@ -112,7 +101,6 @@ export default function HelusRegister() {
             </TouchableOpacity>
           </View>
 
-          {/* Título */}
           <View style={styles.titleContainer}>
             <View style={styles.logoContainer}>
               <Ionicons name="person-add" size={32} color="#382f2f" />
@@ -121,7 +109,6 @@ export default function HelusRegister() {
             <Text style={styles.subtitle}>Regístrate como empleado Helus</Text>
           </View>
 
-          {/* Formulario */}
           <View style={styles.formContainer}>
             {/* Nombre del usuario */}
             <View style={styles.inputContainer}>
