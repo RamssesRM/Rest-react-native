@@ -25,10 +25,10 @@ const ComidasListPage = () => {
         scrollEventThrottle={16}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingTop: insets.top + HEADER_HEIGHT }}>
-        <Text style={styles.pageTitle}>Comidas</Text>
+        <Text style={styles.pageTitle}>Menus</Text>
         <CategoriasList />
 
-        <Text style={styles.allComidasTitle}>Todas las comidas</Text>
+        <Text style={styles.allComidasTitle}>Todos los menus</Text>
         <ComidasList />
       </Animated.ScrollView>
     </View>
