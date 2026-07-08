@@ -2,7 +2,7 @@ import { Colors } from "@/constants/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { Link } from "expo-router";
 import { StyleSheet, Text, TouchableOpacity, View, } from "react-native";
-import Animated, { SharedValue } from "react-native-reanimated";
+import Animated, { SharedValue, useAnimatedStyle, interpolate, Extrapolation } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface ComidasHeaderProps {
@@ -10,12 +10,53 @@ interface ComidasHeaderProps {
   scrollOffset: SharedValue<number>;
 }
 
+const SCOLL_THRESHOLD = 60;
+
 const ComidasHeader = ({ title, scrollOffset }: ComidasHeaderProps) => {
   const insets = useSafeAreaInsets();
+
+  const header1Style = useAnimatedStyle(() => {
+    const opacity = interpolate(
+      scrollOffset.value,
+      [0, SCOLL_THRESHOLD * 0.6],
+      [1, 0],
+      Extrapolation.CLAMP
+    );
+      const translateY = interpolate(
+      scrollOffset.value,
+      [0, SCOLL_THRESHOLD * 0.6],
+      [0, -10],
+      Extrapolation.CLAMP
+    );
+    return {
+      opacity,
+      transform: [{ translateY }],
+    };
+  });
+
+  const header2Style = useAnimatedStyle(() => {
+    const opacity = interpolate(
+      scrollOffset.value,
+      [0, SCOLL_THRESHOLD * 0.6],
+      [1, 0],
+      Extrapolation.CLAMP
+    );
+      const translateY = interpolate(
+      scrollOffset.value,
+      [0, SCOLL_THRESHOLD * 0.6],
+      [0, -10],
+      Extrapolation.CLAMP
+    );
+    return {
+      opacity,
+      transform: [{ translateY }],
+    };
+  });
+
   return (
     <Animated.View style={[styles.headerContainer, { paddingTop: insets.top }]}>
       {/* header 1*/}
-      <Animated.View style={[styles.header1]}>
+      <Animated.View style={[styles.header1, header1Style]}>
         <Link href={'/(app)/(auth)/(modal)/location'} asChild>
           <TouchableOpacity style={styles.locationButton}>
             <View style={styles.locationButtonIcon}>
@@ -27,30 +68,36 @@ const ComidasHeader = ({ title, scrollOffset }: ComidasHeaderProps) => {
         </Link>
 
         <View style={styles.rightIcons}>
+        <Link href={'/(app)/(auth)/(modal)/filter'} asChild>
           <TouchableOpacity style={styles.iconButton}>
             <Ionicons name='filter' size={20} />
           </TouchableOpacity>
+        </Link>  
         <TouchableOpacity style={styles.iconButton}>
           <Ionicons name='map-outline' size={20} />
         </TouchableOpacity>
       </View>
-      </Animated.View> 
+      </Animated.View>
 
       {/* Header 2 */}
-      {/* <Animated.View style={[styles.header2]}>
+       <Animated.View style={[styles.header2, header2Style]}>
         <View style={styles.centerContent}>
           <Text style={styles.titleSmall}>{title}</Text>
+          <Link href={'/(app)/(auth)/(modal)/location'} asChild>
           <TouchableOpacity style={styles.locationSmall}>
             <Text style={styles.locationSmallTextt}>Ubicación</Text>
             <Ionicons name="chevron-down" size={14} />
           </TouchableOpacity>
+          </Link>
         </View>
         <View style={styles.rightIcons}>
-          <TouchableOpacity style={styles.iconButton}>
-            <Ionicons name="filter" size={20} />
-          </TouchableOpacity>
+          <Link href={'/(app)/(auth)/(modal)/filter'} asChild>
+           <TouchableOpacity style={styles.iconButton}>
+             <Ionicons name="filter" size={20} />
+           </TouchableOpacity>
+          </Link>
         </View>
-      </Animated.View> */}
+      </Animated.View> 
     </Animated.View>
   );
 };
@@ -65,8 +112,7 @@ const styles = StyleSheet.create({
     zIndex: 100,
     boxShadow: "0px 2px 4px -2px rgba(0, 0, 0, 0.2)",
   },
-  header1: {
-    
+  header1: {    
     paddingHorizontal: 16,
     paddingTop: 8,
     paddingBottom: 12,

@@ -14,11 +14,11 @@ const Layout = () => {
         options={{
           presentation: "modal",
           animation: "slide_from_bottom",
-          sheetAllowedDetents: [0.7],
+          headerShown: true,
           title: "Ubicacion",
           headerShadowVisible: false,
-          sheetCornerRadius: 16,
-          sheetGrabberVisible: true,
+          headerStyle: { backgroundColor: 'white' },
+          headerTitleStyle: { color: '#000', fontWeight: 'bold' },
           headerRight: () => (
             <TouchableOpacity
               style={{
@@ -28,7 +28,32 @@ const Layout = () => {
               }}
               onPress={() => router.dismiss()}
             >
-              <Ionicons name="close-sharp" size={24} />
+              <Ionicons name="close-sharp" size={24} color={Colors.dark} />
+            </TouchableOpacity>
+          ),
+        }}
+      />
+       <Stack.Screen
+        name="(modal)/filter"
+        options={{
+          presentation: "modal",
+          animation: "slide_from_bottom",
+          headerShown: true,
+          title: "Ubicacion",
+          headerShadowVisible: false,
+          headerStyle: { backgroundColor: 'white' },
+          headerTitleStyle: { color: '#000', fontWeight: 'bold' },
+          contentStyle: { backgroundColor: 'white' },
+          headerRight: () => (
+            <TouchableOpacity
+              style={{
+                padding: 6,
+                borderRadius: 20,
+                backgroundColor: Colors.light,
+              }}
+              onPress={() => router.dismiss()}
+            >
+              <Ionicons name="close-sharp" size={24} color={Colors.dark} />
             </TouchableOpacity>
           ),
         }}
