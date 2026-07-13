@@ -46,3 +46,4 @@ npx expo install @gorhom/bottom-sheet react-native-reanimated react-native-gestu
 npx expo install expo-sqlite
 npm install sharp/npm ci 
 npx expo install expo-image
+npx expo install expo-secure-store

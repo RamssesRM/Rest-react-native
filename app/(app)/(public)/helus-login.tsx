@@ -1,53 +1,63 @@
 //pantalla de login de helus
+import { loginUser } from '@/app/api/authApi';
+import useUserStore from '@/hooks/use-userstore';
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
+import * as SecureStore from 'expo-secure-store';
 import React, { useState } from "react";
 import {
-    Alert,
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 export default function HelusLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const { setUser } = useUserStore();
 
   const handleLogin = async () => {
     // Validación básica
-    if (!email.trim()) {
-      Alert.alert("Error", "Ingresa tu correo o usuario");
+    if (!email.trim() || !password.trim()) {
+      Alert.alert("Error", "Ingresa correo y contraseña");
       return;
     }
-    if (!password.trim()) {
-      Alert.alert("Error", "Ingresa tu contraseña");
-      return;
-    }
+    
 
     setIsLoading(true);
 
     try {
-      // Aquí iría tu lógica de autenticación con el backend
-      // const response = await fetch('TU_API/auth/helus-login', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ email, password }),
-      // });
+      const data = await loginUser(email, password);
+
+      // guardamos tokens
+      await SecureStore.setItemAsync('jwt_access', data.access);
+      await SecureStore.setItemAsync('jwt_refresh', data.refresh);
+
+      // hay que guardar el token de la sesion en zustand
+      setUser({
+        id: data.user.id,
+        email: data.user.email,
+        name: data.user.first_name,
+        role: data.user.role
+      });
+      Alert.alert('¡Bienvenido!', `Hola ${data.user.first_name}`)
+      router.replace('/descubrir')
 
       // Simulación de login exitoso
-      setTimeout(() => {
-        setIsLoading(false);
-        // Redirigir a la app principal
-        router.replace("/descubrir");
-      }, 1500);
+      // setTimeout(() => {
+      //   setIsLoading(false);
+      //   // Redirigir a la app principal
+      //   router.replace("/descubrir");
+      // }, 1500);
     } catch (error) {
       setIsLoading(false);
       Alert.alert("Error", "Credenciales incorrectas");
