@@ -1,30 +1,43 @@
-// import useUserStore from '@/hooks/use-userstore';
-// import { useRouter } from 'expo-router';
-// import * as SecureStore from 'expo-secure-store';
-// import React from 'react';
-// import { Alert, StyleSheet, Text, View } from 'react-native';
+import useUserStore from '@/hooks/use-userstore';
+import { useRouter } from 'expo-router';
+import * as SecureStore from 'expo-secure-store';
+import { Alert, Button, StyleSheet, Text, View } from 'react-native';
 
-// const Page = () => {
-//   const router = useRouter();
-//   const { user, setIsGuest, setUser } = useUserStore();
+const Page = () => {
+  const router = useRouter();
+  const { user, setIsGuest, setUser } = useUserStore();
 
-//   return (    
-//     <View style={styles.container}>
-//       <Text>My inside Page</Text>
+  const handleLogout = async () => {
+    try {
+      await SecureStore.deleteItemAsync('jwt_access');
+      await SecureStore.deleteItemAsync('jwt_refresh');
+      setUser(null);
+      setIsGuest(false);
+    } catch (error) {
+      Alert.alert('Error', 'No se pudo cerrar la sesión');
+    }
+  };
 
-//       <Text style={{ marginTop: 10 }}>
-//         {user ? `Logueado como: ${user.name}` : 'No hay sesión activa'}
-//       </Text>
-//     </View>
-//   )
-// }
+  return (
+    <View style={styles.container}>
+      <Text>My inside Page</Text>
 
-// const styles = StyleSheet.create({
-//   container:{
-//     flex:1,
-//   },
-// });
+      <Text style={{ marginTop: 10 }}>
+        {user ? `Logueado como: ${user.name}` : 'No hay sesión activa'}
+      </Text>
+      
+      <Button
+        title='Cerrar Sesión'
+        onPress={handleLogout}
+      />
+    </View>
+  );
+};
 
-// export default Page;
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+});
 
-export { default } from '@/src/db/MenuScreen';
+export default Page;
