@@ -5,7 +5,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import * as SecureStore from 'expo-secure-store';
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Alert,
   KeyboardAvoidingView,
@@ -32,7 +32,6 @@ export default function HelusLogin() {
       return;
     }
     
-
     setIsLoading(true);
 
     try {
@@ -60,7 +59,9 @@ export default function HelusLogin() {
       // }, 1500);
     } catch (error) {
       setIsLoading(false);
+      // console.error('Error detallado: ', error)
       Alert.alert("Error", "Credenciales incorrectas");
+      // Alert.alert("Error de inicio de sesión", error.message || "Error desconocido");
     }
   };
 
