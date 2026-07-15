@@ -46,25 +46,25 @@ export default function HelusRegister() {
       Alert.alert("Error", "Las contraseñas no coinciden");
       return;
     }
-    const nombres = first_name.split(' ')
-    if (first_name.split(' ').length<2){
-      Alert.alert('Error','Ingresa tu nombre y apellido')
+    const nombres = first_name.split(' ');
+    if (nombres.length < 2) {
+      Alert.alert('Error', 'Ingresa tu nombre y apellido');
       return;
     }
     setIsLoading(true);
 
     try {
       const data = await registerUser({
-        username:name,
-        email:email,
+        username: name,
+        email: email,
         first_name: nombres[0],
         last_name: nombres[1],
-        password:password,
-        role:'cliente'
-      })
+        password: password,
+        role: 'cliente'
+      });
 
-      await SecureStore.setItemAsync('jwt_access', data.access)
-      await SecureStore.setItemAsync('jwt_refresh', data.refresh)
+      await SecureStore.setItemAsync('jwt_access', data.access);
+      await SecureStore.setItemAsync('jwt_refresh', data.refresh);
 
       setUser({
         id: data.user.id,
@@ -72,12 +72,12 @@ export default function HelusRegister() {
         name: data.user.first_name,
         role: data.user.role
       });
-      Alert.alert('¡Bienvenido!', `Hola ${data.user.first_name} te has registrado exitosamente`)
-      router.replace('/descubrir')
+      Alert.alert('¡Bienvenido!', `Hola ${data.user.first_name} te has registrado exitosamente`);
+      router.replace('/descubrir');
 
     } catch (error) {
       Alert.alert("Error al registrarse", (error as any).message);
-    }finally{
+    } finally {
       setIsLoading(false);
     }
   };
@@ -110,14 +110,8 @@ export default function HelusRegister() {
           </View>
 
           <View style={styles.formContainer}>
-            {/* Nombre del usuario */}
             <View style={styles.inputContainer}>
-              <Ionicons
-                name="person-outline"
-                size={22}
-                color="#999"
-                style={styles.inputIcon}
-              />
+              <Ionicons name="person-outline" size={22} color="#999" style={styles.inputIcon} />
               <TextInput
                 style={styles.input}
                 placeholder="Nombre de usuario"
@@ -126,14 +120,8 @@ export default function HelusRegister() {
                 onChangeText={setName}
               />
             </View>
-            {/* Nombre y apellido */}
             <View style={styles.inputContainer}>
-              <Ionicons
-                name="person-outline"
-                size={22}
-                color="#999"
-                style={styles.inputIcon}
-              />
+              <Ionicons name="person-outline" size={22} color="#999" style={styles.inputIcon} />
               <TextInput
                 style={styles.input}
                 placeholder="Nombre y apellido"
@@ -143,14 +131,8 @@ export default function HelusRegister() {
               />
             </View>
 
-            {/* Email */}
             <View style={styles.inputContainer}>
-              <Ionicons
-                name="mail-outline"
-                size={22}
-                color="#999"
-                style={styles.inputIcon}
-              />
+              <Ionicons name="mail-outline" size={22} color="#999" style={styles.inputIcon} />
               <TextInput
                 style={styles.input}
                 placeholder="Correo electrónico"
@@ -162,14 +144,8 @@ export default function HelusRegister() {
               />
             </View>
 
-            {/* Contraseña */}
             <View style={styles.inputContainer}>
-              <Ionicons
-                name="lock-closed-outline"
-                size={22}
-                color="#999"
-                style={styles.inputIcon}
-              />
+              <Ionicons name="lock-closed-outline" size={22} color="#999" style={styles.inputIcon} />
               <TextInput
                 style={styles.input}
                 placeholder="Contraseña"
@@ -178,26 +154,13 @@ export default function HelusRegister() {
                 onChangeText={setPassword}
                 secureTextEntry={!showPassword}
               />
-              <TouchableOpacity
-                onPress={() => setShowPassword(!showPassword)}
-                style={styles.eyeButton}
-              >
-                <Ionicons
-                  name={showPassword ? "eye-off-outline" : "eye-outline"}
-                  size={22}
-                  color="#999"
-                />
+              <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeButton}>
+                <Ionicons name={showPassword ? "eye-off-outline" : "eye-outline"} size={22} color="#999" />
               </TouchableOpacity>
             </View>
 
-            {/* Confirmar contraseña */}
             <View style={styles.inputContainer}>
-              <Ionicons
-                name="lock-closed-outline"
-                size={22}
-                color="#999"
-                style={styles.inputIcon}
-              />
+              <Ionicons name="lock-closed-outline" size={22} color="#999" style={styles.inputIcon} />
               <TextInput
                 style={styles.input}
                 placeholder="Confirmar contraseña"
@@ -208,12 +171,8 @@ export default function HelusRegister() {
               />
             </View>
 
-            {/* Botón de registro */}
             <TouchableOpacity
-              style={[
-                styles.registerButton,
-                isLoading && styles.buttonDisabled,
-              ]}
+              style={[styles.registerButton, isLoading && styles.buttonDisabled]}
               onPress={handleRegister}
               disabled={isLoading}
             >
@@ -224,7 +183,6 @@ export default function HelusRegister() {
               )}
             </TouchableOpacity>
 
-            {/* Ir a login */}
             <View style={styles.loginLinkContainer}>
               <Text style={styles.loginLinkText}>¿Ya tienes cuenta? </Text>
               <TouchableOpacity onPress={() => router.back()}>
