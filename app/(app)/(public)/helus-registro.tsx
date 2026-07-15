@@ -1,7 +1,10 @@
 // app/(auth)/helus-register.tsx
+import { registerUser } from "@/app/api/authApi";
+import useUserStore from '@/hooks/use-userstore';
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
+import * as SecureStore from 'expo-secure-store';
 import React, { useState } from "react";
 import {
     Alert,
@@ -17,11 +20,14 @@ import {
 
 export default function HelusRegister() {
   const [name, setName] = useState("");
+  const [first_name, setFirstName] = useState('');
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  const { setUser } = useUserStore();
 
   const handleRegister = async () => {
     // Validaciones
@@ -33,37 +39,56 @@ export default function HelusRegister() {
       Alert.alert("Error", "Ingresa tu correo");
       return;
     }
-    if (password.length < 6) {
-      Alert.alert("Error", "La contraseña debe tener al menos 6 caracteres");
+    if (password.length < 8) {
+      Alert.alert("Error", "La contraseña debe tener al menos 8 caracteres");
       return;
     }
     if (password !== confirmPassword) {
       Alert.alert("Error", "Las contraseñas no coinciden");
       return;
     }
-
+    const nombres = first_name.split(' ')
+    if (first_name.split(' ').length<2){
+      Alert.alert('Error','Ingresa tu nombre y apellido')
+      return;
+    }
     setIsLoading(true);
 
     try {
-      // Aquí iría la lógica de registro con el backend
-      // const response = await fetch('TU_API/auth/helus-register', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ name, email, password }),
-      // });
+      const data = await registerUser({
+        username:name,
+        email:email,
+        first_name: nombres[0],
+        last_name: nombres[1],
+        password:password,
+        role:'cliente'
+      })
+
+      await SecureStore.setItemAsync('jwt_access', data.access)
+      await SecureStore.setItemAsync('jwt_refresh', data.refresh)
+
+      setUser({
+        id: data.user.id,
+        email: data.user.email,
+        name: data.user.first_name,
+        role: data.user.role
+      });
+      Alert.alert('¡Bienvenido!', `Hola ${data.user.first_name} te has registrado exitosamente`)
+      router.replace('/descubrir')
 
       // Simulación de registro exitoso
-      setTimeout(() => {
-        setIsLoading(false);
-        Alert.alert(
-          "¡Éxito!",
-          "Cuenta creada correctamente. Ahora puedes iniciar sesión.",
-          [{ text: "OK", onPress: () => router.back() }],
-        );
-      }, 1500);
+      // setTimeout(() => {
+      //   setIsLoading(false);
+      //   Alert.alert(
+      //     "¡Éxito!",
+      //     "Cuenta creada correctamente. Ahora puedes iniciar sesión.",
+      //     [{ text: "OK", onPress: () => router.back() }],
+      //   );
+      // }, 1500);
     } catch (error) {
+      Alert.alert("Error al registrarse", error.message);
+    }finally{
       setIsLoading(false);
-      Alert.alert("Error", "No se pudo crear la cuenta");
     }
   };
 
@@ -98,7 +123,7 @@ export default function HelusRegister() {
 
           {/* Formulario */}
           <View style={styles.formContainer}>
-            {/* Nombre completo */}
+            {/* Nombre del usuario */}
             <View style={styles.inputContainer}>
               <Ionicons
                 name="person-outline"
@@ -108,10 +133,26 @@ export default function HelusRegister() {
               />
               <TextInput
                 style={styles.input}
-                placeholder="Nombre completo"
+                placeholder="Nombre de usuario"
                 placeholderTextColor="#666"
                 value={name}
                 onChangeText={setName}
+              />
+            </View>
+            {/* Nombre y apellido */}
+            <View style={styles.inputContainer}>
+              <Ionicons
+                name="person-outline"
+                size={22}
+                color="#999"
+                style={styles.inputIcon}
+              />
+              <TextInput
+                style={styles.input}
+                placeholder="Nombre y apellido"
+                placeholderTextColor="#666"
+                value={first_name}
+                onChangeText={setFirstName}
               />
             </View>
 

@@ -5,17 +5,17 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import * as SecureStore from 'expo-secure-store';
-import { useState } from "react";
+import React, { useState } from "react";
 import {
-  Alert,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    Alert,
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
 
 export default function HelusLogin() {
@@ -60,8 +60,8 @@ export default function HelusLogin() {
     } catch (error) {
       setIsLoading(false);
       // console.error('Error detallado: ', error)
-      Alert.alert("Error", "Credenciales incorrectas");
-      // Alert.alert("Error de inicio de sesión", error.message || "Error desconocido");
+      // Alert.alert("Error", "Credenciales incorrectas");
+      Alert.alert("Error de inicio de sesión", error.message || "Error desconocido");
     }
   };
 

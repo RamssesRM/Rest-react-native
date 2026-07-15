@@ -11,7 +11,20 @@ export const loginUser = async (username, password)=>{
         if (response.ok){
             return data
         }else{
-            throw new Error(data.detail || 'Credenciales inválidas 14');
+            let mensajeError = 'Credenciales inválidas'
+            // Buscamos en 'non_field_errors' (Es donde Django pone los ValidationError)
+            if (data.non_field_errors && data.non_field_errors.length > 0) {
+                mensajeError = data.non_field_errors[0];
+            } 
+            // Buscamos en 'detail' (Por si acaso SimpleJWT lanza un error genérico)
+            else if (data.detail) {
+                mensajeError = Array.isArray(data.detail) ? data.detail[0] : data.detail;
+            }
+            // Buscamos errores específicos de campos (ej: username ya existe)
+            else if (data.username) {
+                mensajeError = Array.isArray(data.username) ? data.username[0] : data.username;
+            }
+            throw new Error(mensajeError);
         }
     }catch(error){
         throw error
