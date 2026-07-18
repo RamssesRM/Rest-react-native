@@ -1,6 +1,7 @@
 import useUserStore from '@/hooks/use-userstore';
 import { useRouter } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
+import React from 'react';
 import { Alert, Button, StyleSheet, Text, View } from 'react-native';
 
 const Page = () => {
