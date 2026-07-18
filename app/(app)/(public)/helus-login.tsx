@@ -48,7 +48,7 @@ export default function HelusLogin() {
         name: data.user.first_name,
         role: data.user.role
       });
-      Alert.alert('¡Bienvenido!', `Hola ${data.user.first_name}`)
+      // Alert.alert('¡Bienvenido!', `Hola ${data.user.first_name}`)
       router.replace('/descubrir')
 
       // Simulación de login exitoso

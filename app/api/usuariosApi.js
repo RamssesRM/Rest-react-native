@@ -1,3 +1,4 @@
+import * as SecureStore from 'expo-secure-store'; // Para obtener el token
 import { BASE_URL, getHeaders } from "./apiConfig";
 
 // Esta funcion trae todas las categorias de django
@@ -81,3 +82,25 @@ export const eliminarUsuario = async (id) => {
         throw error
     }
 }
+
+export const tomarStatsConUsuario = async (user_id) => {
+    try {
+        const token = await SecureStore.getItemAsync('jwt_access');
+        const response = await fetch(`${BASE_URL}/usuarios/${user_id}/stats/`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        if (!response.ok) {
+            throw new Error('Error al traer las stats del usuario');
+        }
+        const data = await response.json();
+        return data;
+
+    } catch (error) {
+        console.log('Error al traer las stats del usuario:', error);
+        throw error;
+    }
+};

@@ -1,7 +1,8 @@
 import useUserStore from '@/hooks/use-userstore';
 import { useRouter } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
-import { Alert, Button, StyleSheet, Text, View } from 'react-native';
+import React from 'react';
+import { Alert, StyleSheet, Text, View } from 'react-native';
 
 const Page = () => {
   const router = useRouter();
@@ -30,11 +31,6 @@ const Page = () => {
       <Text style={{ marginTop: 10 }}>
         {user ? `Logueado como: ${user.name}` : 'No hay sesión activa'}
       </Text>
-      
-      <Button
-        title='Inicia Sesion'
-        onPress={handleLogout}
-      />
     </View>
   )
 }
