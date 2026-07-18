@@ -111,3 +111,74 @@ export const eliminarOrden = async (id) => {
         throw error
     }
 }
+
+// api/ordenesApi.js
+import * as SecureStore from 'expo-secure-store';
+
+const getAuthHeaders = async () => {
+    const token = await SecureStore.getItemAsync('jwt_access');
+    return {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+    };
+};
+
+// --- CLIENTE ---
+export const getMisOrdenes = async () => {
+    const headers = await getAuthHeaders();
+    // Limpio, sin enviarle datos falsos por la URL
+    const response = await fetch(`${BASE_URL}/ordenes/`, { headers }); 
+    
+    if (!response.ok) throw new Error('Error al traer mis órdenes');
+    return response.json();
+};
+
+// --- MESERO ---
+export const getOrdenesActivas = async () => {
+    const headers = await getAuthHeaders();
+    // Traer todas y el frontend filtra las que no sean 'pagado' o 'eliminado', o modifica tu viewset en django
+    const response = await fetch(`${BASE_URL}/ordenes/`, { headers });
+    if (!response.ok) throw new Error('Error al traer órdenes activas');
+    return response.json();
+};
+
+// --- CAJERO ---
+export const getOrdenesFinalizadas = async () => {
+    const headers = await getAuthHeaders();
+    const response = await fetch(`${BASE_URL}/ordenes/?estatus=finalizado`, { headers });
+    if (!response.ok) throw new Error('Error al traer órdenes para cobrar');
+    return response.json();
+};
+
+// --- ADMIN ---
+export const getTodasLasOrdenes = async (filtro = '', busqueda = '') => {
+    const headers = await getAuthHeaders();
+    let url = `${BASE_URL}/ordenes/?`;
+    if (filtro) url += `estatus=${filtro}&`;
+    if (busqueda) url += `search=${busqueda}`; // Requiere configurar esto en tu ViewSet de Django
+    const response = await fetch(url, { headers });
+    if (!response.ok) throw new Error('Error al traer todas las órdenes');
+    return response.json();
+};
+
+// --- ACCIONES (Para todos los roles) ---
+export const cambiarEstadoOrden = async (ordenId, nuevoEstado) => {
+    const headers = await getAuthHeaders();
+    const response = await fetch(`${BASE_URL}/ordenes/${ordenId}/`, {
+        method: 'PATCH',
+        headers,
+        body: JSON.stringify({ estatus: nuevoEstado })
+    });
+    if (!response.ok) throw new Error('Error al actualizar el estado');
+    return response.json();
+};
+
+export const eliminarOrdenCliente = async (ordenId) => {
+    const headers = await getAuthHeaders();
+    const response = await fetch(`${BASE_URL}/ordenes/${ordenId}/`, {
+        method: 'PATCH',
+        headers,
+        body: JSON.stringify({ estatus: 'eliminado' }) // Eliminación lógica
+    });
+    if (!response.ok) throw new Error('Error al eliminar la orden');
+};
