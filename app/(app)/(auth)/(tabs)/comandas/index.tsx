@@ -6,5 +6,4 @@
 //     </View>
 //   )
 // }
-
-export { default } from '@/src/db/MenuScreen';
+export { default } from '@/app/(app)/(auth)/(tabs)/comandas/comandasScreen';

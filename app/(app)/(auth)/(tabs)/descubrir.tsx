@@ -1,44 +1,30 @@
-import useUserStore from '@/hooks/use-userstore';
-import { useRouter } from 'expo-router';
-import * as SecureStore from 'expo-secure-store';
-import React from 'react';
-import { Alert, StyleSheet, Text, View } from 'react-native';
+// import useUserStore from '@/hooks/use-userstore';
+// import { useRouter } from 'expo-router';
+// import * as SecureStore from 'expo-secure-store';
+// import React from 'react';
+// import { Alert, StyleSheet, Text, View } from 'react-native';
 
-const Page = () => {
-  const router = useRouter();
-  const { user, setIsGuest, setUser } = useUserStore();
+// const Page = () => {
+//   const router = useRouter();
+//   const { user, setIsGuest, setUser } = useUserStore();
 
-  const handleLogout = async () => {
-    try{
-      // Hay que borrar los tokens del zustand
-      await SecureStore.deleteItemAsync('jwt_access')
-      await SecureStore.deleteItemAsync('jwt_refresh')
+//   return (    
+//     <View style={styles.container}>
+//       <Text>My inside Page</Text>
 
-      setUser(null);
-      setIsGuest(false)
+//       <Text style={{ marginTop: 10 }}>
+//         {user ? `Logueado como: ${user.name}` : 'No hay sesión activa'}
+//       </Text>
+//     </View>
+//   )
+// }
 
-      // router.replace('/') No es necesario cambiar la ruta, al quitar los tokens de inicio de sesion en el zustan lo envia predeterminadamente a /
+// const styles = StyleSheet.create({
+//   container:{
+//     flex:1,
+//   },
+// });
 
-    }catch(error){
-      Alert.alert('Error', 'No se pudo cerrar la sesión')
-    }
-  }
+// export default Page;
 
-  return (    
-    <View style={styles.container}>
-      <Text>My inside Page</Text>
-
-      <Text style={{ marginTop: 10 }}>
-        {user ? `Logueado como: ${user.name}` : 'No hay sesión activa'}
-      </Text>
-    </View>
-  )
-}
-
-const styles = StyleSheet.create({
-  container:{
-    flex:1,
-  },
-});
-
-export default Page;
+export { default } from '@/src/db/MenuScreen';
