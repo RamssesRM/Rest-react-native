@@ -1,10 +1,9 @@
 import { cambiarEstadoOrden, getMisOrdenes, getOrdenesActivas, getOrdenesFinalizadas, getTodasLasOrdenes } from '@/app/api/ordenesApi';
 import useUserStore from '@/hooks/use-userstore';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import { useFocusEffect, useRouter } from 'expo-router';
+import React, { useState } from 'react';
 import { ActivityIndicator, Alert, FlatList, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-
 // Colores dinámicos para los estados (UI/UX Profesional)
 const getStatusColor = (status) => {
     switch (status) {
@@ -50,14 +49,33 @@ export default function ComandasScreen() {
         }
     };
 
-    useEffect(() => {
-        if (user) cargarDatos();
-    }, [user, filtroAdmin, busquedaAdmin]); // Se recarga si el admin cambia el filtro
-
-    // Acciones sobre las órdenes
-    const handleCambiarEstado = async (id, nuevoEstado) => {
+    useFocusEffect(
+    React.useCallback(() => {
+      const cargarDatos = async () => {
+        if (!user) return;
+        setIsLoading(true);
         try {
-            await cambiarEstadoOrden(id, nuevoEstado);
+          let data = [];
+          if (role === 'cliente') data = await getMisOrdenes(user?.id);
+          else if (role === 'mesero') data = await getOrdenesActivas();
+          else if (role === 'cajero') data = await getOrdenesFinalizadas();
+          else if (role === 'admin') data = await getTodasLasOrdenes(filtroAdmin, busquedaAdmin);
+          
+          setOrdenes(data);
+        } catch (error) {
+          Alert.alert('Error', 'No se pudieron cargar las comandas');
+        } finally {
+          setIsLoading(false);
+        }
+      };
+
+      cargarDatos();
+    }, [user, role, filtroAdmin, busquedaAdmin]) // Se añade 'role' a las dependencias
+  );
+
+    const handleCambiarEstado = async (id, nuevoEstado, datosExtra = {}) => {
+        try {
+            await cambiarEstadoOrden(id, nuevoEstado, datosExtra);
             cargarDatos(); // Refresca la lista
         } catch (error) {
             Alert.alert('Error', 'No se pudo cambiar el estado');
@@ -112,20 +130,22 @@ export default function ComandasScreen() {
     );
 
     const RenderClienteHeader = () => (
-        <TouchableOpacity style={styles.createButton} onPress={() => Alert.alert('Navegación', 'Ir a la pantalla de Menú para crear orden')}>
-            <Ionicons name="add-circle" size={24} color="#000" />
-            <Text style={styles.createButtonText}>Nueva Orden</Text>
-        </TouchableOpacity>
-    );
+    <TouchableOpacity 
+        style={styles.createButton} 
+        onPress={() => router.push('/comandas/nuevaOrden')}
+    >
+        <Ionicons name="add-circle" size={24} color="#000" />
+        <Text style={styles.createButtonText}>Nueva Orden</Text>
+    </TouchableOpacity>
+);
 
     const RenderCard = ({ item }) => {
-        // Filtro rápido en frontend para el mesero (no mostrar pagados/eliminados)
         if (role === 'mesero' && (item.estatus === 'pagado' || item.estatus === 'eliminado')) return null;
 
         return (
             <View style={styles.card}>
                 <View style={styles.cardHeader}>
-                    <Text style={styles.mesaText}>Mesa: {item.mesa_fk?.numero_mesa || 'N/A'}</Text>
+                    <Text style={styles.mesaText}>Mesa: {item.mesa_info?.numero_mesa || 'N/A'}</Text>
                     <View style={[styles.statusBadge, { backgroundColor: getStatusColor(item.estatus) + '20' }]}>
                         <Text style={[styles.statusText, { color: getStatusColor(item.estatus) }]}>
                             {item.estatus.toUpperCase()}
@@ -134,7 +154,7 @@ export default function ComandasScreen() {
                 </View>
 
                 <Text style={styles.clienteText}>
-                    {role === 'cliente' ? `Atendido por: ${item.mesero?.first_name || 'N/A'}` : `Cliente: ${item.cliente?.first_name || item.cliente?.email || 'N/A'}`}
+                    {role === 'cliente' ? `Atendido por: ${item.mesero_info?.first_name || 'N/A'}` : `Cliente: ${item.cliente_info?.first_name || item.cliente_info?.email || 'N/A'}`}
                 </Text>
                 <Text style={styles.fechaText}>{new Date(item.fecha_creacion).toLocaleString()}</Text>
 
@@ -144,7 +164,10 @@ export default function ComandasScreen() {
                     {/* BOTONES DE ACCIÓN SEGÚN ROL */}
                     <View style={styles.actionsContainer}>
                         {role === 'mesero' && item.estatus === 'pidiendo' && (
-                            <TouchableOpacity style={styles.actionBtn} onPress={() => handleCambiarEstado(item.id, 'cocinando')}>
+                            <TouchableOpacity 
+                            style={styles.actionBtn} 
+                            onPress={() => handleCambiarEstado(item.id, 'cocinando', { mesero: user.id })}
+                            >
                                 <Text style={styles.actionText}>Cocinar</Text>
                             </TouchableOpacity>
                         )}
@@ -183,8 +206,6 @@ export default function ComandasScreen() {
         </View>
     );
 }
-
-// --- ESTILOS MODERNOS (Claros con Dorado) ---
 const styles = StyleSheet.create({
     container: { 
         flex: 1, 

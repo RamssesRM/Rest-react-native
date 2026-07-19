@@ -83,22 +83,8 @@ export const getLocalCategorias = async () => {
 export const getLocalProductos = async () => {
     const db = getDB();
     if (!db) throw new Error('DB no inicializada');
-
     try {
-        const productos = await db.getAllAsync(`
-            SELECT 
-                p.id, 
-                p.nombre, 
-                p.descripcion, 
-                p.precio, 
-                p.imagen, 
-                c.nombre as categoria_nombre, 
-                p.estatus
-            FROM productos p 
-            LEFT JOIN categorias c ON p.categoria_id = c.id
-            WHERE p.estatus = 1
-        `);
-        console.log(`📦 ${productos.length} productos cargados desde SQLite`);
+        const productos = await db.getAllAsync('SELECT p.id, p.nombre, p.descripcion, p.precio, p.imagen, p.categoria_id, c.nombre as categoria_nombre, p.estatus FROM productos p LEFT JOIN categorias c ON p.categoria_id = c.id WHERE p.estatus = 1');
         return productos;
     } catch (error) {
         console.error('❌ Error obteniendo productos locales:', error);
