@@ -86,7 +86,7 @@ export default function HelusRegister() {
       //   );
       // }, 1500);
     } catch (error) {
-      Alert.alert("Error al registrarse", error.message);
+      Alert.alert("Error al registrarse", (error as any).message);
     }finally{
       setIsLoading(false);
     }

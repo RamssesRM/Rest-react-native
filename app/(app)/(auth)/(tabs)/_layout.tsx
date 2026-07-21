@@ -1,5 +1,6 @@
 import { FontAwesome5, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
+import React from 'react';
 
 const Layout = () => {
   return (

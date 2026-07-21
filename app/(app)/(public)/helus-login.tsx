@@ -61,7 +61,7 @@ export default function HelusLogin() {
       setIsLoading(false);
       // console.error('Error detallado: ', error)
       // Alert.alert("Error", "Credenciales incorrectas");
-      Alert.alert("Error de inicio de sesión", error.message || "Error desconocido");
+      Alert.alert("Error de inicio de sesión", (error as any).message || "Error desconocido");
     }
   };
 
