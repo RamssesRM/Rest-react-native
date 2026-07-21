@@ -73,11 +73,11 @@ export const actualizarOrden = async (id, Data) => {
     try{
         const response = await fetch(`${BASE_URL}/ordenes/${id}/`, {
             method : 'PUT',
-            headers: getHeaders,
+            headers: getHeaders(),
             body:JSON.stringify(Data),
         })
         if (!response.ok) throw new Error('Error actualizando la orden 48')
-        return await response.json
+        return await response.json()
     }catch (error){
         console.log('Error al momento de actualizar la orden 50', error);
         throw error

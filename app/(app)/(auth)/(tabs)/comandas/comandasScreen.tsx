@@ -36,7 +36,7 @@ export default function ComandasScreen() {
         setIsLoading(true);
         try {
             let data = [];
-            if (role === 'cliente') data = await getMisOrdenes(user?.id);
+            if (role === 'cliente') data = await getMisOrdenes();
             else if (role === 'mesero') data = await getOrdenesActivas();
             else if (role === 'cajero') data = await getOrdenesFinalizadas();
             else if (role === 'admin') data = await getTodasLasOrdenes(filtroAdmin, busquedaAdmin);
@@ -56,7 +56,7 @@ export default function ComandasScreen() {
         setIsLoading(true);
         try {
           let data = [];
-          if (role === 'cliente') data = await getMisOrdenes(user?.id);
+          if (role === 'cliente') data = await getMisOrdenes();
           else if (role === 'mesero') data = await getOrdenesActivas();
           else if (role === 'cajero') data = await getOrdenesFinalizadas();
           else if (role === 'admin') data = await getTodasLasOrdenes(filtroAdmin, busquedaAdmin);
@@ -166,7 +166,7 @@ export default function ComandasScreen() {
                         {role === 'mesero' && item.estatus === 'pidiendo' && (
                             <TouchableOpacity 
                             style={styles.actionBtn} 
-                            onPress={() => handleCambiarEstado(item.id, 'cocinando', { mesero: user.id })}
+                            onPress={() => handleCambiarEstado(item.id, 'cocinando', { mesero: user?.id })}
                             >
                                 <Text style={styles.actionText}>Cocinar</Text>
                             </TouchableOpacity>
