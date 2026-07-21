@@ -1,5 +1,5 @@
 import { Colors, Fonts } from '@/constants/theme';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { ScrollView, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
 
 const cuisineFilters = [

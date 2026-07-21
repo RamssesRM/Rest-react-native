@@ -134,7 +134,7 @@ export default function PerfilScreen() {
               onPress={() => alert(`Ir a: ${item.text}`)}
             >
               <View style={styles.menuItemLeft}>
-                <Ionicons name={item.icon} size={24} color="#D4AF37" />
+                <Ionicons name={item.icon as any} size={24} color="#D4AF37" />
                 <Text style={styles.menuText}>{item.text}</Text>
               </View>
               <Ionicons name="chevron-forward" size={20} color="#555" />

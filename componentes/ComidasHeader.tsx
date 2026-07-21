@@ -1,6 +1,7 @@
 import { Colors } from "@/constants/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { Link } from "expo-router";
+import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View, } from "react-native";
 import Animated, { SharedValue, useAnimatedStyle, interpolate, Extrapolation } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -37,19 +38,32 @@ const ComidasHeader = ({ title, scrollOffset }: ComidasHeaderProps) => {
   const header2Style = useAnimatedStyle(() => {
     const opacity = interpolate(
       scrollOffset.value,
-      [0, SCOLL_THRESHOLD * 0.6],
-      [1, 0],
+      [SCOLL_THRESHOLD * 0.3, SCOLL_THRESHOLD],
+      [0, 1],
       Extrapolation.CLAMP
     );
       const translateY = interpolate(
       scrollOffset.value,
       [0, SCOLL_THRESHOLD * 0.6],
-      [0, -10],
+      [-10, 0],
       Extrapolation.CLAMP
     );
     return {
       opacity,
       transform: [{ translateY }],
+    };
+  });
+
+  const shadowStyle = useAnimatedStyle(() => { 
+    const opacity = interpolate(
+      scrollOffset.value,
+      [0, SCOLL_THRESHOLD],
+      [0, 1],
+      Extrapolation.CLAMP
+    );
+    return {
+      shadowOpacity: opacity * 0.1,
+      elevation: opacity * 4,
     };
   });
 
@@ -110,7 +124,10 @@ const styles = StyleSheet.create({
     right: 0,
     backgroundColor: "#ffd700",
     zIndex: 100,
-    boxShadow: "0px 2px 4px -2px rgba(0, 0, 0, 0.2)",
+    // boxShadow: "0px 2px 4px -2px rgba(0, 0, 0, 0.2)",
+    shadowColor: "#000",
+    shadowOffset: { width: 0,height: 2 },
+    shadowRadius: 4,
   },
   header1: {    
     paddingHorizontal: 16,
