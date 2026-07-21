@@ -17,9 +17,8 @@ const MenuScreen = () => {
                 setDebugMsg('✅ Base de datos abierta');
 
                 // 2. Intentar conectar a Django
-                // 2. Intentar conectar a Django
                 try {
-                    setDebugMsg('Conectando a Django...');
+                    setDebugMsg('Conectando a la Base de Datos...');
                     const controller = new AbortController();
                     const timeoutId = setTimeout(() => controller.abort(), 10000);
 

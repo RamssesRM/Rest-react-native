@@ -5,6 +5,7 @@ export const tomarMesas = async () => {
     try{
         const response = await fetch(`${BASE_URL}/mesas/`);
         if (!response.ok) throw new Error('Error al traer las mesas 6');
+        return await response.json()
     }catch (error){
         console.log('Error al traer todas las mesas 8', error);
         throw error;
@@ -46,7 +47,7 @@ export const actualizarMesa = async (id, Data) => {
             body:JSON.stringify(Data),
         })
         if (!response.ok) throw new Error('Error actualizando la mesa 48')
-        return await response.json
+        return await response.json()
     }catch (error){
         console.log('Error al momento de actualizar la mesa 50', error);
         throw error

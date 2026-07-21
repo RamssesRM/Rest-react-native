@@ -1,4 +1,5 @@
 import { BASE_URL, getHeaders } from "./apiConfig";
+import * as SecureStore from 'expo-secure-store';
 
 // Esta funcion trae todas las categorias de django
 export const tomarOrdenes = async () => {
@@ -112,9 +113,7 @@ export const eliminarOrden = async (id) => {
     }
 }
 
-// api/ordenesApi.js
-import * as SecureStore from 'expo-secure-store';
-
+// --- AUTH HEADERS ---
 const getAuthHeaders = async () => {
     const token = await SecureStore.getItemAsync('jwt_access');
     return {
@@ -162,12 +161,13 @@ export const getTodasLasOrdenes = async (filtro = '', busqueda = '') => {
 };
 
 // --- ACCIONES (Para todos los roles) ---
-export const cambiarEstadoOrden = async (ordenId, nuevoEstado) => {
+export const cambiarEstadoOrden = async (ordenId, nuevoEstado, datosExtra = {}) => {
     const headers = await getAuthHeaders();
     const response = await fetch(`${BASE_URL}/ordenes/${ordenId}/`, {
         method: 'PATCH',
         headers,
-        body: JSON.stringify({ estatus: nuevoEstado })
+        // Usamos el operador spread (...) para unir el estatus con el mesero_id
+        body: JSON.stringify({ estatus: nuevoEstado, ...datosExtra }), 
     });
     if (!response.ok) throw new Error('Error al actualizar el estado');
     return response.json();

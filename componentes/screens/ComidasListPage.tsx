@@ -4,8 +4,8 @@ import { StyleSheet, Text, View } from "react-native";
 import Animated, { useAnimatedScrollHandler, useSharedValue } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { CategoriasList } from "../CategoriasList";
-import ComidasList from "../ComidasList";
 import ComidasHeader from "../ComidasHeader";
+import ComidasList from "../ComidasList";
 const HEADER_HEIGHT = 60;
 const ComidasListPage = () => {
   const insets = useSafeAreaInsets();
@@ -16,6 +16,7 @@ const ComidasListPage = () => {
       scrollOffset.value = event.contentOffset.y
     }
   })
+
   return (
     <View style={styles.container}>
 
