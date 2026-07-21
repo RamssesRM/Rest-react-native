@@ -5,7 +5,7 @@ import { useFocusEffect, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { ActivityIndicator, Alert, FlatList, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 // Colores dinámicos para los estados (UI/UX Profesional)
-const getStatusColor = (status) => {
+const getStatusColor = (status: string) => {
     switch (status) {
         case 'pidiendo': return '#FF9800'; // Naranja
         case 'cocinando': return '#F44336'; // Rojo
