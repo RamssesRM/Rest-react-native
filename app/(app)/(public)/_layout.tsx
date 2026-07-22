@@ -1,3 +1,4 @@
+import React from "react";
 import { Stack } from "expo-router";
 const Layout = () => {
   return (
@@ -13,12 +14,26 @@ const Layout = () => {
         name="otras-opciones"
         options={{
           headerShown: false,
-          presentation: 'formSheet',
-          title: '',
+          presentation: "formSheet",
+          title: "",
           sheetAllowedDetents: [0.6],
           sheetGrabberVisible: true,
           sheetCornerRadius: 16,
           headerShadowVisible: false,
+        }}
+      />
+
+      {/* AGREGA LAS DOS PANTALLAS NUEVAS AQUÍ ABAJO */}
+      <Stack.Screen
+        name="helus-login"
+        options={{
+          headerShown: false, // Oculta la barra superior por defecto de Expo
+        }}
+      />
+      <Stack.Screen
+        name="helus-registro"
+        options={{
+          headerShown: false, // Oculta la barra superior por defecto de Expo
         }}
       />
     </Stack>

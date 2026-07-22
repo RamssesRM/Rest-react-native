@@ -1,5 +1,6 @@
 import FacebookAutenBoton from "@/componentes/auten/FacebookAutenButon";
 import GoogleAutenBoton from "@/componentes/auten/GoogleAutenBoton";
+import Helusboton from "@/componentes/auten/HelusAutenBoton";
 import ScrollInfinitoSuave from "@/componentes/ScrollinfinitoSuave"; // O la ruta exacta donde guardaste el componente
 import { Fonts } from "@/constants/theme";
 import useUserStore from "@/hooks/use-userstore";
@@ -70,7 +71,7 @@ export default function Index() {
         />
         <Animated.Text entering={FadeInDown.delay(200)} style={styles.tagline}>
           {" "}
-          Bienvenido a Helus Resto-Bar{" "}
+          Bienvenidos a Helus Restobar {" "}
         </Animated.Text>
 
         {/* botones de logeo */}
@@ -79,6 +80,9 @@ export default function Index() {
             <GoogleAutenBoton />
           </Animated.View>
           <Animated.View entering={FadeInDown.delay(400)}>
+            <Helusboton />
+          </Animated.View>
+          <Animated.View entering={FadeInDown.delay(500)}>
             {/* Quitamos el <Link> y le pasamos el trigger directo al botón */}
             <TouchableOpacity
               style={styles.otherButton}
@@ -90,6 +94,8 @@ export default function Index() {
             </TouchableOpacity>
           </Animated.View>
         </View>
+
+        
 
         <Animated.View
           style={styles.privacyContainer}
@@ -157,7 +163,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 50,
     lineHeight: 30,
-    color: "#ffff",
+    color: "#e4ba30",
   },
   buttonContainer: {
     gap: 12,
@@ -194,9 +200,11 @@ const styles = StyleSheet.create({
   },
 
   sheetBackground: {
-    backgroundColor: "#f0f0f0", // Fondo oscuro que tenías en el modal
+    backgroundColor: "#382f2f", // <-- Cambiado de '#f0f0f0' a negro premium mate
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
+    borderWidth: 1,
+    borderColor: "#262626"
   },
   sheetContent: {
     flex: 1,
