@@ -2,8 +2,13 @@ import { Colors } from "@/constants/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { Link } from "expo-router";
 import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View, } from "react-native";
-import Animated, { SharedValue, useAnimatedStyle, interpolate, Extrapolation } from "react-native-reanimated";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import Animated, {
+  Extrapolation,
+  interpolate,
+  SharedValue,
+  useAnimatedStyle,
+} from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface ComidasHeaderProps {
@@ -21,13 +26,13 @@ const ComidasHeader = ({ title, scrollOffset }: ComidasHeaderProps) => {
       scrollOffset.value,
       [0, SCOLL_THRESHOLD * 0.6],
       [1, 0],
-      Extrapolation.CLAMP
+      Extrapolation.CLAMP,
     );
-      const translateY = interpolate(
+    const translateY = interpolate(
       scrollOffset.value,
       [0, SCOLL_THRESHOLD * 0.6],
       [0, -10],
-      Extrapolation.CLAMP
+      Extrapolation.CLAMP,
     );
     return {
       opacity,
@@ -40,13 +45,13 @@ const ComidasHeader = ({ title, scrollOffset }: ComidasHeaderProps) => {
       scrollOffset.value,
       [SCOLL_THRESHOLD * 0.3, SCOLL_THRESHOLD],
       [0, 1],
-      Extrapolation.CLAMP
+      Extrapolation.CLAMP,
     );
-      const translateY = interpolate(
+    const translateY = interpolate(
       scrollOffset.value,
       [0, SCOLL_THRESHOLD * 0.6],
       [-10, 0],
-      Extrapolation.CLAMP
+      Extrapolation.CLAMP,
     );
     return {
       opacity,
@@ -54,12 +59,12 @@ const ComidasHeader = ({ title, scrollOffset }: ComidasHeaderProps) => {
     };
   });
 
-  const shadowStyle = useAnimatedStyle(() => { 
+  const shadowStyle = useAnimatedStyle(() => {
     const opacity = interpolate(
       scrollOffset.value,
       [0, SCOLL_THRESHOLD],
       [0, 1],
-      Extrapolation.CLAMP
+      Extrapolation.CLAMP,
     );
     return {
       shadowOpacity: opacity * 0.1,
@@ -68,50 +73,59 @@ const ComidasHeader = ({ title, scrollOffset }: ComidasHeaderProps) => {
   });
 
   return (
-    <Animated.View style={[styles.headerContainer, { paddingTop: insets.top }]}>
+    <Animated.View
+      style={[styles.headerContainer, { paddingTop: insets.top }, shadowStyle]}
+    >
       {/* header 1*/}
       <Animated.View style={[styles.header1, header1Style]}>
-        <Link href={'/(app)/(auth)/(modal)/location'} asChild>
+        <Link href={"/(app)/(auth)/(modal)/location"} asChild>
           <TouchableOpacity style={styles.locationButton}>
             <View style={styles.locationButtonIcon}>
-              <Ionicons name='business-outline'size={16} />
+              <Ionicons name="business-outline" size={16} />
             </View>
             <Text style={styles.locationText}>Ubicación</Text>
-            <Ionicons name='chevron-down'size={16} />
+            <Ionicons name="chevron-down" size={16} />
           </TouchableOpacity>
         </Link>
 
         <View style={styles.rightIcons}>
-        <Link href={'/(app)/(auth)/(modal)/filter'} asChild>
-          <TouchableOpacity style={styles.iconButton}>
-            <Ionicons name='filter' size={20} />
-          </TouchableOpacity>
-        </Link>  
-        <TouchableOpacity style={styles.iconButton}>
-          <Ionicons name='map-outline' size={20} />
-        </TouchableOpacity>
-      </View>
+          <Link href={"/(app)/(auth)/(modal)/filter"} asChild>
+            <TouchableOpacity style={styles.iconButton}>
+              <Ionicons name="filter" size={20} />
+            </TouchableOpacity>
+          </Link>
+          <Link href={"/(app)/(auth)/(modal)/map"} asChild>
+            <TouchableOpacity style={styles.iconButton}>
+              <Ionicons name="map-outline" size={20} />
+            </TouchableOpacity>
+          </Link>
+        </View>
       </Animated.View>
 
       {/* Header 2 */}
-       <Animated.View style={[styles.header2, header2Style]}>
+      <Animated.View style={[styles.header2, header2Style]}>
         <View style={styles.centerContent}>
           <Text style={styles.titleSmall}>{title}</Text>
-          <Link href={'/(app)/(auth)/(modal)/location'} asChild>
-          <TouchableOpacity style={styles.locationSmall}>
-            <Text style={styles.locationSmallTextt}>Ubicación</Text>
-            <Ionicons name="chevron-down" size={14} />
-          </TouchableOpacity>
+          <Link href={"/(app)/(auth)/(modal)/location"} asChild>
+            <TouchableOpacity style={styles.locationSmall}>
+              <Text style={styles.locationSmallTextt}>Ubicación</Text>
+              <Ionicons name="chevron-down" size={14} />
+            </TouchableOpacity>
           </Link>
         </View>
         <View style={styles.rightIcons}>
-          <Link href={'/(app)/(auth)/(modal)/filter'} asChild>
-           <TouchableOpacity style={styles.iconButton}>
-             <Ionicons name="filter" size={20} />
-           </TouchableOpacity>
+          <Link href={"/(app)/(auth)/(modal)/filter"} asChild>
+            <TouchableOpacity style={styles.iconButton}>
+              <Ionicons name="filter" size={20} />
+            </TouchableOpacity>
+          </Link>
+          <Link href={"/(app)/(auth)/(modal)/map"} asChild>
+            <TouchableOpacity style={styles.iconButton}>
+              <Ionicons name="map-outline" size={20} />
+            </TouchableOpacity>
           </Link>
         </View>
-      </Animated.View> 
+      </Animated.View>
     </Animated.View>
   );
 };
@@ -126,10 +140,10 @@ const styles = StyleSheet.create({
     zIndex: 100,
     // boxShadow: "0px 2px 4px -2px rgba(0, 0, 0, 0.2)",
     shadowColor: "#000",
-    shadowOffset: { width: 0,height: 2 },
+    shadowOffset: { width: 0, height: 2 },
     shadowRadius: 4,
   },
-  header1: {    
+  header1: {
     paddingHorizontal: 16,
     paddingTop: 8,
     paddingBottom: 12,
@@ -193,6 +207,6 @@ const styles = StyleSheet.create({
   locationSmallTextt: {
     fontSize: 12,
     color: Colors.muted,
-  }
+  },
 });
 export default ComidasHeader;
