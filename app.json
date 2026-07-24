@@ -20,7 +20,12 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.anonymous.AppRestaurante"
+      "package": "com.anonymous.AppRestaurante",
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyAEK-VgdtX9iRJcKc5iD_VN3TUVBKWESA0"
+        }
+      }
     },
     "web": {
       "output": "static",

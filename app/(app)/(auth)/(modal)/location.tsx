@@ -1,6 +1,7 @@
 import { Colors, Fonts } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React from 'react';
 
 const Page = () => {
   return (

@@ -51,3 +51,4 @@ npx expo install expo-secure-store
 Localizacion maps:
 
 npx expo install expo-maps expo-location
+npx expo install react-native-maps (esto es la librería)

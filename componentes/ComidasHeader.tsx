@@ -87,7 +87,6 @@ const ComidasHeader = ({ title, scrollOffset }: ComidasHeaderProps) => {
             <Ionicons name="chevron-down" size={16} />
           </TouchableOpacity>
         </Link>
-
         <View style={styles.rightIcons}>
           <Link href={"/(app)/(auth)/(modal)/filter"} asChild>
             <TouchableOpacity style={styles.iconButton}>
