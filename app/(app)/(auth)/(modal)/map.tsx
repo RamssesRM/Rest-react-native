@@ -1,12 +1,19 @@
-import { StyleSheet, Text, View, ActivityIndicator, Platform, TouchableOpacity } from 'react-native';
-import React, { useRef } from 'react';
-import { useRouter } from 'expo-router';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useRestaurants, useRestaurantMarkers } from '@/hooks/useRestaurants';
-import { Ionicons } from '@expo/vector-icons';
-import { Colors } from '@/constants/theme';
-import * as Location from 'expo-location';
-import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+import { Colors } from "@/constants/theme";
+import { useRestaurantMarkers, useRestaurants } from "@/hooks/useRestaurants";
+import { Ionicons } from "@expo/vector-icons";
+import * as Location from "expo-location";
+import { useRouter } from "expo-router";
+import React, { useEffect, useRef } from "react"; // 👈 Asegúrate de importar useEffect
+import {
+  ActivityIndicator,
+  Platform,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const Page = () => {
   const router = useRouter();
@@ -14,28 +21,45 @@ const Page = () => {
   const mapRef = useRef<MapView>(null);
 
   const { data: restaurants, isLoading: restaurantsLoading } = useRestaurants();
-  const { data: restaurantMarkers, isLoading: markersLoading } = useRestaurantMarkers();
+  const { data: restaurantMarkers, isLoading: markersLoading } =
+    useRestaurantMarkers();
 
-  // Función corregida con solicitud de permisos
+  // 🔴 AQUÍ VA EL BLOQUE DE CÓDIGO 🔴
+  useEffect(() => {
+    if (restaurantMarkers && restaurantMarkers.length > 0 && mapRef.current) {
+      const coordinates = restaurantMarkers.map((m) => ({
+        latitude: m.latitude,
+        longitude: m.longitude,
+      }));
+
+      mapRef.current.fitToCoordinates(coordinates, {
+        edgePadding: { top: 80, right: 80, bottom: 80, left: 80 },
+        animated: true,
+      });
+    }
+  }, [restaurantMarkers]);
+
   const locateMe = async () => {
     let { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== 'granted') {
-      alert('Se requieren permisos de ubicación para centrar el mapa.');
+    if (status !== "granted") {
+      alert("Se requieren permisos de ubicación.");
       return;
     }
 
     let location = await Location.getCurrentPositionAsync({});
-    mapRef.current?.animateToRegion({
-      latitude: location.coords.latitude,
-      longitude: location.coords.longitude,
-      latitudeDelta: 0.01,
-      longitudeDelta: 0.01,
-    }, 1000);
+    mapRef.current?.animateToRegion(
+      {
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+        latitudeDelta: 0.01,
+        longitudeDelta: 0.01,
+      },
+      1000,
+    );
   };
 
   const markerSelected = (restaurantId: string) => {
-    console.log('Restaurante seleccionado:', restaurantId);
-    // Aquí podrías navegar al detalle: router.push(`/restaurant/${restaurantId}`);
+    console.log("Restaurante seleccionado:", restaurantId);
   };
 
   if (restaurantsLoading || markersLoading) {
@@ -46,21 +70,20 @@ const Page = () => {
     );
   }
 
-  if (Platform.OS === 'android' || Platform.OS === 'ios') {
+  if (Platform.OS === "android" || Platform.OS === "ios") {
     return (
       <View style={styles.container}>
-        <MapView 
+        <MapView
           ref={mapRef}
-          provider={PROVIDER_GOOGLE} // 👈 Forzar el proveedor de Google Maps
-          style={StyleSheet.absoluteFillObject} 
+          provider={PROVIDER_GOOGLE}
+          style={StyleSheet.absoluteFillObject}
           initialRegion={{
             latitude: restaurantMarkers?.[0]?.latitude || 7.7669,
-            longitude: restaurantMarkers?.[0]?.longitude || -72.2250,
-            latitudeDelta: 0.0922,
-            longitudeDelta: 0.0421,
+            longitude: restaurantMarkers?.[0]?.longitude || -72.225,
+            latitudeDelta: 0.05,
+            longitudeDelta: 0.05,
           }}
-          showsUserLocation={true} // 👈 Muestra el punto azul del usuario
-          showsMyLocationButton={false} // Desactivamos el nativo para usar nuestro botón custom
+          showsUserLocation={true}
         >
           {restaurantMarkers?.map((marker) => (
             <Marker
@@ -75,17 +98,20 @@ const Page = () => {
           ))}
         </MapView>
 
-        {/* Botón flotante para regresar */}
-        <TouchableOpacity 
-          style={[styles.floatingButton, { top: insets.top + 10, left: 16 }]} 
+        {/* Botón flotante para cerrar */}
+        <TouchableOpacity
+          style={[styles.floatingButton, { top: insets.top + 10, left: 16 }]}
           onPress={() => router.back()}
         >
           <Ionicons name="close-outline" size={24} color="#000" />
         </TouchableOpacity>
 
-        {/* Botón flotante para ubicar al usuario */}
-        <TouchableOpacity 
-          style={[styles.floatingButton, { bottom: insets.bottom + 20, right: 16 }]} 
+        {/* Botón flotante para ubicar */}
+        <TouchableOpacity
+          style={[
+            styles.floatingButton,
+            { bottom: insets.bottom + 20, right: 16 },
+          ]}
           onPress={locateMe}
         >
           <Ionicons name="locate-outline" size={24} color="#000" />
@@ -105,17 +131,17 @@ const styles = StyleSheet.create({
   },
   loaderContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#fff',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#fff",
   },
   floatingButton: {
-    position: 'absolute',
-    backgroundColor: '#fff',
+    position: "absolute",
+    backgroundColor: "#fff",
     padding: 12,
     borderRadius: 30,
     elevation: 4,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,

@@ -10,7 +10,7 @@ const Layout = () => {
     <Stack screenOptions={{ headerShown: false }}>
       {/* Cambiado de 'index' a '(tabs)' */}
       <Stack.Screen name="(tabs)" />
-      <Stack.Screen name="(modal)/map.tsx" />
+      <Stack.Screen name="(modal)/map" options={{ presentation: "modal" }} />
       <Stack.Screen
         name="(modal)/location"
         options={{
