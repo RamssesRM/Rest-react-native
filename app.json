@@ -51,7 +51,8 @@
         {
           "locationWhenInUsePermission": "Allow $(PRODUCT_NAME) para usar tu localización"
         }
-      ]
+      ],
+      "expo-maps"
     ],
     "experiments": {
       "typedRoutes": true,

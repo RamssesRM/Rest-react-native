@@ -1,86 +1,123 @@
-import { BASE_URL, getHeaders } from "./apiConfig";
+import { BASE_URL } from "./apiConfig";
+import * as SecureStore from 'expo-secure-store';
 
-// Esta funcion trae todas las categorias de django
+const getAuthHeaders = async () => {
+    const token = await SecureStore.getItemAsync('jwt_access');
+    return {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+    };
+};
+
+// Obtener todos los detalles
 export const tomarDetallesOrdenes = async () => {
-    try{
-        const response = await fetch(`${BASE_URL}/detalles/`);
-        if (!response.ok) throw new Error('Error al traer las detalles 6');
-    }catch (error){
-        console.log('Error al traer todas las detalles 8', error);
+    try {
+        const headers = await getAuthHeaders();
+        const response = await fetch(`${BASE_URL}/detalles/`, { headers });
+        if (!response.ok) throw new Error('Error al traer los detalles');
+        return await response.json();
+    } catch (error) {
+        console.log('Error al traer todos los detalles', error);
         throw error;
     }
 };
 
-// Esta funcion trae la categoria cuando se inserte un id, se utiliza más que todo cuando se vaya a editar para llenar los campos que se van a modificar y hacerla más dinámica
+// Obtener detalle por ID
 export const tomarDetalleOrdenConId = async (id) => {
-    try{
-        const response = await fetch(`${BASE_URL}/detalles/${id}/`);
-        if (!response.ok) throw new Error('Error al traer la orden 18');
-    }catch (error){
-        console.log('Error al traer la orden 20', error);
+    try {
+        const headers = await getAuthHeaders();
+        const response = await fetch(`${BASE_URL}/detalles/${id}/`, { headers });
+        if (!response.ok) throw new Error('Error al traer el detalle');
+        return await response.json();
+    } catch (error) {
+        console.log('Error al traer el detalle', error);
         throw error;
     }
-}
+};
 
+// Obtener detalles por orden
+export const tomarDetallesPorOrden = async (orden_id) => {
+    try {
+        const headers = await getAuthHeaders();
+        const response = await fetch(`${BASE_URL}/detalles/?orden_fk=${orden_id}`, { headers });
+        if (!response.ok) throw new Error('Error trayendo detalles de la orden');
+        return await response.json();
+    } catch (error) {
+        console.log('Error al tomar detalles de la orden', error);
+        throw error;
+    }
+};
+
+// Obtener detalles por usuario
 export const tomarDetalleOrdenConUsuario = async (usuario_id) => {
-    try{
-        const response = fetch(`${BASE_URL}/detalles/?usuario_fk_id=${usuario_id}`)
-        if (!response.ok) throw new Error ('Error trayendo la ')
-    }catch (error){
-        console.log('Error al tomar la orden con el usuario que lo agregó', error)
-        throw error
+    try {
+        const headers = await getAuthHeaders();
+        const response = await fetch(`${BASE_URL}/detalles/?usuario_fk_id=${usuario_id}`, { headers });
+        if (!response.ok) throw new Error('Error trayendo detalles del usuario');
+        return await response.json();
+    } catch (error) {
+        console.log('Error al tomar detalles del usuario', error);
+        throw error;
     }
-}
+};
 
+// Obtener detalles por producto
 export const tomarDetalleOrdenConProducto = async (producto_id) => {
-    try{
-        const response = fetch(`${BASE_URL}/detalles/?producto_fk_id=${producto_id}`)
-        if (!response.ok) throw new Error ('Error trayendo la ')
-    }catch (error){
-        console.log('Error al tomar la orden con el usuario que lo agregó', error)
-        throw error
+    try {
+        const headers = await getAuthHeaders();
+        const response = await fetch(`${BASE_URL}/detalles/?producto_fk_id=${producto_id}`, { headers });
+        if (!response.ok) throw new Error('Error trayendo detalles del producto');
+        return await response.json();
+    } catch (error) {
+        console.log('Error al tomar detalles del producto', error);
+        throw error;
     }
-}
+};
 
-// Esto guarda la categoria al momento de pasarle un objeto que el django acepte, si no lo acepta o no cumple con los modelos y los serializadores de django no va a guardar la informacion
+// Crear detalle
 export const crearDetalleOrden = async (Data) => {
-    try{
+    try {
+        const headers = await getAuthHeaders();
         const response = await fetch(`${BASE_URL}/detalles/`, {
             method: 'POST',
-            headers: getHeaders(),
+            headers,
             body: JSON.stringify(Data),
         });
-        if (!response.ok) throw new Error('Error al guardar la orden 32')
-            return await response.json();
-    }catch (error){
-        console.log('Error al momento de crear la orden 36', error);
+        if (!response.ok) throw new Error('Error al guardar el detalle');
+        return await response.json();
+    } catch (error) {
+        console.log('Error al momento de crear el detalle', error);
         throw error;
     }
-}
+};
 
+// Actualizar detalle completo
 export const actualizarDetalleOrden = async (id, Data) => {
-    try{
+    try {
+        const headers = await getAuthHeaders();
         const response = await fetch(`${BASE_URL}/detalles/${id}/`, {
-            method : 'PUT',
-            headers: getHeaders,
-            body:JSON.stringify(Data),
-        })
-        if (!response.ok) throw new Error('Error actualizando la orden 48')
-        return await response.json
-    }catch (error){
-        console.log('Error al momento de actualizar la orden 50', error);
-        throw error
+            method: 'PUT',
+            headers,
+            body: JSON.stringify(Data),
+        });
+        if (!response.ok) throw new Error('Error actualizando el detalle');
+        return await response.json();
+    } catch (error) {
+        console.log('Error al momento de actualizar el detalle', error);
+        throw error;
     }
-}
+};
 
+// Actualizar detalle parcial
 export const patchDetalleOrden = async (id, dataParcial) => {
     try {
+        const headers = await getAuthHeaders();
         const response = await fetch(`${BASE_URL}/detalles/${id}/`, {
             method: 'PATCH',
-            headers: getHeaders(),
+            headers,
             body: JSON.stringify(dataParcial),
         });
-        if (!response.ok) throw new Error('Error al modificar la orden');
+        if (!response.ok) throw new Error('Error al modificar el detalle');
         return await response.json();
     } catch (error) {
         console.error('Error en PATCH:', error);
@@ -88,16 +125,18 @@ export const patchDetalleOrden = async (id, dataParcial) => {
     }
 };
 
+// Eliminar detalle
 export const eliminarDetalleOrden = async (id) => {
-    try{
-        const response = fetch(`${BASE_URL}/detalles/${id}`,{
+    try {
+        const headers = await getAuthHeaders();
+        const response = await fetch(`${BASE_URL}/detalles/${id}/`, {
             method: 'DELETE',
-            headers:getHeaders(),
-        })
-        if (!response.ok) throw new Error('Error al eliminar fisicamente la orden')
-        return true
-    }catch (error){
-        console.log('Error al eliminar la orden fisicamente', error)
-        throw error
+            headers,
+        });
+        if (!response.ok) throw new Error('Error al eliminar el detalle');
+        return true;
+    } catch (error) {
+        console.log('Error al eliminar el detalle', error);
+        throw error;
     }
-}
+};

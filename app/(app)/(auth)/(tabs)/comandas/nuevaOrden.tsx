@@ -1,11 +1,9 @@
+import { crearOrden, crearDetalle, getMesas, getCategorias, getProductos } from '@/app/api/ordenesApi';
 import useUserStore from '@/hooks/use-userstore';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
-import * as SecureStore from 'expo-secure-store';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, FlatList, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-
-const API_URL = 'http://10.0.2.2:8000/api';
 
 export default function NuevaOrdenScreen() {
     const router = useRouter();
@@ -23,17 +21,15 @@ export default function NuevaOrdenScreen() {
     useEffect(() => {
         const initData = async () => {
             try {
-                const headers = { 'Authorization': `Bearer ${await SecureStore.getItemAsync('jwt_access')}` };
-
-                const [mesasRes, catsRes, prodsRes] = await Promise.all([
-                    fetch(`${API_URL}/mesas/`, { headers }),
-                    fetch(`${API_URL}/categorias/`, { headers }),
-                    fetch(`${API_URL}/productos/`, { headers }),
+                const [mesasData, catsData, prodsData] = await Promise.all([
+                    getMesas(),
+                    getCategorias(),
+                    getProductos(),
                 ]);
 
-                setMesas(await mesasRes.json());
-                setCategorias(await catsRes.json());
-                setProductos(await prodsRes.json());
+                setMesas(mesasData);
+                setCategorias(catsData);
+                setProductos(prodsData);
             } catch (error) {
                 Alert.alert('Error', 'No se pudo cargar la información');
             } finally {
@@ -85,53 +81,23 @@ export default function NuevaOrdenScreen() {
     const enviarOrdenBackend = async () => {
         setIsLoading(true);
         try {
-            const token = await SecureStore.getItemAsync('jwt_access');
-            const headers = { 'Authorization': `Bearer token`, 'Content-Type': 'application/json' };
-            headers.Authorization = `Bearer ${token}`;
-
-            const payload = {
+            const ordenCreada = await crearOrden({
                 mesa_fk: selectedMesa.id,
                 cliente: user.id,
                 estatus: 'pidiendo'
-            };
-            console.log("ENVIANDO ESTO A DJANGO:", JSON.stringify(payload));
-            
-            // PASO A: Crear la Orden (Sin productos aún)
-            const ordenRes = await fetch(`${API_URL}/ordenes/`, {
-                method: 'POST',
-                headers,
-                body: JSON.stringify({
-                    mesa_fk: selectedMesa.id,
-                    cliente: user.id,
-                    estatus: 'pidiendo'
-                    // monto_total: 0.00 // Tu backend lo calculará, pero por si acaso lo dejamos
-                })
             });
-            const ordenCreada = await ordenRes.json();
 
-            // PASO B: Crear los Detalles (El ciclo recorre el carrito)
             for (const item of carrito) {
-                const detalleRes = await fetch(`${API_URL}/detalles/`, {
-                    method: 'POST',
-                    headers,
-                    body: JSON.stringify({
-                        orden_fk: ordenCreada.id,
-                        producto_fk: item.id,
-                        precio: item.precio,
-                        cantidad: item.cantidad
-                    })
+                await crearDetalle({
+                    orden_fk: ordenCreada.id,
+                    producto_fk: item.id,
+                    precio: item.precio,
+                    cantidad: item.cantidad
                 });
-                if (!detalleRes.ok) {
-                    const errorDetalle = await detalleRes.json();
-                    console.log("ERROR DETALLE:", JSON.stringify(errorDetalle));
-                    Alert.alert('Error en detalle', JSON.stringify(errorDetalle));
-                    throw new Error('Error al crear detalle');
-                }
             }
 
             Alert.alert('¡Éxito!', 'Orden enviada a cocina');
-            router.back(); // Regresa al panel de comandas
-
+            router.back();
         } catch (error) {
             Alert.alert('Error', 'No se pudo crear la orden');
         } finally {
@@ -145,12 +111,6 @@ export default function NuevaOrdenScreen() {
         : productos;
 
     if (isLoading) return <ActivityIndicator style={{flex:1}} color="#D4AF37" size="large"/>;
-
-    // console.log("Categoría seleccionada:", selectedCat);
-    // if (selectedCat) {
-    //     console.log("Ejemplo de producto categoría_id:", productos[0]?.categoria_id);
-    //     console.log("Son iguales?", String(productos[0]?.categoria_id) === String(selectedCat));
-    // }
 
     return (
         <View style={styles.container}>

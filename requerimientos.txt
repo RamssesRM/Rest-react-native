@@ -52,3 +52,6 @@ Localizacion maps:
 
 npx expo install expo-maps expo-location
 npx expo install react-native-maps (esto es la librería)
+
+npx expo install expo-print
+npx expo install expo-image-picker
