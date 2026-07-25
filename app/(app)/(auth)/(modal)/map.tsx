@@ -3,9 +3,10 @@ import { useRestaurantMarkers, useRestaurants } from "@/hooks/useRestaurants";
 import { Ionicons } from "@expo/vector-icons";
 import * as Location from "expo-location";
 import { useRouter } from "expo-router";
-import React, { useEffect, useRef } from "react"; // 👈 Asegúrate de importar useEffect
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
   Platform,
   StyleSheet,
   Text,
@@ -24,7 +25,8 @@ const Page = () => {
   const { data: restaurantMarkers, isLoading: markersLoading } =
     useRestaurantMarkers();
 
-  // 🔴 AQUÍ VA EL BLOQUE DE CÓDIGO 🔴
+  const [mapReady, setMapReady] = useState(false);
+
   useEffect(() => {
     if (restaurantMarkers && restaurantMarkers.length > 0 && mapRef.current) {
       const coordinates = restaurantMarkers.map((m) => ({
@@ -37,12 +39,12 @@ const Page = () => {
         animated: true,
       });
     }
-  }, [restaurantMarkers]);
+  }, [restaurantMarkers, mapReady]);
 
   const locateMe = async () => {
     let { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== "granted") {
-      alert("Se requieren permisos de ubicación.");
+      Alert.alert("Permiso denegado", "Se requieren permisos de ubicación.");
       return;
     }
 
@@ -61,6 +63,11 @@ const Page = () => {
   const markerSelected = (restaurantId: string) => {
     console.log("Restaurante seleccionado:", restaurantId);
   };
+
+  const onMapReady = useCallback(() => {
+    console.log("MapView listo");
+    setMapReady(true);
+  }, []);
 
   if (restaurantsLoading || markersLoading) {
     return (
@@ -84,6 +91,7 @@ const Page = () => {
             longitudeDelta: 0.05,
           }}
           showsUserLocation={true}
+          onMapReady={onMapReady}
         >
           {restaurantMarkers?.map((marker) => (
             <Marker
@@ -98,7 +106,6 @@ const Page = () => {
           ))}
         </MapView>
 
-        {/* Botón flotante para cerrar */}
         <TouchableOpacity
           style={[styles.floatingButton, { top: insets.top + 10, left: 16 }]}
           onPress={() => router.back()}
@@ -106,7 +113,6 @@ const Page = () => {
           <Ionicons name="close-outline" size={24} color="#000" />
         </TouchableOpacity>
 
-        {/* Botón flotante para ubicar */}
         <TouchableOpacity
           style={[
             styles.floatingButton,
