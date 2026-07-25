@@ -1,8 +1,10 @@
 import { cambiarEstadoOrden, getMisOrdenes, getOrdenesActivas, getOrdenesFinalizadas, getTodasLasOrdenes } from '@/app/api/ordenesApi';
+import DetallesOrdenesCard from '@/componentes/DetallesOrdenesCard';
 import useUserStore from '@/hooks/use-userstore';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import BottomSheet from '@gorhom/bottom-sheet';
 import { useFocusEffect, useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, FlatList, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 // Colores dinámicos para los estados (UI/UX Profesional)
 const getStatusColor = (status: string) => {
@@ -26,13 +28,17 @@ export default function ComandasScreen() {
     const [ordenes, setOrdenes] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
 
+    // Bottom Sheet
+    const bottomSheetRef = useRef<BottomSheet>(null);
+    const [ordenSeleccionada, setOrdenSeleccionada] = useState(null);
+
     // Estados para el Admin
     const [filtroAdmin, setFiltroAdmin] = useState('');
     const [busquedaAdmin, setBusquedaAdmin] = useState('');
     const [textoTemporal, setTextoTemporal] = useState('');
 
-    // Carga de datos según el rol
     const cargarDatos = async () => {
+        if (!user) return;
         setIsLoading(true);
         try {
             let data = [];
@@ -40,7 +46,7 @@ export default function ComandasScreen() {
             else if (role === 'mesero') data = await getOrdenesActivas();
             else if (role === 'cajero') data = await getOrdenesFinalizadas();
             else if (role === 'admin') data = await getTodasLasOrdenes(filtroAdmin, busquedaAdmin);
-
+            
             setOrdenes(data);
         } catch (error) {
             Alert.alert('Error', 'No se pudieron cargar las comandas');
@@ -51,26 +57,8 @@ export default function ComandasScreen() {
 
     useFocusEffect(
     React.useCallback(() => {
-      const cargarDatos = async () => {
-        if (!user) return;
-        setIsLoading(true);
-        try {
-          let data = [];
-          if (role === 'cliente') data = await getMisOrdenes();
-          else if (role === 'mesero') data = await getOrdenesActivas();
-          else if (role === 'cajero') data = await getOrdenesFinalizadas();
-          else if (role === 'admin') data = await getTodasLasOrdenes(filtroAdmin, busquedaAdmin);
-          
-          setOrdenes(data);
-        } catch (error) {
-          Alert.alert('Error', 'No se pudieron cargar las comandas');
-        } finally {
-          setIsLoading(false);
-        }
-      };
-
       cargarDatos();
-    }, [user, role, filtroAdmin, busquedaAdmin]) // Se añade 'role' a las dependencias
+    }, [user, role, filtroAdmin, busquedaAdmin])
   );
 
     const handleCambiarEstado = async (id, nuevoEstado, datosExtra = {}) => {
@@ -88,6 +76,23 @@ export default function ComandasScreen() {
             { text: 'Sí, eliminar', style: 'destructive', onPress: () => handleCambiarEstado(id, 'eliminado') }
         ]);
     };
+
+    // Abrir detalle de orden
+    const handleAbrirDetalle = useCallback((orden) => {
+        setOrdenSeleccionada(orden);
+        bottomSheetRef.current?.expand();
+    }, []);
+
+    // Cerrar detalle
+    const handleCerrarDetalle = useCallback(() => {
+        bottomSheetRef.current?.close();
+        setOrdenSeleccionada(null);
+    }, []);
+
+    // Recargar datos después de cambios
+    const handleEstadoCambiado = useCallback(() => {
+        cargarDatos();
+    }, [user, role, filtroAdmin, busquedaAdmin]);
 
     // --- COMPONENTES POR ROL ---
 
@@ -143,7 +148,11 @@ export default function ComandasScreen() {
         if (role === 'mesero' && (item.estatus === 'pagado' || item.estatus === 'eliminado')) return null;
 
         return (
-            <View style={styles.card}>
+            <TouchableOpacity 
+                style={styles.card}
+                onPress={() => handleAbrirDetalle(item)}
+                activeOpacity={0.7}
+            >
                 <View style={styles.cardHeader}>
                     <Text style={styles.mesaText}>Mesa: {item.mesa_info?.numero_mesa || 'N/A'}</Text>
                     <View style={[styles.statusBadge, { backgroundColor: getStatusColor(item.estatus) + '20' }]}>
@@ -166,24 +175,24 @@ export default function ComandasScreen() {
                         {role === 'mesero' && item.estatus === 'pidiendo' && (
                             <TouchableOpacity 
                             style={styles.actionBtn} 
-                            onPress={() => handleCambiarEstado(item.id, 'cocinando', { mesero: user?.id })}
+                            onPress={(e) => { e.stopPropagation?.(); handleCambiarEstado(item.id, 'cocinando', { mesero: user?.id }); }}
                             >
                                 <Text style={styles.actionText}>Cocinar</Text>
                             </TouchableOpacity>
                         )}
                         {role === 'cajero' && item.estatus === 'finalizado' && (
-                            <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#4CAF50' }]} onPress={() => handleCambiarEstado(item.id, 'pagado')}>
+                            <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#4CAF50' }]} onPress={(e) => { e.stopPropagation?.(); handleCambiarEstado(item.id, 'pagado'); }}>
                                 <Text style={{ ...styles.actionText, color: '#fff' }}>Cobrar</Text>
                             </TouchableOpacity>
                         )}
                         {role === 'cliente' && item.estatus === 'pidiendo' && (
-                            <TouchableOpacity style={styles.deleteBtn} onPress={() => handleEliminar(item.id)}>
+                            <TouchableOpacity style={styles.deleteBtn} onPress={(e) => { e.stopPropagation?.(); handleEliminar(item.id); }}>
                                 <Text style={styles.deleteText}>Cancelar</Text>
                             </TouchableOpacity>
                         )}
                     </View>
                 </View>
-            </View>
+            </TouchableOpacity>
         );
     };
 
@@ -202,6 +211,15 @@ export default function ComandasScreen() {
                 renderItem={RenderCard}
                 contentContainerStyle={styles.list}
                 ListEmptyComponent={<Text style={styles.emptyText}>No hay comandas para mostrar</Text>}
+            />
+
+            {/* Bottom Sheet de Detalles */}
+            <DetallesOrdenesCard
+                ref={bottomSheetRef}
+                orden={ordenSeleccionada}
+                role={role || ''}
+                onDismiss={handleCerrarDetalle}
+                onEstadoCambiado={handleEstadoCambiado}
             />
         </View>
     );
