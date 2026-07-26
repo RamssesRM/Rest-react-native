@@ -23,7 +23,7 @@
       "package": "com.anonymous.AppRestaurante",
       "config": {
         "googleMaps": {
-          "apiKey": "AIzaSyAEK-VgdtX9iRJcKc5iD_VN3TUVBKWESA0"
+          "apiKey": "AIzaSyAEK-VgdtX9iRJcKc5iD_VN3TUVBKwESA0"
         }
       }
     },
@@ -52,7 +52,7 @@
           "locationWhenInUsePermission": "Allow $(PRODUCT_NAME) para usar tu localización"
         }
       ],
-      "expo-maps"
+      "@react-native-google-signin/google-signin"
     ],
     "experiments": {
       "typedRoutes": true,

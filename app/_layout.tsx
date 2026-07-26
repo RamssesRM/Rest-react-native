@@ -11,6 +11,7 @@ import React, { useEffect, useState } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { ThemeProvider } from "@/hooks/use-theme";
 
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
