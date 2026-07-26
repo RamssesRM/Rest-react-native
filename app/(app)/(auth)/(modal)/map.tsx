@@ -7,13 +7,14 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  Linking,
   Platform,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
-import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
+import MapView, { Callout, Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const Page = () => {
@@ -21,11 +22,14 @@ const Page = () => {
   const insets = useSafeAreaInsets();
   const mapRef = useRef<MapView>(null);
 
-  const { data: restaurants, isLoading: restaurantsLoading } = useRestaurants();
+  const { data: restaurants } = useRestaurants();
   const { data: restaurantMarkers, isLoading: markersLoading } =
     useRestaurantMarkers();
 
   const [mapReady, setMapReady] = useState(false);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [userLocation, setUserLocation] =
+    useState<Location.LocationObject | null>(null);
 
   useEffect(() => {
     if (restaurantMarkers && restaurantMarkers.length > 0 && mapRef.current) {
@@ -49,6 +53,7 @@ const Page = () => {
     }
 
     let location = await Location.getCurrentPositionAsync({});
+    setUserLocation(location);
     mapRef.current?.animateToRegion(
       {
         latitude: location.coords.latitude,
@@ -60,16 +65,39 @@ const Page = () => {
     );
   };
 
-  const markerSelected = (restaurantId: string) => {
-    console.log("Restaurante seleccionado:", restaurantId);
+  const openDirections = async (destLat: number, destLng: number) => {
+    let originParam = "";
+
+    if (userLocation) {
+      originParam = `origin=${userLocation.coords.latitude},${userLocation.coords.longitude}&`;
+    } else {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status === "granted") {
+        const loc = await Location.getCurrentPositionAsync({});
+        setUserLocation(loc);
+        originParam = `origin=${loc.coords.latitude},${loc.coords.longitude}&`;
+      }
+    }
+
+    const url = `https://www.google.com/maps/dir/?${originParam}destination=${destLat},${destLng}&travelmode=driving`;
+
+    const canOpen = await Linking.canOpenURL(url);
+    if (canOpen) {
+      await Linking.openURL(url);
+    } else {
+      Alert.alert("Error", "No se puede abrir Google Maps.");
+    }
   };
 
   const onMapReady = useCallback(() => {
-    console.log("MapView listo");
     setMapReady(true);
   }, []);
 
-  if (restaurantsLoading || markersLoading) {
+  const selectedRestaurant = selectedId
+    ? restaurants?.find((r) => r.id === selectedId)
+    : null;
+
+  if (markersLoading) {
     return (
       <View style={styles.loaderContainer}>
         <ActivityIndicator size={"large"} color={Colors.secondary} />
@@ -93,17 +121,85 @@ const Page = () => {
           showsUserLocation={true}
           onMapReady={onMapReady}
         >
-          {restaurantMarkers?.map((marker) => (
-            <Marker
-              key={marker.id}
-              coordinate={{
-                latitude: marker.latitude,
-                longitude: marker.longitude,
-              }}
-              title={marker.name}
-              onPress={() => markerSelected(marker.id)}
-            />
-          ))}
+          {restaurantMarkers?.map((marker) => {
+            const restaurant = restaurants?.find((r) => r.id === marker.id);
+            return (
+              <Marker
+                key={marker.id}
+                coordinate={{
+                  latitude: marker.latitude,
+                  longitude: marker.longitude,
+                }}
+                title={marker.name}
+                onPress={() => setSelectedId(marker.id)}
+              >
+                <Callout
+                  tooltip
+                  onPress={() => {
+                    if (selectedRestaurant) {
+                      openDirections(
+                        selectedRestaurant.location.latitude,
+                        selectedRestaurant.location.longitude,
+                      );
+                    }
+                  }}
+                >
+                  <View style={styles.calloutContainer}>
+                    <Text style={styles.calloutTitle} numberOfLines={1}>
+                      {marker.name}
+                    </Text>
+
+                    {restaurant && (
+                      <>
+                        <Text style={styles.calloutAddress} numberOfLines={1}>
+                          {restaurant.location.address}
+                        </Text>
+
+                        <View style={styles.calloutRow}>
+                          <Ionicons name="star" size={14} color="#FFB800" />
+                          <Text style={styles.calloutRating}>
+                            {marker.rating}
+                          </Text>
+                          <Text style={styles.calloutDot}> • </Text>
+                          <Ionicons
+                            name="time-outline"
+                            size={14}
+                            color="#666"
+                          />
+                          <Text style={styles.calloutDelivery}>
+                            {marker.deliveryTime}
+                          </Text>
+                        </View>
+
+                        <Text style={styles.calloutCuisine} numberOfLines={1}>
+                          {marker.cuisine.join(" • ")}
+                        </Text>
+
+                        <View style={styles.calloutDivider} />
+
+                        <View style={styles.calloutDirectionsRow}>
+                          <Ionicons
+                            name="navigate-outline"
+                            size={16}
+                            color="#4285F4"
+                          />
+                          <Text style={styles.calloutDirectionsText}>
+                            Cómo llegar
+                          </Text>
+                        </View>
+
+                        {!restaurant.isOpen && (
+                          <Text style={styles.calloutClosed}>
+                            Cerrado ahora
+                          </Text>
+                        )}
+                      </>
+                    )}
+                  </View>
+                </Callout>
+              </Marker>
+            );
+          })}
         </MapView>
 
         <TouchableOpacity
@@ -151,5 +247,77 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
+  },
+  calloutContainer: {
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    padding: 14,
+    minWidth: 220,
+    maxWidth: 260,
+    elevation: 6,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+  },
+  calloutTitle: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#1a1a1a",
+    marginBottom: 2,
+  },
+  calloutAddress: {
+    fontSize: 12,
+    color: "#888",
+    marginBottom: 6,
+  },
+  calloutRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 4,
+  },
+  calloutRating: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: "#333",
+    marginLeft: 3,
+  },
+  calloutDot: {
+    fontSize: 13,
+    color: "#ccc",
+  },
+  calloutDelivery: {
+    fontSize: 13,
+    color: "#666",
+    marginLeft: 2,
+  },
+  calloutCuisine: {
+    fontSize: 12,
+    color: "#666",
+    marginBottom: 4,
+  },
+  calloutDivider: {
+    height: 1,
+    backgroundColor: "#eee",
+    marginVertical: 8,
+  },
+  calloutDirectionsRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 4,
+    paddingVertical: 4,
+  },
+  calloutDirectionsText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#4285F4",
+  },
+  calloutClosed: {
+    fontSize: 11,
+    color: "#E53935",
+    fontWeight: "500",
+    marginTop: 4,
+    textAlign: "center",
   },
 });

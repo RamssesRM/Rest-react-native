@@ -1,6 +1,6 @@
 //configuracion del boton de Helus autenticacion
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useRouter } from "expo-router";
+import React, { useRouter } from "expo-router";
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
 const Helusboton = () => {
   const router = useRouter();
