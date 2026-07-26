@@ -55,3 +55,6 @@ npx expo install react-native-maps (esto es la librería)
 
 npx expo install expo-print
 npx expo install expo-image-picker
+
+Google logueo:
+npx expo install @react-native-google-signin/google-signin

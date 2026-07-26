@@ -10,6 +10,7 @@ import { Slot } from "expo-router";
 import { useEffect, useState } from "react"; // ✅ 1. Importamos useState y useEffect
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {

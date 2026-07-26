@@ -85,8 +85,8 @@ const Page = () => {
           provider={PROVIDER_GOOGLE}
           style={StyleSheet.absoluteFillObject}
           initialRegion={{
-            latitude: restaurantMarkers?.[0]?.latitude || 7.7669,
-            longitude: restaurantMarkers?.[0]?.longitude || -72.225,
+            latitude: restaurantMarkers?.[0]?.latitude || 7.7776,
+            longitude: restaurantMarkers?.[0]?.longitude || -72.2333,
             latitudeDelta: 0.05,
             longitudeDelta: 0.05,
           }}

@@ -1,5 +1,23 @@
 const API_URL = 'http://10.0.2.2:8000/api';
 
+export const googleLogin = async (googleToken) => {
+  try {
+    const response = await fetch(`${API_URL}/auth/google/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: googleToken }),
+    });
+    const data = await response.json();
+    if (response.ok) {
+      return data;
+    } else {
+      throw new Error(data.error || 'Error al autenticar con Google');
+    }
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const loginUser = async (username, password)=>{
     try{
         const response = await fetch(`${API_URL}/auth/login/`, {
