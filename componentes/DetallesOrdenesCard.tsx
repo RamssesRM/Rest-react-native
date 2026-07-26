@@ -1,6 +1,6 @@
+import { BASE_URL } from '@/app/api/apiConfig';
 import { eliminarDetalleOrden, patchDetalleOrden } from '@/app/api/detallesOrdenesApi';
 import { cambiarEstadoOrden, registrarPago } from '@/app/api/ordenesApi';
-import { BASE_URL } from '@/app/api/apiConfig';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import BottomSheet, { BottomSheetBackdrop, BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import * as Haptics from 'expo-haptics';
@@ -16,6 +16,7 @@ type DetalleOrden = {
     producto_fk: string;
     precio: number;
     cantidad: number;
+    nota?: string;
     subtotal?: number;
 };
 
@@ -45,6 +46,7 @@ const DetallesOrdenesCard = forwardRef<BottomSheet, DetallesOrdenesCardProps>(
         const [detalles, setDetalles] = useState<DetalleOrden[]>([]);
         const [isLoading, setIsLoading] = useState(false);
         const [detallesEditados, setDetallesEditados] = useState<Map<string, number>>(new Map());
+        const [notasEditadas, setNotasEditadas] = useState<Map<string, string>>(new Map());
         const snapPoints = useMemo(() => ['75%'], []);
 
         const [modalVisible, setModalVisible] = useState(false);
@@ -86,6 +88,11 @@ const DetallesOrdenesCard = forwardRef<BottomSheet, DetallesOrdenesCardProps>(
 
                     setDetalles(detallesConInfo);
                     setDetallesEditados(new Map());
+                    const notasIniciales = new Map<string, string>();
+                    detallesConInfo.forEach((d: DetalleOrden) => {
+                        if (d.nota) notasIniciales.set(d.id, d.nota);
+                    });
+                    setNotasEditadas(notasIniciales);
                 }
             } catch (error) {
                 console.error('Error cargando detalles:', error);
@@ -98,6 +105,70 @@ const DetallesOrdenesCard = forwardRef<BottomSheet, DetallesOrdenesCardProps>(
             if (role !== 'cliente') return false;
             return detallesEditados.size > 0;
         }, [detallesEditados, role]);
+
+        const handleNotaChange = useCallback((detalleId: string, nota: string) => {
+            setNotasEditadas(prev => {
+                const next = new Map(prev);
+                if (nota.trim()) {
+                    next.set(detalleId, nota);
+                } else {
+                    next.delete(detalleId);
+                }
+                return next;
+            });
+        }, []);
+
+        const handleEnviarNotasMesero = async () => {
+            setIsLoading(true);
+            try {
+                const promises: Promise<any>[] = [];
+                for (const [detalleId, nota] of notasEditadas) {
+                    promises.push(patchDetalleOrden(detalleId, { nota }));
+                }
+                await Promise.all(promises);
+                Alert.alert('Éxito', 'Notas actualizadas');
+                await cargarDetalles();
+                onEstadoCambiado?.();
+            } catch (error) {
+                Alert.alert('Error', 'No se pudieron guardar las notas');
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        const handleCocinar = async () => {
+            Alert.alert('Confirmar', '¿Enviar orden a cocina?', [
+                { text: 'Cancelar', style: 'cancel' },
+                {
+                    text: 'Sí, cocinar',
+                    onPress: async () => {
+                        setIsLoading(true);
+                        try {
+                            if (notasEditadas.size > 0) {
+                                const promises: Promise<any>[] = [];
+                                for (const [detalleId, nota] of notasEditadas) {
+                                    promises.push(patchDetalleOrden(detalleId, { nota }));
+                                }
+                                await Promise.all(promises);
+                            }
+                            await cambiarEstadoOrden(orden!.id, 'cocinando');
+                            Alert.alert('Éxito', 'Orden enviada a cocina');
+                            onEstadoCambiado?.();
+                            onDismiss();
+                        } catch (error) {
+                            Alert.alert('Error', 'No se pudo enviar la orden');
+                        } finally {
+                            setIsLoading(false);
+                        }
+                    }
+                }
+            ]);
+        };
+
+        const hayCambiosMesero = useMemo(() => {
+            if (role !== 'mesero') return false;
+            return notasEditadas.size > 0;
+        }, [notasEditadas, role]);
 
         const handleCantidadChange = useCallback((detalleId: string, nuevaCantidad: number) => {
             if (nuevaCantidad < 1) {
@@ -178,8 +249,8 @@ const DetallesOrdenesCard = forwardRef<BottomSheet, DetallesOrdenesCardProps>(
 
             let contenido = `
 ╔══════════════════════════════════╗
-║        HELUS RESTOBAR           ║
-║        COMANDA #${orden!.id.slice(0, 8).toUpperCase()}        ║
+║            HELUS RESTOBAR              ║
+║            COMANDA #${orden!.id.slice(0, 8).toUpperCase()}           ║
 ╚══════════════════════════════════╝
 
 Mesa: ${mesa}
@@ -197,6 +268,10 @@ PRODUCTOS:
                 contenido += `
 ${d.cantidad}x ${nombre}
    $${Number(d.precio || 0).toFixed(2)} c/u    = $${subtotal}`;
+                if (d.nota) {
+                    contenido += `
+   Nota: ${d.nota}`;
+                }
             });
 
             contenido += `
@@ -364,6 +439,7 @@ TOTAL: $${Number(orden!.monto_total || 0).toFixed(2)}
                         detalles.map(detalle => {
                             const cantidadActual = detallesEditados.get(detalle.id) ?? detalle.cantidad;
                             const editado = detallesEditados.has(detalle.id);
+                            const notaActual = notasEditadas.get(detalle.id) ?? detalle.nota ?? '';
 
                             return (
                                 <View key={detalle.id} style={[styles.productCard, editado && styles.productCardEdited]}>
@@ -404,6 +480,44 @@ TOTAL: $${Number(orden!.monto_total || 0).toFixed(2)}
                         })
                     )}
 
+                    {role === 'mesero' && orden.estatus === 'pidiendo' && (
+                        <View style={styles.notaSection}>
+                            <Text style={styles.notaSectionTitle}>Notas de productos</Text>
+                            {detalles.map(detalle => (
+                                <View key={detalle.id} style={styles.notaItem}>
+                                    <Text style={styles.notaProductName}>
+                                        {detalle.producto_info?.nombre || 'Producto'}
+                                    </Text>
+                                    <TextInput
+                                        style={styles.notaInput}
+                                        placeholder="Ej: sin cebolla, poco cocido..."
+                                        placeholderTextColor="#B0B0B0"
+                                        multiline
+                                        numberOfLines={2}
+                                        textAlignVertical="top"
+                                        maxLength={500}
+                                        value={notasEditadas.get(detalle.id) ?? detalle.nota ?? ''}
+                                        onChangeText={(text) => handleNotaChange(detalle.id, text)}
+                                    />
+                                </View>
+                            ))}
+                        </View>
+                    )}
+
+                    {role === 'mesero' && orden.estatus !== 'pidiendo' && detalles.some(d => d.nota) && (
+                        <View style={styles.notaSection}>
+                            <Text style={styles.notaSectionTitle}>Notas</Text>
+                            {detalles.filter(d => d.nota).map(detalle => (
+                                <View key={detalle.id} style={styles.notaDisplayItem}>
+                                    <Text style={styles.notaDisplayProduct}>
+                                        {detalle.producto_info?.nombre || 'Producto'}:
+                                    </Text>
+                                    <Text style={styles.notaDisplayText}>{detalle.nota}</Text>
+                                </View>
+                            ))}
+                        </View>
+                    )}
+
                     <View style={styles.totalRow}>
                         <Text style={styles.totalLabel}>Total</Text>
                         <Text style={styles.totalAmount}>${Number(orden.monto_total || 0).toFixed(2)}</Text>
@@ -422,6 +536,31 @@ TOTAL: $${Number(orden!.monto_total || 0).toFixed(2)}
                                 <Ionicons name="print-outline" size={20} color="#fff" />
                                 <Text style={styles.actionBtnText}>Imprimir Comanda</Text>
                             </TouchableOpacity>
+                        )}
+
+                        {role === 'mesero' && orden.estatus === 'pidiendo' && (
+                            <>
+                                {hayCambiosMesero && (
+                                    <TouchableOpacity
+                                        style={[styles.actionBtnPrimary, isLoading && styles.actionBtnDisabled]}
+                                        onPress={handleEnviarNotasMesero}
+                                        disabled={isLoading}
+                                    >
+                                        <Ionicons name="save-outline" size={20} color="#fff" />
+                                        <Text style={styles.actionBtnText}>
+                                            {isLoading ? 'Guardando...' : 'Guardar Notas'}
+                                        </Text>
+                                    </TouchableOpacity>
+                                )}
+                                <TouchableOpacity
+                                    style={[styles.actionBtnCook, isLoading && styles.actionBtnDisabled]}
+                                    onPress={handleCocinar}
+                                    disabled={isLoading}
+                                >
+                                    <Ionicons name="flame-outline" size={20} color="#fff" />
+                                    <Text style={styles.actionBtnText}>Cocinar</Text>
+                                </TouchableOpacity>
+                            </>
                         )}
 
                         {role === 'mesero' && orden.estatus === 'cocinando' && (
@@ -749,6 +888,15 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         gap: 8,
     },
+    actionBtnCook: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#E65100',
+        paddingVertical: 14,
+        borderRadius: 12,
+        gap: 8,
+    },
     actionBtnDisabled: {
         opacity: 0.5,
     },
@@ -756,6 +904,57 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 16,
         fontWeight: 'bold',
+    },
+    notaSection: {
+        marginTop: 12,
+        marginBottom: 8,
+    },
+    notaSectionTitle: {
+        fontSize: 14,
+        fontWeight: 'bold',
+        color: '#262626',
+        marginBottom: 8,
+    },
+    notaItem: {
+        marginBottom: 10,
+    },
+    notaProductName: {
+        fontSize: 13,
+        fontWeight: '600',
+        color: '#555',
+        marginBottom: 4,
+    },
+    notaInput: {
+        borderWidth: 1,
+        borderColor: '#E0E0E0',
+        borderRadius: 8,
+        paddingHorizontal: 12,
+        paddingVertical: 8,
+        fontSize: 13,
+        color: '#262626',
+        backgroundColor: '#FFF',
+        minHeight: 52,
+    },
+    notaDisplayItem: {
+        flexDirection: 'row',
+        backgroundColor: '#FFF',
+        borderRadius: 8,
+        padding: 10,
+        marginBottom: 6,
+        borderWidth: 1,
+        borderColor: '#EFEFEF',
+    },
+    notaDisplayProduct: {
+        fontSize: 13,
+        fontWeight: '600',
+        color: '#262626',
+        marginRight: 6,
+    },
+    notaDisplayText: {
+        fontSize: 13,
+        color: '#666',
+        flex: 1,
+        fontStyle: 'italic',
     },
     modalOverlay: {
         flex: 1,
