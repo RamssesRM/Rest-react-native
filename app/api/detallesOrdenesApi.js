@@ -1,19 +1,8 @@
-import { BASE_URL } from "./apiConfig";
-import * as SecureStore from 'expo-secure-store';
+import { apiClient } from "./apiClient";
 
-const getAuthHeaders = async () => {
-    const token = await SecureStore.getItemAsync('jwt_access');
-    return {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-    };
-};
-
-// Obtener todos los detalles
 export const tomarDetallesOrdenes = async () => {
     try {
-        const headers = await getAuthHeaders();
-        const response = await fetch(`${BASE_URL}/detalles/`, { headers });
+        const response = await apiClient('/detalles/');
         if (!response.ok) throw new Error('Error al traer los detalles');
         return await response.json();
     } catch (error) {
@@ -22,11 +11,9 @@ export const tomarDetallesOrdenes = async () => {
     }
 };
 
-// Obtener detalle por ID
 export const tomarDetalleOrdenConId = async (id) => {
     try {
-        const headers = await getAuthHeaders();
-        const response = await fetch(`${BASE_URL}/detalles/${id}/`, { headers });
+        const response = await apiClient(`/detalles/${id}/`);
         if (!response.ok) throw new Error('Error al traer el detalle');
         return await response.json();
     } catch (error) {
@@ -35,11 +22,9 @@ export const tomarDetalleOrdenConId = async (id) => {
     }
 };
 
-// Obtener detalles por orden
 export const tomarDetallesPorOrden = async (orden_id) => {
     try {
-        const headers = await getAuthHeaders();
-        const response = await fetch(`${BASE_URL}/detalles/?orden_fk=${orden_id}`, { headers });
+        const response = await apiClient(`/detalles/?orden_fk=${orden_id}`);
         if (!response.ok) throw new Error('Error trayendo detalles de la orden');
         return await response.json();
     } catch (error) {
@@ -48,11 +33,9 @@ export const tomarDetallesPorOrden = async (orden_id) => {
     }
 };
 
-// Obtener detalles por usuario
 export const tomarDetalleOrdenConUsuario = async (usuario_id) => {
     try {
-        const headers = await getAuthHeaders();
-        const response = await fetch(`${BASE_URL}/detalles/?usuario_fk_id=${usuario_id}`, { headers });
+        const response = await apiClient(`/detalles/?usuario_fk_id=${usuario_id}`);
         if (!response.ok) throw new Error('Error trayendo detalles del usuario');
         return await response.json();
     } catch (error) {
@@ -61,11 +44,9 @@ export const tomarDetalleOrdenConUsuario = async (usuario_id) => {
     }
 };
 
-// Obtener detalles por producto
 export const tomarDetalleOrdenConProducto = async (producto_id) => {
     try {
-        const headers = await getAuthHeaders();
-        const response = await fetch(`${BASE_URL}/detalles/?producto_fk_id=${producto_id}`, { headers });
+        const response = await apiClient(`/detalles/?producto_fk_id=${producto_id}`);
         if (!response.ok) throw new Error('Error trayendo detalles del producto');
         return await response.json();
     } catch (error) {
@@ -74,13 +55,10 @@ export const tomarDetalleOrdenConProducto = async (producto_id) => {
     }
 };
 
-// Crear detalle
 export const crearDetalleOrden = async (Data) => {
     try {
-        const headers = await getAuthHeaders();
-        const response = await fetch(`${BASE_URL}/detalles/`, {
+        const response = await apiClient('/detalles/', {
             method: 'POST',
-            headers,
             body: JSON.stringify(Data),
         });
         if (!response.ok) throw new Error('Error al guardar el detalle');
@@ -91,13 +69,10 @@ export const crearDetalleOrden = async (Data) => {
     }
 };
 
-// Actualizar detalle completo
 export const actualizarDetalleOrden = async (id, Data) => {
     try {
-        const headers = await getAuthHeaders();
-        const response = await fetch(`${BASE_URL}/detalles/${id}/`, {
+        const response = await apiClient(`/detalles/${id}/`, {
             method: 'PUT',
-            headers,
             body: JSON.stringify(Data),
         });
         if (!response.ok) throw new Error('Error actualizando el detalle');
@@ -108,13 +83,10 @@ export const actualizarDetalleOrden = async (id, Data) => {
     }
 };
 
-// Actualizar detalle parcial
 export const patchDetalleOrden = async (id, dataParcial) => {
     try {
-        const headers = await getAuthHeaders();
-        const response = await fetch(`${BASE_URL}/detalles/${id}/`, {
+        const response = await apiClient(`/detalles/${id}/`, {
             method: 'PATCH',
-            headers,
             body: JSON.stringify(dataParcial),
         });
         if (!response.ok) throw new Error('Error al modificar el detalle');
@@ -125,13 +97,10 @@ export const patchDetalleOrden = async (id, dataParcial) => {
     }
 };
 
-// Eliminar detalle
 export const eliminarDetalleOrden = async (id) => {
     try {
-        const headers = await getAuthHeaders();
-        const response = await fetch(`${BASE_URL}/detalles/${id}/`, {
+        const response = await apiClient(`/detalles/${id}/`, {
             method: 'DELETE',
-            headers,
         });
         if (!response.ok) throw new Error('Error al eliminar el detalle');
         return true;

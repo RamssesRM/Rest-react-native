@@ -1,5 +1,5 @@
 import { Image } from 'expo-image';
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import {
   ImageSourcePropType,
   StyleSheet,
@@ -100,7 +100,6 @@ const ScrollInfinitoSuave = ({
       }
     },
   );
-  const [loaded, setLoaded] = useState(false)
   return (
     <Animated.ScrollView
       contentContainerStyle={styles.container}

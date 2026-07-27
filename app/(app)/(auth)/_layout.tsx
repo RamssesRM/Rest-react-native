@@ -60,6 +60,13 @@ const Layout = () => {
           ),
         }}
       />
+      <Stack.Screen
+        name="gestion-usuarios"
+        options={{
+          headerShown: false,
+          animation: 'slide_from_right',
+        }}
+      />
     </Stack>
   );
 };

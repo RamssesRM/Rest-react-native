@@ -1,8 +1,8 @@
 import { tomarStatsConUsuario } from '@/app/api/usuariosApi';
 import useUserStore from '@/hooks/use-userstore';
+import { clearAuth } from '@/utils/auth';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
-import * as SecureStore from 'expo-secure-store';
 import React, { useEffect, useState } from 'react';
 import {
     Alert,
@@ -17,7 +17,7 @@ import {
 
 export default function PerfilScreen() {
   const router = useRouter();
-  const { user, setIsGuest, setUser } = useUserStore();
+  const { user } = useUserStore();
   
   // Estados para las estadísticas que vienen de Django
   const [stats, setStats] = useState({
@@ -57,19 +57,14 @@ export default function PerfilScreen() {
     { icon: 'settings-outline', text: 'Ajustes y Privacidad', target: 'ajustes' },
     { icon: 'notifications-outline', text: 'Notificaciones', target: 'notificaciones' },
     { icon: 'help-circle-outline', text: 'Ayuda y Soporte', target: 'ayuda' },
+    ...(user?.role === 'admin' ? [
+      { icon: 'people-outline', text: 'Gestión de Usuarios', target: 'gestion-usuarios' },
+    ] : []),
   ];
 
   const handleLogout = async () => {
     try{
-      // Hay que borrar los tokens del zustand
-      await SecureStore.deleteItemAsync('jwt_access')
-      await SecureStore.deleteItemAsync('jwt_refresh')
-
-      setUser(null);
-      setIsGuest(false)
-
-      // router.replace('/') No es necesario cambiar la ruta, al quitar los tokens de inicio de sesion en el zustan lo envia predeterminadamente a /
-
+      await clearAuth();
     }catch(error){
       Alert.alert('Error', 'No se pudo cerrar la sesión')
     }
@@ -129,9 +124,13 @@ export default function PerfilScreen() {
             <TouchableOpacity 
               key={index} 
               style={styles.menuItem}
-              // Cuando crees esas pantallas, descomenta router.push:
-              // onPress={() => router.push(`/${item.target}`)}
-              onPress={() => alert(`Ir a: ${item.text}`)}
+              onPress={() => {
+                if (item.target === 'gestion-usuarios') {
+                  router.push('/gestion-usuarios');
+                } else {
+                  alert(`Ir a: ${item.text}`);
+                }
+              }}
             >
               <View style={styles.menuItemLeft}>
                 <Ionicons name={item.icon as any} size={24} color="#D4AF37" />

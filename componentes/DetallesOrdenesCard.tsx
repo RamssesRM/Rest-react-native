@@ -1,12 +1,11 @@
-import { BASE_URL } from '@/app/api/apiConfig';
-import { eliminarDetalleOrden, patchDetalleOrden } from '@/app/api/detallesOrdenesApi';
-import { cambiarEstadoOrden, registrarPago } from '@/app/api/ordenesApi';
+import { eliminarDetalleOrden, patchDetalleOrden, tomarDetallesPorOrden } from '@/app/api/detallesOrdenesApi';
+import { cambiarEstadoOrden, registrarPago, getProductos } from '@/app/api/ordenesApi';
+import useUserStore from '@/hooks/use-userstore';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import BottomSheet, { BottomSheetBackdrop, BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import * as Haptics from 'expo-haptics';
 import * as ImagePicker from 'expo-image-picker';
 import * as Print from 'expo-print';
-import * as SecureStore from 'expo-secure-store';
 import React, { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, Image, Modal, Share as RNShare, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
@@ -43,6 +42,7 @@ type DetallesOrdenesCardProps = {
 
 const DetallesOrdenesCard = forwardRef<BottomSheet, DetallesOrdenesCardProps>(
     ({ orden, role, onDismiss, onEstadoCambiado }, ref) => {
+        const { user } = useUserStore();
         const [detalles, setDetalles] = useState<DetalleOrden[]>([]);
         const [isLoading, setIsLoading] = useState(false);
         const [detallesEditados, setDetallesEditados] = useState<Map<string, number>>(new Map());
@@ -68,32 +68,24 @@ const DetallesOrdenesCard = forwardRef<BottomSheet, DetallesOrdenesCardProps>(
             if (!orden) return;
             setIsLoading(true);
             try {
-                const token = await SecureStore.getItemAsync('jwt_access');
-                const headers = { 'Authorization': `Bearer ${token}` };
-
-                const [detallesRes, productosRes] = await Promise.all([
-                    fetch(`${BASE_URL}/detalles/?orden_fk=${orden.id}`, { headers }),
-                    fetch(`${BASE_URL}/productos/`, { headers })
+                const [detallesData, productosData] = await Promise.all([
+                    tomarDetallesPorOrden(orden.id),
+                    getProductos(),
                 ]);
 
-                if (detallesRes.ok && productosRes.ok) {
-                    const detallesData = await detallesRes.json();
-                    const productosData = await productosRes.json();
+                const productosMap = new Map(productosData.map((p: any) => [p.id, p]));
+                const detallesConInfo = detallesData.map((d: any) => ({
+                    ...d,
+                    producto_info: productosMap.get(d.producto_fk) || { nombre: 'Producto', precio: d.precio }
+                }));
 
-                    const productosMap = new Map(productosData.map((p: any) => [p.id, p]));
-                    const detallesConInfo = detallesData.map((d: any) => ({
-                        ...d,
-                        producto_info: productosMap.get(d.producto_fk) || { nombre: 'Producto', precio: d.precio }
-                    }));
-
-                    setDetalles(detallesConInfo);
-                    setDetallesEditados(new Map());
-                    const notasIniciales = new Map<string, string>();
-                    detallesConInfo.forEach((d: DetalleOrden) => {
-                        if (d.nota) notasIniciales.set(d.id, d.nota);
-                    });
-                    setNotasEditadas(notasIniciales);
-                }
+                setDetalles(detallesConInfo);
+                setDetallesEditados(new Map());
+                const notasIniciales = new Map<string, string>();
+                detallesConInfo.forEach((d: DetalleOrden) => {
+                    if (d.nota) notasIniciales.set(d.id, d.nota);
+                });
+                setNotasEditadas(notasIniciales);
             } catch (error) {
                 console.error('Error cargando detalles:', error);
             } finally {
@@ -151,7 +143,7 @@ const DetallesOrdenesCard = forwardRef<BottomSheet, DetallesOrdenesCardProps>(
                                 }
                                 await Promise.all(promises);
                             }
-                            await cambiarEstadoOrden(orden!.id, 'cocinando');
+                            await cambiarEstadoOrden(orden!.id, 'cocinando', { mesero: user?.id });
                             Alert.alert('Éxito', 'Orden enviada a cocina');
                             onEstadoCambiado?.();
                             onDismiss();
@@ -401,8 +393,8 @@ TOTAL: $${Number(orden!.monto_total || 0).toFixed(2)}
 
                     <View style={styles.infoSection}>
                         <InfoRow label="Cliente" value={orden.cliente_info?.first_name || orden.cliente_info?.email || 'N/A'} />
-                        {orden.mesero_info && (
-                            <InfoRow label="Mesero" value={orden.mesero_info.first_name || 'N/A'} />
+                        {(role === 'admin' || orden.mesero_info) && (
+                            <InfoRow label="Mesero" value={orden.mesero_info?.first_name || 'N/A'} />
                         )}
                         <InfoRow label="Fecha" value={new Date(orden.fecha_creacion).toLocaleString()} />
                     </View>

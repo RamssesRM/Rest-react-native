@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, FlatList, StyleSheet, Text, View } from 'react-native';
 import { openDatabase } from './database';
 import { getLocalProductos, saveCategorias, saveProductos } from './menuService';
+import { BASE_URL } from '../../app/api/apiConfig';
 
 const MenuScreen = () => {
     const [productos, setProductos] = useState([]);
@@ -23,7 +24,7 @@ const MenuScreen = () => {
                     const timeoutId = setTimeout(() => controller.abort(), 10000);
 
                     // --- PASO A: Traer las Categorías primero ---
-                    const resCategorias = await fetch('http://10.0.2.2:8000/api/categorias/', {
+                    const resCategorias = await fetch(`${BASE_URL}/categorias/`, {
                         signal: controller.signal
                     });
                     // console.log(resCategorias)
@@ -41,7 +42,7 @@ const MenuScreen = () => {
                     const controller2 = new AbortController();
                     const timeoutId2 = setTimeout(() => controller2.abort(), 10000);
 
-                    const response = await fetch('http://10.0.2.2:8000/api/productos/', {
+                    const response = await fetch(`${BASE_URL}/productos/`, {
                         signal: controller2.signal
                     });
                     // console.log(response)

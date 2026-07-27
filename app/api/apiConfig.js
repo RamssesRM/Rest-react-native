@@ -1,5 +1,1 @@
-export const BASE_URL = 'http://10.0.2.2:8000/api';
-
-export const getHeaders = () => ({
-    'Content-Type': 'application/json',
-})
+export const BASE_URL = process.env.EXPO_PUBLIC_API_URL;

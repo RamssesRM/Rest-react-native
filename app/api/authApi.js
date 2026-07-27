@@ -1,8 +1,8 @@
-const API_URL = 'http://10.0.2.2:8000/api';
+import { BASE_URL } from './apiConfig';
 
 export const googleLogin = async (googleToken) => {
   try {
-    const response = await fetch(`${API_URL}/auth/google/`, {
+    const response = await fetch(`${BASE_URL}/auth/google/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ token: googleToken }),
@@ -20,7 +20,7 @@ export const googleLogin = async (googleToken) => {
 
 export const loginUser = async (username, password)=>{
     try{
-        const response = await fetch(`${API_URL}/auth/login/`, {
+        const response = await fetch(`${BASE_URL}/auth/login/`, {
             method: 'POST',
             headers: {'Content-Type':'application/json'},
             body:JSON.stringify({username, password}),
@@ -51,7 +51,7 @@ export const loginUser = async (username, password)=>{
 
 export const registerUser = async (userData) => {
     try{
-        const response = await fetch(`${API_URL}/auth/registro/`,{
+        const response = await fetch(`${BASE_URL}/auth/registro/`,{
             method:'POST',
             headers:{'Content-Type':'application/json'},
             body:JSON.stringify(userData),
