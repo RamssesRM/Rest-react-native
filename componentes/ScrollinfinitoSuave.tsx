@@ -1,6 +1,6 @@
 import { Image } from 'expo-image';
 import { useEffect, useState } from "react";
-import {
+import React, {
   ImageSourcePropType,
   StyleSheet,
   Text,
@@ -22,31 +22,31 @@ interface IconItem {
 
 const iconDataSets: Record<"set1" | "set2" | "set3", IconItem[]> = {
   set1: [
-    { image: require("../assets/images/imageWebp/190.webp"), isImage: true, color: "#transparent" },
-    { image: require("../assets/images/imageWebp/189.webp"), isImage: true, color: "#transparent" },
-    { image: require("../assets/images/imageWebp/188.webp"), isImage: true, color: "#transparent" },
-    { image: require("../assets/images/imageWebp/187.webp"), isImage: true, color: "#transparent" },
-    { image: require("../assets/images/imageWebp/186.webp"), isImage: true, color: "#transparent" },
+    { image: require("../assets/images/imageWebp/190.webp"), isImage: true, color: "transparent" },
+    { image: require("../assets/images/imageWebp/189.webp"), isImage: true, color: "transparent" },
+    { image: require("../assets/images/imageWebp/188.webp"), isImage: true, color: "transparent" },
+    { image: require("../assets/images/imageWebp/187.webp"), isImage: true, color: "transparent" },
+    { image: require("../assets/images/imageWebp/186.webp"), isImage: true, color: "transparent" },
   ],
   set2: [
-    { image: require("../assets/images/imageWebp/181.webp"), isImage: true, color: "#transparent" },
-    { image: require("../assets/images/imageWebp/182.webp"), isImage: true, color: "#transparent" },
-    { image: require("../assets/images/imageWebp/183.webp"), isImage: true, color: "#transparent" },
-    { image: require("../assets/images/imageWebp/184.webp"), isImage: true, color: "#transparent" },
-    { image: require("../assets/images/imageWebp/185.webp"), isImage: true, color: "#transparent" },
+    { image: require("../assets/images/imageWebp/181.webp"), isImage: true, color: "transparent" },
+    { image: require("../assets/images/imageWebp/182.webp"), isImage: true, color: "transparent" },
+    { image: require("../assets/images/imageWebp/183.webp"), isImage: true, color: "transparent" },
+    { image: require("../assets/images/imageWebp/184.webp"), isImage: true, color: "transparent" },
+    { image: require("../assets/images/imageWebp/185.webp"), isImage: true, color: "transparent" },
   ],
   set3: [
-    { image: require("../assets/images/imageWebp/176.webp"), isImage: true, color: "#transparent" },
-    { image: require("../assets/images/imageWebp/177.webp"), isImage: true, color: "#transparent" },
-    { image: require("../assets/images/imageWebp/178.webp"), isImage: true, color: "#transparent" },
-    { image: require("../assets/images/imageWebp/179.webp"), isImage: true, color: "#transparent" },
-    { image: require("../assets/images/imageWebp/180.webp"), isImage: true, color: "#transparent" },
+    { image: require("../assets/images/imageWebp/176.webp"), isImage: true, color: "transparent" },
+    { image: require("../assets/images/imageWebp/177.webp"), isImage: true, color: "transparent" },
+    { image: require("../assets/images/imageWebp/178.webp"), isImage: true, color: "transparent" },
+    { image: require("../assets/images/imageWebp/179.webp"), isImage: true, color: "transparent" },
+    { image: require("../assets/images/imageWebp/180.webp"), isImage: true, color: "transparent" },
   ],
 };
 
 const ITEM_HEIGHT = 160;
 const SCROLL_SPEED = 20; // pixels por segundo
-const FRAME_RATE = 60; // frames por sesgundo
+const FRAME_RATE = 60; // frames por segundo
 
 interface ScrollInfinitoSuaveProps {
   scrollDirection?: "up" | "down";
@@ -100,7 +100,7 @@ const ScrollInfinitoSuave = ({
       }
     },
   );
-  const [loaded, setLoaded] = useState(false)
+
   return (
     <Animated.ScrollView
       contentContainerStyle={styles.container}
@@ -115,7 +115,6 @@ const ScrollInfinitoSuave = ({
         >
           {/* 2. Condicional inteligente: si tiene la propiedad 'isImage', renderiza la imagen. Si no, renderiza el emoji */}
           {item.isImage ? (
-            
             <Image
               source={item.image}
               style={styles.imageStyle}
@@ -132,7 +131,7 @@ const ScrollInfinitoSuave = ({
   );
 };
 
-//definicion de componente de scroll infinito suave
+// Definición de componente de scroll infinito suave
 
 const styles = StyleSheet.create({
   container: {
@@ -149,9 +148,9 @@ const styles = StyleSheet.create({
     boxShadow: "0 -2px 10px rgba(0, 0, 0, 0.1)",
   },
   imageStyle: {
-  width: '100%',          // Ocupa todo el ancho del contenedor (160)
-  height: '100%',         // Ocupa todo el alto del contenedor (ITEM_HEIGHT)
-  borderRadius: 20,       // El mismo borde del contenedor para que encaje perfecto
-},
+    width: '100%',          // Ocupa todo el ancho del contenedor (160)
+    height: '100%',         // Ocupa todo el alto del contenedor (ITEM_HEIGHT)
+    borderRadius: 20,       // El mismo borde del contenedor para que encaje perfecto
+  },
 });
 export default ScrollInfinitoSuave;

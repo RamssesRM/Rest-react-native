@@ -1,3 +1,4 @@
+import { openDatabase } from "@/src/db/database";
 import {
   Nunito_400Regular,
   Nunito_700Bold_Italic,
@@ -6,7 +7,11 @@ import {
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useFonts } from "expo-font";
 import { Slot } from "expo-router";
+import React, { useEffect, useState } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { ThemeProvider } from "@/hooks/use-theme";
+
+
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -23,12 +28,34 @@ export default function RootLayout() {
     Nunito_700Bold_Italic,
     Nunito_900Black,
   });
-  if (!fontsLoaded) return null;
+
+  // ✅ 3. Creamos el estado para saber si la BD está lista
+  const [dbReady, setDbReady] = useState(false);
+
+  // ✅ 4. Abrimos la base de datos una sola vez al arrancar la app
+  useEffect(() => {
+    const initDB = async () => {
+      try {
+        await openDatabase();
+        setDbReady(true);
+      } catch (error) {
+        console.error("Error al inicializar BD en _layout:", error);
+      }
+    };
+    initDB();
+  }, []);
+
+  // ✅ 5. Esperamos tanto a las fuentes como a la Base de Datos
+  if (!fontsLoaded || !dbReady) {
+    return null; 
+  }
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <QueryClientProvider client={queryClient}>
-        <Slot />
+        <ThemeProvider>
+          <Slot />
+        </ThemeProvider>
       </QueryClientProvider>
     </GestureHandlerRootView>
   );

@@ -6,6 +6,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
+import React from 'react';
 
 const Page = () => {
   const router = useRouter();
@@ -48,7 +49,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   closeBtn: {
-    backgroundColor: Colors.light,
+    backgroundColor: Colors.surface,
     borderRadius: 40,
     padding: 8,
     alignSelf: "flex-end",

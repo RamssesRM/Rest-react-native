@@ -53,6 +53,22 @@ export const saveProductos = async (productos) => {
     }
 };
 
+export const getLocalCategorias = async () => {
+    const db = getDB();
+    if (!db) throw new Error('DB no inicializada');
+
+    try {
+        const categorias = await db.getAllAsync(`
+            SELECT id, nombre FROM Categorias ORDER BY nombre ASC
+        `);
+        console.log(`📦 ${categorias.length} categorías cargadas desde SQLite`);
+        return categorias;
+    } catch (error) {
+        console.error('❌ Error obteniendo categorías locales:', error);
+        return [];
+    }
+};
+
 export const getLocalProductos = async () => {
     const db = getDB();
     if (!db) throw new Error('DB no inicializada');

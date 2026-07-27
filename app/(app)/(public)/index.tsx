@@ -1,5 +1,6 @@
 import FacebookAutenBoton from "@/componentes/auten/FacebookAutenButon";
 import GoogleAutenBoton from "@/componentes/auten/GoogleAutenBoton";
+import Helusboton from "@/componentes/auten/HelusAutenBoton";
 import ScrollInfinitoSuave from "@/componentes/ScrollinfinitoSuave"; // O la ruta exacta donde guardaste el componente
 import { Fonts } from "@/constants/theme";
 import useUserStore from "@/hooks/use-userstore";
@@ -79,6 +80,9 @@ export default function Index() {
             <GoogleAutenBoton />
           </Animated.View>
           <Animated.View entering={FadeInDown.delay(400)}>
+            <Helusboton />
+          </Animated.View>
+          <Animated.View entering={FadeInDown.delay(500)}>
             {/* Quitamos el <Link> y le pasamos el trigger directo al botón */}
             <TouchableOpacity
               style={styles.otherButton}
@@ -90,6 +94,8 @@ export default function Index() {
             </TouchableOpacity>
           </Animated.View>
         </View>
+
+        
 
         <Animated.View
           style={styles.privacyContainer}

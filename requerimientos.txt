@@ -44,5 +44,5 @@ npm install axios
 npx expo install @gorhom/bottom-sheet react-native-reanimated react-native-gesture-handler ()
 
 npx expo install expo-sqlite
-npm install sharp
+npm install sharp/npm ci 
 npx expo install expo-image

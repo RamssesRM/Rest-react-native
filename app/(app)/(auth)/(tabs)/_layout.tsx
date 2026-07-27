@@ -1,5 +1,6 @@
 import { FontAwesome5, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
+import React from 'react';
 
 const Layout = () => {
   return (
@@ -33,11 +34,11 @@ const Layout = () => {
           <FontAwesome5 name={focused ? "receipt" : 'clipboard-list'} color={color} size={size} />
         ),
       }} />
-      <Tabs.Screen name="buscar" options={{ 
-        title: "Buscar",
+      <Tabs.Screen name="sobre-nosotros" options={{ 
+        title: "Sobre Nosotros",
         headerShown: false,
         tabBarIcon:({color, size, focused}) => (
-          <FontAwesome5 name={focused ? "search-location" : 'search'} color={color} size={size} />
+          <Ionicons name={focused ? "information-circle" : "information-circle-outline"} color={color} size={size} />
         ),
       }} />
       <Tabs.Screen name="perfil" options={{ 

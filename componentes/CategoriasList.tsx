@@ -1,6 +1,9 @@
-import { Colors } from "@/constants/theme";
-import { categories } from "@/data/categories";
+import { useTheme } from "@/hooks/use-theme";
+import { useFilterStore } from "@/hooks/use-filterstore";
+import { getLocalCategorias } from "@/src/db/menuService";
+import React, { useEffect, useState } from "react";
 import {
+  ActivityIndicator,
   FlatList,
   Image,
   StyleSheet,
@@ -9,45 +12,97 @@ import {
   View,
 } from "react-native";
 
+type CategoriaLocal = {
+  id: string;
+  nombre: string;
+  imagen: string | null;
+};
+
 export const CategoriasList = () => {
-  const renderCategory = ({ item }: { item: (typeof categories)[0] }) => (
-    <TouchableOpacity style={styles.categoryCard}>
-      <View
-        style={[
-          styles.categoryImageContainer,
-          { backgroundColor: item.backgroundColor },
-        ]}
+  const [categorias, setCategorias] = useState<CategoriaLocal[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const { categories, setFilters, clearFilters } = useFilterStore();
+  const { colors } = useTheme();
+
+  useEffect(() => {
+    const cargarCategorias = async () => {
+      try {
+        const data = await getLocalCategorias();
+        setCategorias(data);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    cargarCategorias();
+  }, []);
+
+  const toggleCategory = (nombre: string) => {
+    if (categories.length === 1 && categories[0] === nombre) {
+      clearFilters();
+    } else {
+      setFilters({ categories: [nombre], price: null, sort: "recommended" });
+    }
+  };
+
+  const s = styles(colors);
+
+  const renderCategory = ({ item }: { item: CategoriaLocal }) => {
+    const isActive = categories.length === 1 && categories[0] === item.nombre;
+    return (
+      <TouchableOpacity
+        style={[s.categoryCard, isActive && s.categoryCardActive]}
+        onPress={() => toggleCategory(item.nombre)}
       >
-        <Image source={item.image} style={styles.categoryImage} />
+        <View style={s.categoryImageContainer}>
+          {item.imagen ? (
+            <Image source={{ uri: item.imagen }} style={s.categoryImage} />
+          ) : (
+            <View style={[s.categoryImage, s.placeholderImage]} />
+          )}
+        </View>
+        <View style={s.categoryInfo}>
+          <Text style={[s.categoryName, isActive && s.categoryNameActive]}>
+            {item.nombre}
+          </Text>
+          <Text style={s.categoryPlaces}>Ver menú</Text>
+        </View>
+      </TouchableOpacity>
+    );
+  };
+
+  if (isLoading) {
+    return (
+      <View style={s.categoriesSection}>
+        <ActivityIndicator size="small" color={colors.secondary} />
       </View>
-      <View style={styles.categoryInfo}>
-        <Text style={styles.categoryName}>{item.name}</Text>
-        <Text style={styles.categoryPlaces}>{item.placesCount} places</Text>
-      </View>
-    </TouchableOpacity>
-  );
+    );
+  }
 
   return (
-    <View style={styles.categoriesSection}>
-      <View style={styles.categoriesHeader}>
-        <Text style={styles.categoriesTitle}>Categorías</Text>
-        <TouchableOpacity style={styles.seeAllButton}>
-          <Text style={styles.seeAll}>Ver todo</Text>
-        </TouchableOpacity>
+    <View style={s.categoriesSection}>
+      <View style={s.categoriesHeader}>
+        <Text style={s.categoriesTitle}>Categorías</Text>
+        {categories.length > 0 && (
+          <TouchableOpacity style={s.seeAllButton} onPress={clearFilters}>
+            <Text style={s.seeAll}>Ver todo</Text>
+          </TouchableOpacity>
+        )}
       </View>
       <FlatList
         horizontal
-        data={categories}
+        data={categorias}
         renderItem={renderCategory}
         keyExtractor={(item) => item.id}
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.categoriesList}
+        contentContainerStyle={s.categoriesList}
       />
     </View>
   );
 };
 
-const styles = StyleSheet.create({
+const styles = (c: ReturnType<typeof useTheme>['colors']) => StyleSheet.create({
   categoriesSection: {
     marginBottom: 24,
   },
@@ -62,17 +117,18 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "600",
     marginVertical: 6,
+    color: c.text,
   },
   seeAll: {
     fontSize: 14,
-    color: Colors.secondary,
+    color: c.secondary,
     fontWeight: "500",
   },
   seeAllButton: {
     padding: 8,
     paddingHorizontal: 16,
     borderRadius: 8,
-    backgroundColor: Colors.primaryLight,
+    backgroundColor: c.primaryLight,
   },
   categoriesList: {
     gap: 12,
@@ -82,35 +138,52 @@ const styles = StyleSheet.create({
     width: 130,
     borderRadius: 12,
     overflow: "hidden",
-    backgroundColor: "#fff",
+    backgroundColor: c.card,
     marginVertical: 8,
-    boxShadow: "0px 4px 2px -2px rgba(0, 0, 0, 0.2)",
-    elevation: 2,
+    elevation: 3,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    borderWidth: 2,
+    borderColor: "transparent",
+  },
+  categoryCardActive: {
+    borderColor: c.gold,
+    backgroundColor: c.goldLight,
   },
   categoryImageContainer: {
     padding: 12,
+    backgroundColor: c.gray100,
   },
   categoryImage: {
     width: 106,
     height: 106,
     borderRadius: 8,
   },
+  placeholderImage: {
+    backgroundColor: c.gray200,
+  },
   categoryInfo: {
-    backgroundColor: "#fff",
+    backgroundColor: c.card,
     padding: 12,
     paddingTop: 4,
     borderLeftWidth: StyleSheet.hairlineWidth,
     borderRightWidth: StyleSheet.hairlineWidth,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderColor: Colors.light,
+    borderColor: c.border,
   },
   categoryName: {
     fontSize: 14,
     fontWeight: "600",
     marginBottom: 2,
+    color: c.text,
+  },
+  categoryNameActive: {
+    fontWeight: "700",
   },
   categoryPlaces: {
     fontSize: 12,
-    color: Colors.muted,
+    color: c.textMuted,
   },
 });
