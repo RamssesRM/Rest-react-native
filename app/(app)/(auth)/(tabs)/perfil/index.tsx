@@ -1,5 +1,6 @@
 import { tomarStatsConUsuario } from '@/app/api/usuariosApi';
 import useUserStore from '@/hooks/use-userstore';
+import { useTheme } from '@/hooks/use-theme';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
@@ -18,38 +19,31 @@ import {
 export default function PerfilScreen() {
   const router = useRouter();
   const { user, setIsGuest, setUser } = useUserStore();
-  
-  // Estados para las estadísticas que vienen de Django
+  const { colors } = useTheme();
+
   const [stats, setStats] = useState({
     pedidos: 0,
     favoritos: 0,
     reseñas: 0
   });
 
-  // Petición a Django para obtener los contadores
   useEffect(() => {
     const fetchStats = async () => {
-      if (!user) return; // Si no hay usuario logueado, no hace nada
-      
+      if (!user) return;
       try {
-        // ✅ Se añadió el await. Ya no necesitamos hacer .json() aquí porque la API lo hizo
-        const data = await tomarStatsConUsuario(user.id); 
-        
-        // Actualizamos el estado con los números que vinieron de Django
-        setStats(data); 
+        const data = await tomarStatsConUsuario(user.id);
+        setStats(data);
       } catch (error) {
         console.error("Error cargando estadísticas:", error);
       }
     };
-
     fetchStats();
-}, [user]); // Se ejecuta cada vez que 'user' cambie
+  }, [user]);
 
   const nombre = user?.name || 'Invitado';
   const email = user?.email || 'Sin correo';
   const inicialNombre = nombre.charAt(0).toUpperCase();
 
-  // Menú de opciones (fácil de agregar o quitar elementos)
   const menuOptions = [
     { icon: 'time-outline', text: 'Historial de Órdenes', target: 'historial' },
     { icon: 'heart-outline', text: 'Mis Favoritos', target: 'favoritos' },
@@ -60,84 +54,74 @@ export default function PerfilScreen() {
   ];
 
   const handleLogout = async () => {
-    try{
-      // Hay que borrar los tokens del zustand
-      await SecureStore.deleteItemAsync('jwt_access')
-      await SecureStore.deleteItemAsync('jwt_refresh')
-
+    try {
+      await SecureStore.deleteItemAsync('jwt_access');
+      await SecureStore.deleteItemAsync('jwt_refresh');
       setUser(null);
-      setIsGuest(false)
-
-      // router.replace('/') No es necesario cambiar la ruta, al quitar los tokens de inicio de sesion en el zustan lo envia predeterminadamente a /
-
-    }catch(error){
-      Alert.alert('Error', 'No se pudo cerrar la sesión')
+      setIsGuest(false);
+    } catch (error) {
+      Alert.alert('Error', 'No se pudo cerrar la sesión');
     }
-  }
+  };
+
+  const s = styles(colors);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={s.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
-        
-        {/* --- 1. CABECERA: Foto y Estadísticas --- */}
-        <View style={styles.headerContainer}>
-          
+
+        <View style={s.headerContainer}>
           {user?.imagen ? (
-            <Image source={{ uri: user.imagen }} style={styles.avatar} />
+            <Image source={{ uri: user.imagen }} style={s.avatar} />
           ) : (
-            <View style={[styles.avatar, styles.avatarPlaceholder]}>
-              <Text style={styles.avatarText}>{inicialNombre}</Text>
+            <View style={[s.avatar, s.avatarPlaceholder]}>
+              <Text style={s.avatarText}>{inicialNombre}</Text>
             </View>
           )}
 
-          <View style={styles.statsContainer}>
-            <View style={styles.statBox}>
-              <Text style={styles.statNumber}>{stats.pedidos}</Text>
-              <Text style={styles.statLabel}>Pedidos</Text>
+          <View style={s.statsContainer}>
+            <View style={s.statBox}>
+              <Text style={s.statNumber}>{stats.pedidos}</Text>
+              <Text style={s.statLabel}>Pedidos</Text>
             </View>
-            <View style={[styles.statBox, styles.statBorder]}>
-              <Text style={styles.statNumber}>{stats.favoritos}</Text>
-              <Text style={styles.statLabel}>Favoritos</Text>
+            <View style={[s.statBox, s.statBorder]}>
+              <Text style={s.statNumber}>{stats.favoritos}</Text>
+              <Text style={s.statLabel}>Favoritos</Text>
             </View>
-            <View style={styles.statBox}>
-              <Text style={styles.statNumber}>{stats.reseñas}</Text>
-              <Text style={styles.statLabel}>Reseñas</Text>
+            <View style={s.statBox}>
+              <Text style={s.statNumber}>{stats.reseñas}</Text>
+              <Text style={s.statLabel}>Reseñas</Text>
             </View>
           </View>
         </View>
 
-        {/* --- 2. INFORMACIÓN DEL USUARIO --- */}
-        <View style={styles.infoContainer}>
-          <Text style={styles.username}>{nombre}</Text>
-          <Text style={styles.email}>{email}</Text>
+        <View style={s.infoContainer}>
+          <Text style={s.username}>{nombre}</Text>
+          <Text style={s.email}>{email}</Text>
         </View>
 
-        {/* --- 3. BOTONES PRINCIPALES --- */}
-        <View style={styles.buttonsRow}>
-          <TouchableOpacity style={styles.primaryButton}>
-            <Text style={styles.primaryButtonText}>Editar Perfil</Text>
+        <View style={s.buttonsRow}>
+          <TouchableOpacity style={s.primaryButton}>
+            <Text style={s.primaryButtonText}>Editar Perfil</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.secondaryButton} onPress={handleLogout}>
-            <Ionicons name="log-out-outline" size={18} color="#D4AF37" />
-            <Text style={styles.secondaryButtonText}>Cerrar Sesión</Text>
+          <TouchableOpacity style={s.secondaryButton} onPress={handleLogout}>
+            <Ionicons name="log-out-outline" size={18} color={colors.goldDark} />
+            <Text style={s.secondaryButtonText}>Cerrar Sesión</Text>
           </TouchableOpacity>
         </View>
 
-        {/* --- 4. MENÚ VERTICAL (Uno debajo del otro) --- */}
-        <View style={styles.menuContainer}>
+        <View style={s.menuContainer}>
           {menuOptions.map((item, index) => (
-            <TouchableOpacity 
-              key={index} 
-              style={styles.menuItem}
-              // Cuando crees esas pantallas, descomenta router.push:
-              // onPress={() => router.push(`/${item.target}`)}
+            <TouchableOpacity
+              key={index}
+              style={s.menuItem}
               onPress={() => alert(`Ir a: ${item.text}`)}
             >
-              <View style={styles.menuItemLeft}>
-                <Ionicons name={item.icon as any} size={24} color="#D4AF37" />
-                <Text style={styles.menuText}>{item.text}</Text>
+              <View style={s.menuItemLeft}>
+                <Ionicons name={item.icon as any} size={24} color={colors.goldDark} />
+                <Text style={s.menuText}>{item.text}</Text>
               </View>
-              <Ionicons name="chevron-forward" size={20} color="#555" />
+              <Ionicons name="chevron-forward" size={20} color={colors.textMuted} />
             </TouchableOpacity>
           ))}
         </View>
@@ -147,12 +131,11 @@ export default function PerfilScreen() {
   );
 }
 
-// --- ESTILOS CLAROS (Instagram Light Mode) ---
-const styles = StyleSheet.create({
+const styles = (c: ReturnType<typeof useTheme>['colors']) => StyleSheet.create({
   container: {
     flex: 1,
     paddingTop: 20,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.background,
   },
   headerContainer: {
     flexDirection: 'row',
@@ -167,44 +150,44 @@ const styles = StyleSheet.create({
     height: 90,
     borderRadius: 50,
     borderWidth: 2,
-    borderColor: '#D4AF37',
+    borderColor: c.goldDark,
   },
   avatarPlaceholder: {
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#E8E8E8',
+    backgroundColor: c.gray200,
   },
   avatarText: {
     fontSize: 36,
     fontWeight: 'bold',
-    color: '#D4AF37',
+    color: c.goldDark,
   },
   statsContainer: {
     flexDirection: 'row',
     flex: 1,
     justifyContent: 'space-around',
-    backgroundColor: '#FAFAFA',
+    backgroundColor: c.surface,
     paddingVertical: 15,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#EFEFEF',
+    borderColor: c.border,
   },
   statBorder: {
     borderLeftWidth: 1,
     borderRightWidth: 1,
-    borderColor: '#EFEFEF',
+    borderColor: c.border,
   },
   statBox: {
     alignItems: 'center',
     flex: 1,
   },
   statNumber: {
-    color: '#262626',
+    color: c.text,
     fontSize: 20,
     fontWeight: 'bold',
   },
   statLabel: {
-    color: '#8E8E8E',
+    color: c.textMuted,
     fontSize: 12,
     marginTop: 4,
   },
@@ -213,12 +196,12 @@ const styles = StyleSheet.create({
     marginTop: 15,
   },
   username: {
-    color: '#262626',
+    color: c.text,
     fontSize: 18,
     fontWeight: 'bold',
   },
   email: {
-    color: '#D4AF37',
+    color: c.goldDark,
     fontSize: 14,
     marginTop: 2,
   },
@@ -230,7 +213,7 @@ const styles = StyleSheet.create({
   },
   primaryButton: {
     flex: 1,
-    backgroundColor: '#D4AF37',
+    backgroundColor: c.goldDark,
     paddingVertical: 10,
     borderRadius: 8,
     alignItems: 'center',
@@ -245,28 +228,26 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 6,
-    backgroundColor: '#EFEFEF',
+    backgroundColor: c.surface,
     paddingVertical: 10,
     borderRadius: 8,
     flex: 1,
     borderWidth: 1,
-    borderColor: '#D4AF37',
+    borderColor: c.goldDark,
   },
   secondaryButtonText: {
-    color: '#D4AF37',
+    color: c.goldDark,
     fontWeight: '600',
     fontSize: 14,
   },
-  
-  // --- MENÚ VERTICAL ---
   menuContainer: {
     marginTop: 25,
     marginHorizontal: 16,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.card,
     borderRadius: 12,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: '#EFEFEF',
+    borderColor: c.border,
   },
   menuItem: {
     flexDirection: 'row',
@@ -275,7 +256,7 @@ const styles = StyleSheet.create({
     paddingVertical: 18,
     paddingHorizontal: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#EFEFEF',
+    borderBottomColor: c.border,
   },
   menuItemLeft: {
     flexDirection: 'row',
@@ -283,7 +264,7 @@ const styles = StyleSheet.create({
     gap: 15,
   },
   menuText: {
-    color: '#262626',
+    color: c.text,
     fontSize: 16,
   },
 });

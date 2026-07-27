@@ -41,11 +41,11 @@ const Layout = () => {
           presentation: "modal",
           animation: "slide_from_bottom",
           headerShown: true,
-          title: "Ubicacion",
+          title: "Filtrar Menú",
           headerShadowVisible: false,
-          headerStyle: { backgroundColor: 'white' },
+          headerStyle: { backgroundColor: '#fff' },
           headerTitleStyle: { color: '#000', fontWeight: 'bold' },
-          contentStyle: { backgroundColor: 'white' },
+          contentStyle: { backgroundColor: '#fff' },
           headerRight: () => (
             <TouchableOpacity
               style={{

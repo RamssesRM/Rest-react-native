@@ -1,37 +1,27 @@
 import { Fonts } from "@/constants/theme";
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
-import Animated, { useAnimatedScrollHandler, useSharedValue } from "react-native-reanimated";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { CategoriasList } from "../CategoriasList";
 import ComidasHeader from "../ComidasHeader";
 import ComidasList from "../ComidasList";
-const HEADER_HEIGHT = 60;
+
 const ComidasListPage = () => {
   const insets = useSafeAreaInsets();
-  const scrollOffset = useSharedValue(0);
-
-  const scrollHandler = useAnimatedScrollHandler({
-    onScroll: (event) => {
-      scrollOffset.value = event.contentOffset.y
-    }
-  })
 
   return (
     <View style={styles.container}>
-
-      <ComidasHeader title='Menus'scrollOffset={scrollOffset} />
-      <Animated.ScrollView
-        onScroll={scrollHandler}
-        scrollEventThrottle={16}
+      <ComidasHeader title="Menus" />
+      <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingTop: insets.top + HEADER_HEIGHT }}>
+        contentContainerStyle={{ paddingTop: 8 }}
+      >
         <Text style={styles.pageTitle}>Menus</Text>
         <CategoriasList />
 
         <Text style={styles.allComidasTitle}>Todos los menus</Text>
         <ComidasList />
-      </Animated.ScrollView>
+      </ScrollView>
     </View>
   );
 };

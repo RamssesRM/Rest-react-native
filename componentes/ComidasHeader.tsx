@@ -1,170 +1,75 @@
-import { Colors } from "@/constants/theme";
 import { Ionicons } from "@expo/vector-icons";
+import { useTheme } from "@/hooks/use-theme";
 import { Link, useRouter } from "expo-router";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import Animated, {
-  Extrapolation,
-  interpolate,
-  SharedValue,
-  useAnimatedStyle,
-} from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-
 
 interface ComidasHeaderProps {
   title: string;
-  scrollOffset: SharedValue<number>;
 }
 
-const SCOLL_THRESHOLD = 60;
-
-const ComidasHeader = ({ title, scrollOffset }: ComidasHeaderProps) => {
+const ComidasHeader = ({ title }: ComidasHeaderProps) => {
   const insets = useSafeAreaInsets();
+  const router = useRouter();
+  const { colors } = useTheme();
 
-  const header1Style = useAnimatedStyle(() => {
-    const opacity = interpolate(
-      scrollOffset.value,
-      [0, SCOLL_THRESHOLD * 0.6],
-      [1, 0],
-      Extrapolation.CLAMP,
-    );
-    const translateY = interpolate(
-      scrollOffset.value,
-      [0, SCOLL_THRESHOLD * 0.6],
-      [0, -10],
-      Extrapolation.CLAMP,
-    );
-    return {
-      opacity,
-      transform: [{ translateY }],
-    };
-  });
-
-  const header2Style = useAnimatedStyle(() => {
-    const opacity = interpolate(
-      scrollOffset.value,
-      [SCOLL_THRESHOLD * 0.3, SCOLL_THRESHOLD],
-      [0, 1],
-      Extrapolation.CLAMP,
-    );
-    const translateY = interpolate(
-      scrollOffset.value,
-      [0, SCOLL_THRESHOLD * 0.6],
-      [-10, 0],
-      Extrapolation.CLAMP,
-    );
-    return {
-      opacity,
-      transform: [{ translateY }],
-    };
-  });
-
-  const shadowStyle = useAnimatedStyle(() => {
-    const opacity = interpolate(
-      scrollOffset.value,
-      [0, SCOLL_THRESHOLD],
-      [0, 1],
-      Extrapolation.CLAMP,
-    );
-    return {
-      shadowOpacity: opacity * 0.1,
-      elevation: opacity * 4,
-    };
-  });
+  const s = styles(colors);
 
   return (
-    <Animated.View
-      style={[styles.headerContainer, { paddingTop: insets.top }, shadowStyle]}
-    >
-      {/* header 1*/}
-      <Animated.View style={[styles.header1, header1Style]}>
-        <Link href={"/(app)/(auth)/(modal)/location"} asChild>
-          <TouchableOpacity style={styles.locationButton}>
-            <View style={styles.locationButtonIcon}>
-              <Ionicons name="business-outline" size={16} />
-            </View>
-            <Text style={styles.locationText}>Ubicación</Text>
-            <Ionicons name="chevron-down" size={16} />
-          </TouchableOpacity>
-        </Link>
-        <View style={styles.rightIcons}>
-          <Link href={"/(app)/(auth)/(modal)/filter"} asChild>
-            <TouchableOpacity style={styles.iconButton}>
-              <Ionicons name="filter" size={20} />
-            </TouchableOpacity>
-          </Link>
-          <Link href={"/(app)/(auth)/(modal)/map"} asChild>
-            <TouchableOpacity style={styles.iconButton}>
-              <Ionicons name="map-outline" size={20} />
-            </TouchableOpacity>
-          </Link>
-        </View>
-      </Animated.View>
+    <View style={[s.headerContainer, { paddingTop: insets.top }]}>
+      <View style={s.headerRow}>
+        <TouchableOpacity
+          style={s.locationButton}
+          onPress={() => router.push("/(app)/(auth)/(modal)/location")}
+        >
+          <View style={s.locationButtonIcon}>
+            <Ionicons name="business-outline" size={16} color={colors.text} />
+          </View>
+          <Text style={s.locationText}>Ubicación</Text>
+          <Ionicons name="chevron-down" size={16} color={colors.text} />
+        </TouchableOpacity>
 
-      {/* Header 2 */}
-      <Animated.View style={[styles.header2, header2Style]}>
-        <View style={styles.centerContent}>
-          <Text style={styles.titleSmall}>{title}</Text>
-          <Link href={"/(app)/(auth)/(modal)/location"} asChild>
-            <TouchableOpacity style={styles.locationSmall}>
-              <Text style={styles.locationSmallTextt}>Ubicación</Text>
-              <Ionicons name="chevron-down" size={14} />
-            </TouchableOpacity>
-          </Link>
-        </View>
-        <View style={styles.rightIcons}>
+        <Text style={s.titleCenter}>{title}</Text>
+
+        <View style={s.rightIcons}>
           <Link href={"/(app)/(auth)/(modal)/filter"} asChild>
-            <TouchableOpacity style={styles.iconButton}>
-              <Ionicons name="filter" size={20} />
+            <TouchableOpacity style={s.iconButton}>
+              <Ionicons name="filter" size={20} color={colors.text} />
             </TouchableOpacity>
           </Link>
           <Link href={"/(app)/(auth)/(modal)/map"} asChild>
-            <TouchableOpacity style={styles.iconButton}>
-              <Ionicons name="map-outline" size={20} />
+            <TouchableOpacity style={s.iconButton}>
+              <Ionicons name="map-outline" size={20} color={colors.text} />
             </TouchableOpacity>
           </Link>
         </View>
-      </Animated.View>
-    </Animated.View>
+      </View>
+    </View>
   );
 };
 
-const styles = StyleSheet.create({
+export default ComidasHeader;
+
+const styles = (c: ReturnType<typeof useTheme>['colors']) => StyleSheet.create({
   headerContainer: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: "#ffd700",
-    zIndex: 100,
-    // boxShadow: "0px 2px 4px -2px rgba(0, 0, 0, 0.2)",
+    backgroundColor: c.gold,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
     shadowRadius: 4,
+    elevation: 4,
   },
-  header1: {
-    paddingHorizontal: 16,
-    paddingTop: 8,
-    paddingBottom: 12,
+  headerRow: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
-  },
-  header2: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
     paddingHorizontal: 16,
     paddingVertical: 12,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
   },
   locationText: {
     fontSize: 14,
     fontWeight: "600",
+    color: c.text,
   },
   locationButton: {
     flexDirection: "row",
@@ -174,7 +79,7 @@ const styles = StyleSheet.create({
   },
   locationButtonIcon: {
     borderRadius: 20,
-    backgroundColor: Colors.light,
+    backgroundColor: c.gray200,
     padding: 10,
   },
   rightIcons: {
@@ -184,29 +89,16 @@ const styles = StyleSheet.create({
   iconButton: {
     width: 40,
     height: 40,
-    backgroundColor: Colors.light,
+    backgroundColor: c.gray200,
     borderRadius: 20,
     alignItems: "center",
     justifyContent: "center",
   },
-  centerContent: {
+  titleCenter: {
     flex: 1,
-    alignItems: "center",
-    paddingLeft: 40,
-  },
-  titleSmall: {
+    textAlign: "center",
     fontSize: 16,
-    fontWeight: 700,
-    marginBottom: 2,
-  },
-  locationSmall: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 2,
-  },
-  locationSmallTextt: {
-    fontSize: 12,
-    color: Colors.muted,
+    fontWeight: "700",
+    color: c.text,
   },
 });
-export default ComidasHeader;

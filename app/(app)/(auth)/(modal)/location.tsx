@@ -1,120 +1,145 @@
-import { Colors, Fonts } from '@/constants/theme';
+import { useTheme } from '@/hooks/use-theme';
 import { Ionicons } from '@expo/vector-icons';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import * as Linking from 'expo-linking';
 import React from 'react';
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+
+const MAPS_URL = "https://maps.app.goo.gl/EXHqWDRfpgcMc8pc7";
 
 const Page = () => {
+  const { colors } = useTheme();
+
+  const openMaps = async () => {
+    const canOpen = await Linking.canOpenURL(MAPS_URL);
+    if (canOpen) {
+      await Linking.openURL(MAPS_URL);
+    } else {
+      Alert.alert("Error", "No se puede abrir Google Maps.");
+    }
+  };
+
+  const s = styles(colors);
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Location</Text>
+    <View style={s.container}>
+      <Text style={s.title}>Ubicación</Text>
 
-      {/* Use Current Location */}
-      <TouchableOpacity style={styles.locationItem}>
-        <View style={styles.locationItemIcon}>
-          <Ionicons name="locate-outline" size={18} color="#000" />
+      <TouchableOpacity style={s.locationItem} onPress={openMaps} activeOpacity={0.7}>
+        <View style={[s.locationItemIcon, { backgroundColor: c.successLight }]}>
+          <Ionicons name="location-outline" size={18} color={colors.success} />
         </View>
-        <Text style={styles.locationText}>Use my current location</Text>
+        <View style={s.addressInfo}>
+          <Text style={s.addressText}>Helus Restobar</Text>
+          <Text style={s.cityText}>San Cristóbal, Venezuela</Text>
+        </View>
+        <Ionicons name="open-outline" size={16} color={colors.textMuted} />
       </TouchableOpacity>
 
-      {/* Saved Addresses */}
-      <TouchableOpacity style={styles.locationItem}>
-        <View style={styles.locationItemIcon}>
-          <Ionicons name="location-outline" size={18} color="#000" />
+      <TouchableOpacity style={s.locationItem} onPress={openMaps} activeOpacity={0.7}>
+        <View style={s.locationItemIcon}>
+          <Ionicons name="map-outline" size={18} color={colors.text} />
         </View>
-        <View style={styles.addressInfo}>
-          <Text style={styles.addressText}>Magdalenenstraße 21</Text>
-          <Text style={styles.cityText}>Münster</Text>
+        <View style={s.addressInfo}>
+          <Text style={s.addressText}>Ver en Google Maps</Text>
+          <Text style={s.cityText}>Abrir mapa para ver ruta</Text>
+        </View>
+        <Ionicons name="open-outline" size={16} color={colors.textMuted} />
+      </TouchableOpacity>
+
+      <TouchableOpacity style={s.locationItem}>
+        <View style={s.locationItemIcon}>
+          <Ionicons name="locate-outline" size={18} color={colors.text} />
+        </View>
+        <View style={s.addressInfo}>
+          <Text style={s.addressText}>Mi ubicación actual</Text>
+          <Text style={s.cityText}>Usar GPS del dispositivo</Text>
         </View>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.locationItem}>
-        <View style={styles.locationItemIcon}>
-          <Ionicons name="location-outline" size={18} color="#000" />
-        </View>
-        <View style={styles.addressInfo}>
-          <Text style={styles.addressText}>Schonebecker Weg 57A</Text>
-          <Text style={styles.cityText}>Münster</Text>
-        </View>
-      </TouchableOpacity>
+      <View style={s.sectionHeader}>
+        <Text style={s.sectionTitle}>Horarios</Text>
+      </View>
 
-      {/* Add New Address */}
-      <TouchableOpacity style={styles.locationItem}>
-        <View style={styles.locationItemIcon}>
-          <Ionicons name="add" size={18} color="#000" />
-        </View>
-        <Text style={styles.locationText}>Add new address</Text>
-      </TouchableOpacity>
-
-      {/* My Addresses */}
-      <TouchableOpacity style={styles.locationItem}>
-        <View style={styles.locationItemIcon}>
-          <Ionicons name="list-outline" size={18} color="#000" />
-        </View>
-        <Text style={styles.locationText}>My addresses</Text>
-      </TouchableOpacity>
-
-      {/* Browse All Cities */}
-      <TouchableOpacity style={[styles.locationItem, { paddingLeft: 10, gap: 22 }]}>
-        <Ionicons name="map-outline" size={18} color="#009de0" />
-        <View style={styles.addressInfo}>
-          <Text style={styles.browseCitiesText}>Browse all Wolt cities</Text>
-          <Text style={styles.browseCitiesSubtext}>Münster</Text>
-        </View>
-      </TouchableOpacity>
+      <View style={s.hoursItem}>
+        <Text style={s.hoursDay}>Lunes - Jueves</Text>
+        <Text style={s.hoursTime}>11:00 - 22:00</Text>
+      </View>
+      <View style={s.hoursItem}>
+        <Text style={s.hoursDay}>Viernes - Sábado</Text>
+        <Text style={s.hoursTime}>11:00 - 23:00</Text>
+      </View>
+      <View style={[s.hoursItem, { borderBottomWidth: 0 }]}>
+        <Text style={s.hoursDay}>Domingo</Text>
+        <Text style={s.hoursTime}>12:00 - 22:00</Text>
+      </View>
     </View>
   );
 };
 
-const styles = StyleSheet.create({
+export default Page;
+
+const styles = (c: ReturnType<typeof useTheme>['colors']) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: c.background,
     padding: 20,
   },
   title: {
-    fontFamily: Fonts.brandBold,
-    fontSize: 32,
-    fontWeight: 900,
-    marginBottom: 12,
+    fontSize: 28,
+    fontWeight: '900',
+    marginBottom: 20,
+    color: c.text,
   },
   locationItem: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-    gap: 16,
+    borderBottomColor: c.border,
+    gap: 14,
   },
   locationItemIcon: {
     padding: 8,
     borderRadius: 20,
-    backgroundColor: Colors.light,
-  },
-  locationText: {
-    fontSize: 16,
-    color: '#000',
+    backgroundColor: c.gray100,
   },
   addressInfo: {
     flex: 1,
   },
   addressText: {
     fontSize: 16,
-    color: '#000',
+    color: c.text,
     marginBottom: 2,
   },
   cityText: {
-    fontSize: 14,
-    color: '#999',
+    fontSize: 13,
+    color: c.textMuted,
   },
-  browseCitiesText: {
+  sectionHeader: {
+    marginTop: 28,
+    marginBottom: 8,
+    paddingHorizontal: 4,
+  },
+  sectionTitle: {
     fontSize: 16,
-    color: Colors.secondary,
-    marginBottom: 2,
+    fontWeight: '700',
+    color: c.text,
   },
-  browseCitiesSubtext: {
-    fontSize: 14,
-    color: Colors.secondary,
+  hoursItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: c.border,
+  },
+  hoursDay: {
+    fontSize: 15,
+    color: c.textSecondary,
+  },
+  hoursTime: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: c.secondary,
   },
 });
-
-export default Page;

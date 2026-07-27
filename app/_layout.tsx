@@ -1,4 +1,4 @@
-import { openDatabase } from "@/src/db/database"; // ✅ 2. Importamos la apertura de la BD
+import { openDatabase } from "@/src/db/database";
 import {
   Nunito_400Regular,
   Nunito_700Bold_Italic,
@@ -7,8 +7,9 @@ import {
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useFonts } from "expo-font";
 import { Slot } from "expo-router";
-import { useEffect, useState } from "react"; // ✅ 1. Importamos useState y useEffect
+import { useEffect, useState } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { ThemeProvider } from "@/hooks/use-theme";
 
 
 const queryClient = new QueryClient({
@@ -51,7 +52,9 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <QueryClientProvider client={queryClient}>
-        <Slot />
+        <ThemeProvider>
+          <Slot />
+        </ThemeProvider>
       </QueryClientProvider>
     </GestureHandlerRootView>
   );

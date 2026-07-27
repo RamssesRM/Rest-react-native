@@ -38,7 +38,7 @@ const Layout = () => {
         title: "Sobre Nosotros",
         headerShown: false,
         tabBarIcon:({color, size, focused}) => (
-          <Ionicons name={focused ? "information-circle" : 'information-circle-outline'} color={color} size={size} />
+          <Ionicons name={focused ? "people" : "people-outline"} color={color} size={size} />
         ),
       }} />
       <Tabs.Screen name="perfil" options={{ 

@@ -1,54 +1,74 @@
-import { Colors, Fonts } from '@/constants/theme';
+import { useTheme } from '@/hooks/use-theme';
+import { useFilterStore } from '@/hooks/use-filterstore';
+import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { ScrollView, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-const cuisineFilters = [
-  'Pizza',
-  'Italian',
-  'Mediterranean',
-  'Falafel',
-  'Burger',
-  'Kebab',
-  'Asian',
-  'Chicken',
-  'BBQ',
-  'Pasta',
-  'American',
+const priceFilters = [
+  { label: '$', value: 'bajo' },
+  { label: '$$', value: 'medio' },
+  { label: '$$$', value: 'alto' },
 ];
 
-const priceFilters = ['€', '€€', '€€€', '€€€€'];
+const sortOptions = [
+  { label: 'Recomendados', value: 'recommended' },
+  { label: 'Precio', value: 'price' },
+  { label: 'Nombre A-Z', value: 'name' },
+];
 
-const sortOptions = ['Recommended', 'Delivery price', 'Rating', 'Delivery time'];
+const cuisineFilters = [
+  'Sushi',
+  'Hamburguesas',
+  'Almuerzos',
+  'Marisquería',
+  'Pizza',
+  'Pasta',
+  'Ensaladas',
+  'Postres',
+  'Bebidas',
+];
 
 const Page = () => {
-  const [selectedCuisines, setSelectedCuisines] = useState<string[]>([]);
-  const [selectedPrice, setSelectedPrice] = useState<string | null>(null);
-  const [woltPlusOnly, setWoltPlusOnly] = useState(false);
-  const [selectedSort, setSelectedSort] = useState('Recommended');
+  const router = useRouter();
+  const { colors } = useTheme();
+  const { categories, price, sort, setFilters, clearFilters } = useFilterStore();
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(categories);
+  const [selectedPrice, setSelectedPrice] = useState<string | null>(price);
+  const [selectedSort, setSelectedSort] = useState(sort);
 
   const toggleCuisine = (cuisine: string) => {
-    setSelectedCuisines((prev) =>
-      prev.includes(cuisine) ? prev.filter((c) => c !== cuisine) : [...prev, cuisine]
+    setSelectedCategories((prev) =>
+      prev.includes(cuisine)
+        ? prev.filter((c) => c !== cuisine)
+        : [...prev, cuisine],
     );
   };
 
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Filter</Text>
+  const handleApply = () => {
+    setFilters({
+      categories: selectedCategories,
+      price: selectedPrice,
+      sort: selectedSort,
+    });
+    router.dismiss();
+  };
 
-      {/* Cuisine Filters */}
-      <View style={styles.filterSection}>
-        <View style={styles.chipContainer}>
+  const s = styles(colors);
+
+  return (
+    <View style={s.container}>
+      <Text style={s.title}>Filtrar Menú</Text>
+
+      <View style={s.filterSection}>
+        <Text style={s.sectionTitle}>CATEGORÍA</Text>
+        <View style={s.chipContainer}>
           {cuisineFilters.map((cuisine) => (
             <TouchableOpacity
               key={cuisine}
-              style={[styles.chip, selectedCuisines.includes(cuisine) && styles.chipSelected]}
-              onPress={() => toggleCuisine(cuisine)}>
-              <Text
-                style={[
-                  styles.chipText,
-                  selectedCuisines.includes(cuisine) && styles.chipTextSelected,
-                ]}>
+              style={[s.chip, selectedCategories.includes(cuisine) && s.chipSelected]}
+              onPress={() => toggleCuisine(cuisine)}
+            >
+              <Text style={[s.chipText, selectedCategories.includes(cuisine) && s.chipTextSelected]}>
                 {cuisine}
               </Text>
             </TouchableOpacity>
@@ -56,69 +76,75 @@ const Page = () => {
         </View>
       </View>
 
-      {/* Price Filter */}
-      <View style={styles.filterSection}>
-        <Text style={styles.sectionTitle}>PRICE</Text>
-        <View style={styles.chipContainer}>
-          {priceFilters.map((price) => (
+      <View style={s.filterSection}>
+        <Text style={s.sectionTitle}>PRECIO</Text>
+        <View style={s.chipContainer}>
+          {priceFilters.map((p) => (
             <TouchableOpacity
-              key={price}
-              style={[styles.chip, selectedPrice === price && styles.chipSelected]}
-              onPress={() => setSelectedPrice(price === selectedPrice ? null : price)}>
-              <Text style={[styles.chipText, selectedPrice === price && styles.chipTextSelected]}>
-                {price}
+              key={p.value}
+              style={[s.chip, selectedPrice === p.value && s.chipSelected]}
+              onPress={() => setSelectedPrice(p.value === selectedPrice ? null : p.value)}
+            >
+              <Text style={[s.chipText, selectedPrice === p.value && s.chipTextSelected]}>
+                {p.label}
               </Text>
             </TouchableOpacity>
           ))}
         </View>
       </View>
 
-      {/* Wolt+ Toggle */}
-      <View style={[styles.filterSection, styles.toggleSection]}>
-        <Text style={styles.toggleText}>Only show Wolt+ venues</Text>
-        <Switch
-          value={woltPlusOnly}
-          onValueChange={setWoltPlusOnly}
-          trackColor={{ false: Colors.light, true: Colors.primary }}
-          thumbColor="#fff"
-        />
-      </View>
-
-      {/* Sort By */}
-      <View style={styles.filterSection}>
-        <Text style={styles.sectionTitle}>SORT BY</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chipContainer}>
+      <View style={s.filterSection}>
+        <Text style={s.sectionTitle}>ORDENAR POR</Text>
+        <View style={s.chipContainer}>
           {sortOptions.map((option) => (
             <TouchableOpacity
-              key={option}
-              style={[styles.chip, selectedSort === option && styles.chipSelected]}
-              onPress={() => setSelectedSort(option)}>
-              <Text style={[styles.chipText, selectedSort === option && styles.chipTextSelected]}>
-                {option}
+              key={option.value}
+              style={[s.chip, selectedSort === option.value && s.chipSelected]}
+              onPress={() => setSelectedSort(option.value)}
+            >
+              <Text style={[s.chipText, selectedSort === option.value && s.chipTextSelected]}>
+                {option.label}
               </Text>
             </TouchableOpacity>
           ))}
-        </ScrollView>
+        </View>
       </View>
 
-      {/* Apply Button */}
-      <TouchableOpacity style={styles.applyButton}>
-        <Text style={styles.applyButtonText}>Apply</Text>
-      </TouchableOpacity>
+      <View style={s.buttonRow}>
+        <TouchableOpacity
+          style={s.resetButton}
+          onPress={() => {
+            setSelectedCategories([]);
+            setSelectedPrice(null);
+            setSelectedSort('recommended');
+            clearFilters();
+            router.dismiss();
+          }}
+        >
+          <Text style={s.resetButtonText}>Limpiar</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={s.applyButton} onPress={handleApply}>
+          <Text style={s.applyButtonText}>Aplicar</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
 
-const styles = StyleSheet.create({
+export default Page;
+
+const styles = (c: ReturnType<typeof useTheme>['colors']) => StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 20,
+    backgroundColor: c.background,
   },
   title: {
-    fontFamily: Fonts.brandBold,
-    fontSize: 32,
-    fontWeight: 900,
+    fontSize: 28,
+    fontWeight: '900',
     marginBottom: 24,
+    color: c.text,
   },
   filterSection: {
     marginBottom: 24,
@@ -126,7 +152,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#666',
+    color: c.textMuted,
     marginBottom: 12,
     letterSpacing: 0.5,
   },
@@ -139,44 +165,49 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 20,
-    backgroundColor: Colors.primaryLight,
+    backgroundColor: c.chipBg,
   },
   chipSelected: {
-    backgroundColor: Colors.primary,
+    backgroundColor: c.chipActiveBg,
   },
   chipText: {
-    fontSize: 12,
-    color: Colors.secondary,
+    fontSize: 13,
+    color: c.textSecondary,
+    fontWeight: '500',
   },
   chipTextSelected: {
-    color: '#fff',
-    fontWeight: '600',
+    color: c.text,
+    fontWeight: '700',
   },
-  toggleSection: {
+  buttonRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 12,
-    borderTopWidth: 1,
-    borderBottomWidth: 1,
-    borderColor: '#f0f0f0',
+    gap: 12,
+    marginTop: 24,
   },
-  toggleText: {
-    fontSize: 16,
-    color: '#000',
-  },
-  applyButton: {
-    backgroundColor: Colors.primary,
+  resetButton: {
+    flex: 1,
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: 'center',
-    marginTop: 20,
+    backgroundColor: c.chipBg,
+    borderWidth: 1,
+    borderColor: c.border,
+  },
+  resetButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: c.textSecondary,
+  },
+  applyButton: {
+    flex: 1,
+    paddingVertical: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+    backgroundColor: c.gold,
   },
   applyButtonText: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#fff',
+    fontWeight: '700',
+    color: '#000',
   },
 });
-
-export default Page;

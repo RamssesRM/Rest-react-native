@@ -1,59 +1,50 @@
 import { CategoriasList } from "@/componentes/CategoriasList";
 import ComidasHeader from "@/componentes/ComidasHeader";
 import ComidasList from "@/componentes/ComidasList";
+import { useTheme } from "@/hooks/use-theme";
 import { Fonts } from "@/constants/theme";
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
-import Animated, {
-  useAnimatedScrollHandler,
-  useSharedValue,
-} from "react-native-reanimated";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-const HEADER_HEIGHT = 60;
-const ComidasListPage = () => {
-  const insets = useSafeAreaInsets();
-  const scrollOffset = useSharedValue(0);
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 
-  const scrollHandler = useAnimatedScrollHandler({
-    onScroll: (event) => {
-      scrollOffset.value = event.contentOffset.y;
-    },
-  });
+const ComidasListPage = () => {
+  const { colors } = useTheme();
+  const s = styles(colors);
 
   return (
-    <View style={styles.container}>
-      <ComidasHeader title="Platillos" scrollOffset={scrollOffset} />
-      <Animated.ScrollView
-        onScroll={scrollHandler}
-        scrollEventThrottle={16}
+    <View style={s.container}>
+      <ComidasHeader title="Menús" />
+      <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingTop: insets.top + HEADER_HEIGHT }}
+        contentContainerStyle={{ paddingTop: 8 }}
       >
-        <Text style={styles.pageTitle}>Menus</Text>
+        <Text style={s.pageTitle}>Menus</Text>
         <CategoriasList />
 
-        <Text style={styles.allComidasTitle}>Todos los menus</Text>
+        <Text style={s.allComidasTitle}>Todos los menus</Text>
         <ComidasList />
-      </Animated.ScrollView>
+      </ScrollView>
     </View>
   );
 };
 
-const styles = StyleSheet.create({
+const styles = (c: ReturnType<typeof useTheme>['colors']) => StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: c.background,
   },
   pageTitle: {
     fontFamily: Fonts.brandBlack,
     fontSize: 25,
     marginBottom: 16,
     paddingHorizontal: 16,
+    color: c.text,
   },
   allComidasTitle: {
     fontFamily: Fonts.brandBold,
     fontSize: 30,
     marginBottom: 16,
     paddingHorizontal: 16,
+    color: c.text,
   },
 });
 
