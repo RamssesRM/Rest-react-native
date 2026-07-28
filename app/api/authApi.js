@@ -66,20 +66,24 @@ export const loginUser = async (username, password)=>{
     }
 };
 
-export const resetPassword = async (email) => {
+export const resetPassword = async (email, newPassword = null) => {
     try {
-        const response = await fetch(`${API_URL}/auth/password-reset/`, {
+        const body = newPassword
+            ? { email, new_password: newPassword }
+            : { email };
+        const response = await fetchWithTimeout(`${BASE_URL}/auth/password-reset/`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email }),
+            body: JSON.stringify(body),
         });
         const data = await response.json();
         if (response.ok) {
             return data;
         } else {
-            throw new Error(data.error || data.detail || 'No se pudo enviar el correo de recuperación');
+            throw new Error(data.error || data.detail || 'Error al procesar');
         }
     } catch (error) {
+        if (error.name === 'AbortError') throw new Error('No se pudo conectar con el servidor');
         throw error;
     }
 };

@@ -14,10 +14,10 @@ const Layout = () => {
       {/* 1. Esta pantalla mapea el archivo index.tsx de la raíz de (tabs) y será "Comidas" */}
       {/* 2. Rutas directas sin el '/index' para que coincidan con lo que busca Expo */}
       <Tabs.Screen name="descubrir" options={{ 
-        title: "Descubrir",
+        title: "Comentarios",
         headerShown: false,
         tabBarIcon:({color, size, focused}) => (
-          <Ionicons name={focused ? "compass" : 'compass-outline'} color={color} size={size} />
+          <Ionicons name={focused ? "chatbubble" : 'chatbubble-outline'} color={color} size={size} />
         ),
       }} />
       <Tabs.Screen name="comidas" options={{ 
