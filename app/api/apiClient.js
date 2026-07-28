@@ -26,7 +26,10 @@ const fetchWithTimeout = async (url, options = {}, timeout = TIMEOUT_MS) => {
 
 const refreshAccessToken = async () => {
     const refreshToken = await SecureStore.getItemAsync('jwt_refresh');
-    if (!refreshToken) throw new Error('No refresh token');
+    if (!refreshToken) {
+        await SecureStore.deleteItemAsync('jwt_access');
+        throw new Error('No refresh token');
+    }
 
     const response = await fetchWithTimeout(`${BASE_URL}/auth/refresh/`, {
         method: 'POST',
