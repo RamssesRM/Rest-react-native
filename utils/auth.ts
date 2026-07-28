@@ -13,10 +13,18 @@ export const isTokenExpired = (token: string): boolean => {
 
 export const validateStoredTokens = async (): Promise<boolean> => {
   const token = await SecureStore.getItemAsync('jwt_access');
-  if (!token) return false;
+  if (!token) {
+    const refreshToken = await SecureStore.getItemAsync('jwt_refresh');
+    if (!refreshToken) return false;
+    return true;
+  }
   if (isTokenExpired(token)) {
-    await clearAuth();
-    return false;
+    const refreshToken = await SecureStore.getItemAsync('jwt_refresh');
+    if (!refreshToken) {
+      await clearAuth();
+      return false;
+    }
+    return true;
   }
   return true;
 };

@@ -1,14 +1,23 @@
 import { Stack } from "expo-router";
 import React from "react";
+import { useTheme } from "@/hooks/use-theme";
 
 const _layout = () => {
+  const { colors } = useTheme();
   return (
-    <Stack screenOptions={{ contentStyle: { backgroundColor:'#fff' } }}>
+    <Stack screenOptions={{ contentStyle: { backgroundColor: colors.background } }}>
       <Stack.Screen name="index" options={{ 
-        headerShown: false, // <-- Ocultamos el header nativo de Android
-        headerLargeTitle:true,
-        headerTransparent : true
+        headerShown: false,
+        headerLargeTitle: true,
+        headerTransparent: true
       }} />
+      <Stack.Screen
+        name="editar-perfil"
+        options={{
+          headerShown: false,
+          animation: 'slide_from_right',
+        }}
+      />
     </Stack>
   );
 };

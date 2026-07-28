@@ -36,7 +36,7 @@ export default function PerfilScreen() {
         const data = await tomarStatsConUsuario(user.id);
         setStats(data);
       } catch (error) {
-        console.error("Error cargando estadísticas:", error);
+        // Error silenciado
       }
     };
     fetchStats();
@@ -105,7 +105,7 @@ export default function PerfilScreen() {
         </View>
 
         <View style={s.buttonsRow}>
-          <TouchableOpacity style={s.primaryButton}>
+          <TouchableOpacity style={s.primaryButton} onPress={() => router.push('./perfil/editar-perfil')}>
             <Text style={s.primaryButtonText}>Editar Perfil</Text>
           </TouchableOpacity>
           <TouchableOpacity style={s.secondaryButton} onPress={handleLogout}>
