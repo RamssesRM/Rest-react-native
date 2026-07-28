@@ -100,6 +100,7 @@ export default function GestionUsuariosScreen() {
         }
 
         const accion = usuario.is_active ? 'desactivar' : 'activar';
+        const accionPasado = usuario.is_active ? 'desactivado' : 'activado';
         Alert.alert(
             `${accion.charAt(0).toUpperCase() + accion.slice(1)} Usuario`,
             `¿${accion.charAt(0).toUpperCase() + accion.slice(1)} a ${usuario.first_name || usuario.username}?`,
@@ -115,7 +116,7 @@ export default function GestionUsuariosScreen() {
                             setUsuarios(prev =>
                                 prev.map(u => u.id === usuario.id ? { ...u, is_active: !u.is_active } : u)
                             );
-                            Alert.alert('Éxito', `Usuario ${accion}do`);
+                            Alert.alert('Éxito', `Usuario ${accionPasado}`);
                         } catch (error) {
                             Alert.alert('Error', `No se pudo ${accion} el usuario`);
                         } finally {

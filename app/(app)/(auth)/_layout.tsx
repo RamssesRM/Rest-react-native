@@ -68,6 +68,13 @@ const Layout = () => {
           animation: 'slide_from_right',
         }}
       />
+      <Stack.Screen
+        name="auditoria"
+        options={{
+          headerShown: false,
+          animation: 'slide_from_right',
+        }}
+      />
     </Stack>
   );
 };

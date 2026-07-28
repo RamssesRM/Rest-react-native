@@ -55,6 +55,7 @@ export default function PerfilScreen() {
     { icon: 'help-circle-outline', text: 'Ayuda y Soporte', target: 'ayuda' },
     ...(user?.role === 'admin' ? [
       { icon: 'people-outline', text: 'Gestión de Usuarios', target: 'gestion-usuarios' },
+      { icon: 'document-text-outline', text: 'Auditoría', target: 'auditoria' },
     ] : []),
   ];
 
@@ -121,6 +122,8 @@ export default function PerfilScreen() {
               onPress={() => {
                 if (item.target === 'gestion-usuarios') {
                   router.push('/gestion-usuarios');
+                } else if (item.target === 'auditoria') {
+                  router.push('/auditoria');
                 } else {
                   alert(`Ir a: ${item.text}`);
                 }
