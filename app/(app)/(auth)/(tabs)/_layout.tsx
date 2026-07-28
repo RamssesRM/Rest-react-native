@@ -21,7 +21,7 @@ const Layout = () => {
         ),
       }} />
       <Tabs.Screen name="comidas" options={{ 
-        title: "Comidas",
+        title: "Menús",
         headerShown: false,
         tabBarIcon:({color, size}) => (
           <MaterialIcons name="restaurant" color={color} size={size} />

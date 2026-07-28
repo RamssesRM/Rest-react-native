@@ -1,3 +1,4 @@
+import { useTheme } from '@/hooks/use-theme';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, FlatList, StyleSheet, Text, View } from 'react-native';
 import { openDatabase } from './database';
@@ -8,16 +9,15 @@ const MenuScreen = () => {
     const [productos, setProductos] = useState([]);
     const [loading, setLoading] = useState(true);
     const [debugMsg, setDebugMsg] = useState('Iniciando...');
+    const { colors } = useTheme();
 
     useEffect(() => {
         const initData = async () => {
             try {
-                // 1. Abrir base de datos SQLite
                 setDebugMsg('Abriendo base de datos...');
                 await openDatabase();
                 setDebugMsg('✅ Base de datos abierta');
 
-                // 2. Intentar conectar a Django
                 try {
                     setDebugMsg('Conectando a la Base de Datos...');
                     const controller = new AbortController();
@@ -27,17 +27,14 @@ const MenuScreen = () => {
                     const resCategorias = await fetch(`${BASE_URL}/categorias/`, {
                         signal: controller.signal
                     });
-                    // console.log(resCategorias)
                     if (resCategorias.ok) {
                         const cats = await resCategorias.json();
                         if (cats.length > 0) {
-                            await saveCategorias(cats); // Ahora sí, con sus nombres reales
+                            await saveCategorias(cats);
                         }
                     }
-                    // console.log(saveCategorias)
-                    clearTimeout(timeoutId); // Limpiamos el tiempo
+                    clearTimeout(timeoutId);
 
-                    // --- PASO B: Traer los Productos ---
                     setDebugMsg('Descargando productos...');
                     const controller2 = new AbortController();
                     const timeoutId2 = setTimeout(() => controller2.abort(), 10000);
@@ -45,7 +42,6 @@ const MenuScreen = () => {
                     const response = await fetch(`${BASE_URL}/productos/`, {
                         signal: controller2.signal
                     });
-                    // console.log(response)
                     clearTimeout(timeoutId2);
 
                     if (response.ok) {
@@ -71,7 +67,6 @@ const MenuScreen = () => {
                     }
                 }
 
-                // 3. Leer de SQLite
                 setDebugMsg('Cargando productos locales...');
                 const localData = await getLocalProductos();
                 setProductos(localData);
@@ -88,37 +83,39 @@ const MenuScreen = () => {
         initData();
     }, []);
 
+    const s = styles(colors);
+
     if (loading) {
         return (
-            <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color="#2e7d32" />
-                <Text style={styles.debugText}>{debugMsg}</Text>
+            <View style={s.loadingContainer}>
+                <ActivityIndicator size="large" color={colors.secondary} />
+                <Text style={s.debugText}>{debugMsg}</Text>
             </View>
         );
     }
 
     if (productos.length === 0) {
         return (
-            <View style={styles.emptyContainer}>
-                <Text style={styles.emptyTitle}>No hay productos disponibles</Text>
-                <Text style={styles.emptySubtitle}>Asegúrate de estar conectado a internet la primera vez.</Text>
-                <Text style={styles.debugText}>{debugMsg}</Text>
+            <View style={s.emptyContainer}>
+                <Text style={s.emptyTitle}>No hay productos disponibles</Text>
+                <Text style={s.emptySubtitle}>Asegúrate de estar conectado a internet la primera vez.</Text>
+                <Text style={s.debugText}>{debugMsg}</Text>
             </View>
         );
     }
 
     return (
-        <View style={styles.container}>
-            <Text style={styles.header}>Menú ({productos.length} productos)</Text>
+        <View style={s.container}>
+            <Text style={s.header}>Menú ({productos.length} productos)</Text>
             <FlatList
                 data={productos}
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => (
-                    <View style={styles.card}>
-                        <Text style={styles.nombre}>{item.nombre}</Text>
-                        <Text style={styles.desc}>{item.descripcion}</Text>
-                        <Text style={styles.precio}>${item.precio?.toFixed(2) || '0.00'}</Text>
-                        <Text style={styles.cat}>Categoría: {item.categoria_nombre}</Text>
+                    <View style={s.card}>
+                        <Text style={s.nombre}>{item.nombre}</Text>
+                        <Text style={s.desc}>{item.descripcion}</Text>
+                        <Text style={s.precio}>${item.precio?.toFixed(2) || '0.00'}</Text>
+                        <Text style={s.cat}>Categoría: {item.categoria_nombre}</Text>
                     </View>
                 )}
             />
@@ -126,72 +123,75 @@ const MenuScreen = () => {
     );
 };
 
-const styles = StyleSheet.create({
+const styles = (c) => StyleSheet.create({
     loadingContainer: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#fff'
+        backgroundColor: c.background
     },
     debugText: {
         marginTop: 20,
-        color: '#666',
+        color: c.textMuted,
         fontSize: 12,
         textAlign: 'center'
     },
     container: {
         flex: 1,
         padding: 16,
-        backgroundColor: '#fff'
+        backgroundColor: c.background
     },
     header: {
         fontSize: 20,
         fontWeight: 'bold',
         marginBottom: 16,
-        color: '#333'
+        color: c.text
     },
     emptyContainer: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        padding: 20
+        padding: 20,
+        backgroundColor: c.background
     },
     emptyTitle: {
         fontSize: 18,
         fontWeight: 'bold',
-        marginBottom: 8
+        marginBottom: 8,
+        color: c.text
     },
     emptySubtitle: {
         fontSize: 14,
-        color: '#666',
+        color: c.textMuted,
         textAlign: 'center',
         marginBottom: 20
     },
     card: {
         padding: 16,
         marginBottom: 12,
-        backgroundColor: '#f5f5f5',
+        backgroundColor: c.surface,
         borderRadius: 10,
         elevation: 2
     },
     nombre: {
         fontSize: 18,
         fontWeight: 'bold',
-        marginBottom: 4
+        marginBottom: 4,
+        color: c.text
     },
     desc: {
         fontSize: 14,
-        color: '#666',
+        color: c.textSecondary,
         marginBottom: 8
     },
     precio: {
         fontSize: 16,
         fontWeight: 'bold',
-        color: '#2e7d32'
+        color: c.success
     },
     cat: {
         fontSize: 12,
-        color: '#999',
+        color: c.textMuted,
         marginTop: 4,
         fontStyle: 'italic'
     }

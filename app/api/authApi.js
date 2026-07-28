@@ -20,11 +20,16 @@ export const googleLogin = async (googleToken) => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ token: googleToken }),
     });
-    const data = await response.json();
-    if (response.ok) {
-      return data;
-    } else {
-      throw new Error(data.error || 'Error al autenticar con Google');
+    const text = await response.text();
+    try {
+      const data = JSON.parse(text);
+      if (response.ok) {
+        return data;
+      } else {
+        throw new Error(data.error || 'Error al autenticar con Google');
+      }
+    } catch (parseError) {
+      throw new Error('Error del servidor. Intenta de nuevo.');
     }
   } catch (error) {
     if (error.name === 'AbortError') throw new Error('No se pudo conectar con el servidor');
@@ -58,6 +63,24 @@ export const loginUser = async (username, password)=>{
     }catch(error){
         if (error.name === 'AbortError') throw new Error('No se pudo conectar con el servidor');
         throw error
+    }
+};
+
+export const resetPassword = async (email) => {
+    try {
+        const response = await fetch(`${API_URL}/auth/password-reset/`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email }),
+        });
+        const data = await response.json();
+        if (response.ok) {
+            return data;
+        } else {
+            throw new Error(data.error || data.detail || 'No se pudo enviar el correo de recuperación');
+        }
+    } catch (error) {
+        throw error;
     }
 };
 

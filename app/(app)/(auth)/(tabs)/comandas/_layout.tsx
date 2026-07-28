@@ -1,7 +1,10 @@
+import { useTheme } from '@/hooks/use-theme';
 import { Stack } from 'expo-router';
 import React from 'react';
 
 const ComandasLayout = () => {
+  const { colors } = useTheme();
+
   return (
     <Stack screenOptions={{ headerShown: false }}>
       
@@ -12,8 +15,9 @@ const ComandasLayout = () => {
         options={{ 
           headerShown: true, 
           title: "Nueva Orden", 
-          headerTintColor: '#262626',
-          headerStyle: { backgroundColor: '#FAFAFA' }
+          headerTintColor: colors.text,
+          headerStyle: { backgroundColor: colors.background },
+          headerTitleStyle: { color: colors.text, fontWeight: 'bold' },
         }} 
       />
 

@@ -128,7 +128,10 @@ export default function HelusLogin() {
               </TouchableOpacity>
             </View>
 
-            <TouchableOpacity style={styles.forgotPasswordContainer}>
+            <TouchableOpacity
+              style={styles.forgotPasswordContainer}
+              onPress={() => router.push("./forgot-password")}
+            >
               <Text style={styles.forgotPasswordText}>
                 ¿Olvidaste tu contraseña?
               </Text>

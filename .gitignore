@@ -32,7 +32,11 @@ yarn-error.*
 
 # local env files
 .env
-.env*.local
+.env.local
+.env.*.local
+
+# expo config (use app.config.js with env vars instead)
+app.json
 
 # typescript
 *.tsbuildinfo

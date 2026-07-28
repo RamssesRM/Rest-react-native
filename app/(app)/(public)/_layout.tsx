@@ -36,6 +36,12 @@ const Layout = () => {
           headerShown: false, // Oculta la barra superior por defecto de Expo
         }}
       />
+      <Stack.Screen
+        name="forgot-password"
+        options={{
+          headerShown: false,
+        }}
+      />
     </Stack>
   );
 };

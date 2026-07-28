@@ -1,9 +1,11 @@
 import { Ionicons } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient";
+import { useTheme } from "@/hooks/use-theme";
 import * as Linking from "expo-linking";
+import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import {
   Alert,
+  Image,
   ScrollView,
   StyleSheet,
   Text,
@@ -17,6 +19,7 @@ const MAPS_URL = "https://maps.app.goo.gl/EXHqWDRfpgcMc8pc7";
 
 const AboutUs = () => {
   const insets = useSafeAreaInsets();
+  const { colors } = useTheme();
 
   const openLink = async (url: string) => {
     const canOpen = await Linking.canOpenURL(url);
@@ -27,29 +30,39 @@ const AboutUs = () => {
     }
   };
 
-  return (
-    <View style={styles.container}>
-      <LinearGradient colors={["#382f2f", "#2a2222"]} style={styles.gradient}>
-        <ScrollView
-          contentContainerStyle={[
-            styles.scrollContent,
-            { paddingTop: insets.top + 10 },
-          ]}
-          showsVerticalScrollIndicator={false}
-        >
-          <View style={styles.heroSection}>
-            <View style={styles.logoContainer}>
-              <Text style={styles.logoText}>HL</Text>
-            </View>
-            <Text style={styles.brandName}>Helus Restobar</Text>
-            <Text style={styles.tagline}>
-              Sabor que conecta, ambiente que inspira
-            </Text>
-          </View>
+  const s = styles(colors);
 
-          <View style={styles.card}>
-            <Text style={styles.sectionTitle}>Quiénes somos</Text>
-            <Text style={styles.description}>
+  return (
+    <View style={s.container}>
+      <ScrollView
+        contentContainerStyle={{ paddingBottom: 40 }}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Hero con imagen de fondo + gradiente */}
+        <View style={s.heroWrapper}>
+          <Image
+            source={require("../../../../assets/images/1.webp")}
+            style={s.heroImage}
+          />
+          <LinearGradient
+            colors={["transparent", colors.background]}
+            style={s.heroGradient}
+          />
+          <View style={[s.heroContent, { paddingTop: insets.top + 20 }]}>
+            <Image
+              source={require("../../../../assets/images/logo2arreglado2.png")}
+              style={s.logoImage}
+            />
+            <Text style={s.brandName}>Helus Restobar</Text>
+            <Text style={s.tagline}>Sabor que conecta, ambiente que inspira</Text>
+          </View>
+        </View>
+
+        {/* Contenido */}
+        <View style={[s.content, { backgroundColor: colors.background }]}>
+          <View style={s.card}>
+            <Text style={s.sectionTitle}>Quiénes somos</Text>
+            <Text style={s.description}>
               Helus Restobar es el lugar perfecto para disfrutar de una
               experiencia gastronómica única. Ofrecemos una variada carta de
               platos cuidadosamente preparados, acompañados de los mejores
@@ -59,140 +72,147 @@ const AboutUs = () => {
             </Text>
           </View>
 
-          <View style={styles.card}>
-            <Text style={styles.sectionTitle}>Horarios</Text>
-            <View style={styles.hoursRow}>
-              <Text style={styles.hoursDay}>Lunes - Jueves</Text>
-              <Text style={styles.hoursTime}>11:00 - 22:00</Text>
+          <View style={s.card}>
+            <Text style={s.sectionTitle}>Horarios</Text>
+            <View style={s.hoursRow}>
+              <Text style={s.hoursDay}>Lunes - Jueves</Text>
+              <Text style={s.hoursTime}>11:00 - 22:00</Text>
             </View>
-            <View style={styles.hoursDivider} />
-            <View style={styles.hoursRow}>
-              <Text style={styles.hoursDay}>Viernes - Sábado</Text>
-              <Text style={styles.hoursTime}>11:00 - 23:00</Text>
+            <View style={s.hoursDivider} />
+            <View style={s.hoursRow}>
+              <Text style={s.hoursDay}>Viernes - Sábado</Text>
+              <Text style={s.hoursTime}>11:00 - 23:00</Text>
             </View>
-            <View style={styles.hoursDivider} />
-            <View style={styles.hoursRow}>
-              <Text style={styles.hoursDay}>Domingo</Text>
-              <Text style={styles.hoursTime}>12:00 - 22:00</Text>
+            <View style={s.hoursDivider} />
+            <View style={s.hoursRow}>
+              <Text style={s.hoursDay}>Domingo</Text>
+              <Text style={s.hoursTime}>12:00 - 22:00</Text>
             </View>
           </View>
 
-          <View style={styles.card}>
-            <Text style={styles.sectionTitle}>Visítanos</Text>
+          <View style={s.card}>
+            <Text style={s.sectionTitle}>Visítanos</Text>
 
             <TouchableOpacity
-              style={styles.actionButton}
+              style={s.actionButton}
               onPress={() => openLink(MAPS_URL)}
               activeOpacity={0.8}
             >
-              <Ionicons name="location-outline" size={22} color="#f4d642" />
-              <Text style={styles.actionText}>Cómo llegar</Text>
-              <Ionicons name="chevron-forward" size={20} color="#666" />
+              <Ionicons name="location-outline" size={22} color={colors.brandYellow} />
+              <Text style={s.actionText}>Cómo llegar</Text>
+              <Ionicons name="chevron-forward" size={20} color={colors.textMuted} />
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={styles.actionButton}
+              style={s.actionButton}
               onPress={() => openLink(INSTAGRAM_URL)}
               activeOpacity={0.8}
             >
-              <Ionicons name="logo-instagram" size={22} color="#f4d642" />
-              <Text style={styles.actionText}>Síguenos en Instagram</Text>
-              <Ionicons name="chevron-forward" size={20} color="#666" />
+              <Ionicons name="logo-instagram" size={22} color={colors.brandYellow} />
+              <Text style={s.actionText}>Síguenos en Instagram</Text>
+              <Ionicons name="chevron-forward" size={20} color={colors.textMuted} />
             </TouchableOpacity>
           </View>
 
-          <View style={styles.card}>
-            <Text style={styles.sectionTitle}>Contacto</Text>
-            <View style={styles.contactRow}>
-              <Ionicons name="call-outline" size={18} color="#f4d642" />
-              <Text style={styles.contactText}>+58 412-1234567</Text>
+          <View style={s.card}>
+            <Text style={s.sectionTitle}>Contacto</Text>
+            <View style={s.contactRow}>
+              <Ionicons name="call-outline" size={18} color={colors.brandYellow} />
+              <Text style={s.contactText}>+58 412-1234567</Text>
             </View>
-            <View style={styles.contactDivider} />
-            <View style={styles.contactRow}>
-              <Ionicons name="mail-outline" size={18} color="#f4d642" />
-              <Text style={styles.contactText}>
-                contacto@helusrestobar.com
-              </Text>
+            <View style={s.contactDivider} />
+            <View style={s.contactRow}>
+              <Ionicons name="mail-outline" size={18} color={colors.brandYellow} />
+              <Text style={s.contactText}>contacto@helusrestobar.com</Text>
             </View>
-            <View style={styles.contactDivider} />
-            <View style={styles.contactRow}>
-              <Ionicons name="location-outline" size={18} color="#f4d642" />
-              <Text style={styles.contactText}>
-                San Cristóbal, Venezuela
-              </Text>
+            <View style={s.contactDivider} />
+            <View style={s.contactRow}>
+              <Ionicons name="location-outline" size={18} color={colors.brandYellow} />
+              <Text style={s.contactText}>San Cristóbal, Venezuela</Text>
             </View>
           </View>
 
-          <View style={styles.footer}>
-            <Text style={styles.footerText}>
+          <View style={s.footer}>
+            <Text style={s.footerText}>
               © 2026 Helus Restobar. Todos los derechos reservados.
             </Text>
           </View>
-        </ScrollView>
-      </LinearGradient>
+        </View>
+      </ScrollView>
     </View>
   );
 };
 
 export default AboutUs;
 
-const styles = StyleSheet.create({
+const styles = (c: ReturnType<typeof useTheme>['colors']) => StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: c.background,
   },
-  gradient: {
-    flex: 1,
+  heroWrapper: {
+    position: "relative",
+    height: 320,
+    justifyContent: "flex-end",
   },
-  scrollContent: {
-    paddingHorizontal: 24,
-    paddingBottom: 40,
+  heroImage: {
+    ...StyleSheet.absoluteFillObject,
+    width: "100%",
+    height: "100%",
+    resizeMode: "cover",
   },
-  heroSection: {
+  heroGradient: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  heroContent: {
     alignItems: "center",
-    paddingVertical: 32,
+    paddingBottom: 30,
+    zIndex: 2,
   },
-  logoContainer: {
-    width: 70,
-    height: 70,
-    borderRadius: 16,
-    backgroundColor: "#f4d642",
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 16,
-  },
-  logoText: {
-    fontSize: 28,
-    fontWeight: "bold",
-    color: "#382f2f",
+  logoImage: {
+    width: 180,
+    height: 180,
+    resizeMode: "contain",
+    marginBottom: 8,
   },
   brandName: {
-    fontSize: 26,
+    fontSize: 28,
     fontWeight: "800",
     color: "#fff",
     letterSpacing: -0.5,
+    textShadowColor: "rgba(0,0,0,0.5)",
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 4,
   },
   tagline: {
     fontSize: 14,
-    color: "#999",
+    color: "#ddd",
     marginTop: 6,
+    textShadowColor: "rgba(0,0,0,0.5)",
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 4,
+  },
+  content: {
+    paddingHorizontal: 20,
+    paddingTop: 10,
   },
   card: {
-    backgroundColor: "rgba(255,255,255,0.08)",
+    backgroundColor: c.surface,
     borderRadius: 14,
     padding: 18,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.1)",
+    borderColor: c.border,
   },
   sectionTitle: {
     fontSize: 16,
     fontWeight: "700",
-    color: "#f4d642",
+    color: c.brandYellow,
     marginBottom: 12,
   },
   description: {
     fontSize: 14,
-    color: "#ccc",
+    color: c.textSecondary,
     lineHeight: 22,
   },
   hoursRow: {
@@ -203,26 +223,26 @@ const styles = StyleSheet.create({
   },
   hoursDay: {
     fontSize: 14,
-    color: "#ccc",
+    color: c.textSecondary,
   },
   hoursTime: {
     fontSize: 14,
-    color: "#fff",
+    color: c.text,
     fontWeight: "600",
   },
   hoursDivider: {
     height: 1,
-    backgroundColor: "rgba(255,255,255,0.1)",
+    backgroundColor: c.border,
   },
   actionButton: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "rgba(244, 214, 66, 0.1)",
+    backgroundColor: c.brandYellowLight,
     borderRadius: 14,
     paddingHorizontal: 16,
     height: 52,
     borderWidth: 1,
-    borderColor: "rgba(244, 214, 66, 0.3)",
+    borderColor: c.brandYellowBorder,
     marginBottom: 10,
     gap: 10,
   },
@@ -230,7 +250,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 15,
     fontWeight: "600",
-    color: "#f4d642",
+    color: c.brandYellow,
   },
   contactRow: {
     flexDirection: "row",
@@ -240,12 +260,12 @@ const styles = StyleSheet.create({
   },
   contactText: {
     fontSize: 14,
-    color: "#ccc",
+    color: c.textSecondary,
     flex: 1,
   },
   contactDivider: {
     height: 1,
-    backgroundColor: "rgba(255,255,255,0.1)",
+    backgroundColor: c.border,
   },
   footer: {
     alignItems: "center",
@@ -254,6 +274,6 @@ const styles = StyleSheet.create({
   },
   footerText: {
     fontSize: 12,
-    color: "#666",
+    color: c.textMuted,
   },
 });

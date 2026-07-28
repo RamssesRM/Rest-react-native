@@ -1,4 +1,3 @@
-import FacebookAutenBoton from "@/componentes/auten/FacebookAutenButon";
 import GoogleAutenBoton from "@/componentes/auten/GoogleAutenBoton";
 import Helusboton from "@/componentes/auten/HelusAutenBoton";
 import ScrollInfinitoSuave from "@/componentes/ScrollinfinitoSuave"; // O la ruta exacta donde guardaste el componente
@@ -125,7 +124,6 @@ export default function Index() {
           </Text>
 
           <GoogleAutenBoton />
-          <FacebookAutenBoton />
 
           <TouchableOpacity
             style={styles.guestButton}
@@ -208,8 +206,8 @@ const styles = StyleSheet.create({
   },
   sheetContent: {
     flex: 1,
-    alignItems: "stretch",
-    paddingHorizontal: 30, // Usa 30 para mantener la misma simetría de la pantalla de atrás
+    alignItems: "center",
+    paddingHorizontal: 30,
     paddingTop: 10,
     gap: 16,
   },

@@ -62,20 +62,20 @@ export const lightColors = {
 
 export const darkColors = {
   // Backgrounds
-  background: "#121212",
-  surface: "#1E1E1E",
-  card: "#1E1E1E",
-  cardHover: "#2A2A2A",
+  background: "#382f2f",
+  surface: "#2a2222",
+  card: "#2a2222",
+  cardHover: "#3d3333",
 
   // Text
   text: "#FFFFFF",
   textSecondary: "#B0B0B0",
-  textMuted: "#777777",
+  textMuted: "#999999",
   textInverse: "#000000",
 
   // Borders
-  border: "#2A2A2A",
-  borderLight: "#333333",
+  border: "#4a3f3f",
+  borderLight: "#554a4a",
 
   // Brand
   primary: "#01BEE5",
@@ -88,7 +88,7 @@ export const darkColors = {
   goldDark: "#D4AF37",
 
   // Brand Helus
-  brandDark: "#1a1a1a",
+  brandDark: "#382f2f",
   brandYellow: "#f4d642",
   brandYellowLight: "rgba(244, 214, 66, 0.1)",
   brandYellowBorder: "rgba(244, 214, 66, 0.3)",
@@ -104,21 +104,21 @@ export const darkColors = {
   infoLight: "rgba(33, 150, 243, 0.15)",
 
   // Semantic
-  inputBg: "#2A2A2A",
-  inputBorder: "#333333",
-  chipBg: "#2A2A2A",
+  inputBg: "#4a3f3f",
+  inputBorder: "#554a4a",
+  chipBg: "#4a3f3f",
   chipActiveBg: "#ffd700",
   overlay: "rgba(0,0,0,0.7)",
 
   // Grayscale
-  gray100: "#2A2A2A",
-  gray200: "#333333",
-  gray300: "#555555",
-  gray400: "#777777",
-  gray500: "#999999",
-  gray600: "#B0B0B0",
-  gray700: "#CCCCCC",
-  gray800: "#E0E0E0",
+  gray100: "#4a3f3f",
+  gray200: "#554a4a",
+  gray300: "#666060",
+  gray400: "#888080",
+  gray500: "#999090",
+  gray600: "#B0A8A8",
+  gray700: "#CCC4C4",
+  gray800: "#E0D8D8",
   gray900: "#FFFFFF",
 };
 

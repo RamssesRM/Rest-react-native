@@ -1,41 +1,41 @@
-import FacebookAutenBoton from "@/componentes/auten/FacebookAutenButon";
 import GoogleAutenBoton from "@/componentes/auten/GoogleAutenBoton";
-import { Colors, Fonts } from "@/constants/theme";
+import { useTheme } from "@/hooks/use-theme";
 import useUserStore from "@/hooks/use-userstore";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
-import React from 'react';
 
 const Page = () => {
   const router = useRouter();
-  const { setIsGuest, setUser } = useUserStore();
+  const { colors } = useTheme();
+  const { setIsGuest } = useUserStore();
   const continueAsGuest = () => {
     setIsGuest(true);
   };
+
+  const s = styles(colors);
+
   return (
-    <View style={styles.container}>
+    <View style={s.container}>
       <TouchableOpacity
-        style={styles.closeBtn}
+        style={s.closeBtn}
         onPress={() => router.dismiss()}
       >
-        <Ionicons name="close" size={24} color="black" />
+        <Ionicons name="close" size={24} color={colors.text} />
       </TouchableOpacity>
-      <Text style={styles.title}>Inicia Sesión o crea una cuenta Helus</Text>
-      <View style={styles.buttonContainer}>
+      <Text style={s.title}>Inicia Sesión o crea una cuenta Helus</Text>
+      <View style={s.buttonContainer}>
         <Animated.View entering={FadeInDown.delay(100)}>
           <GoogleAutenBoton />
         </Animated.View>
         <Animated.View entering={FadeInDown.delay(200)}>
-          <FacebookAutenBoton />
-        </Animated.View>
-        <Animated.View entering={FadeInDown.delay(300)}>
           <TouchableOpacity
-            style={styles.otherButton}
+            style={s.guestButton}
             onPress={continueAsGuest}
           >
-            <Text style={styles.otherButtonText}>Continuar como invitado</Text>
+            <Text style={s.guestButtonText}>Continuar como invitado</Text>
           </TouchableOpacity>
         </Animated.View>
       </View>
@@ -43,36 +43,42 @@ const Page = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const styles = (c: ReturnType<typeof useTheme>['colors']) => StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
+    backgroundColor: c.background,
   },
   closeBtn: {
-    backgroundColor: Colors.surface,
+    backgroundColor: c.surface,
     borderRadius: 40,
     padding: 8,
     alignSelf: "flex-end",
   },
   title: {
     fontSize: 20,
-    fontFamily: Fonts.brandBlack,
+    fontWeight: "900",
+    color: c.text,
     marginVertical: 22,
+    textAlign: "center",
   },
   buttonContainer: {
-    gap: 12,
+    gap: 16,
     width: "100%",
+    alignItems: "center",
   },
-  otherButton: {
+  guestButton: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     paddingVertical: 17,
     borderRadius: 12,
-    gap: 4,
+    backgroundColor: c.surface,
+    borderWidth: 1,
+    borderColor: c.border,
   },
-  otherButtonText: {
-    color: Colors.secondary,
+  guestButtonText: {
+    color: c.secondary,
     fontSize: 18,
     fontWeight: "600",
   },
