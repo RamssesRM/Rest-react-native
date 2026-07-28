@@ -1,4 +1,5 @@
 import { tomarStatsConUsuario } from '@/app/api/usuariosApi';
+import GuestGuard from '@/componentes/GuestGuard';
 import useUserStore from '@/hooks/use-userstore';
 import { clearAuth } from '@/utils/auth';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -71,6 +72,7 @@ export default function PerfilScreen() {
   }
 
   return (
+    <GuestGuard feature="tu perfil">
     <SafeAreaView style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
         
@@ -143,6 +145,7 @@ export default function PerfilScreen() {
 
       </ScrollView>
     </SafeAreaView>
+    </GuestGuard>
   );
 }
 

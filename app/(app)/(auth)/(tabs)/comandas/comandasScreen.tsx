@@ -1,5 +1,6 @@
 import { cambiarEstadoOrden, getMisOrdenes, getOrdenesActivas, getOrdenesCajero, getTodasLasOrdenes } from '@/app/api/ordenesApi';
 import DetallesOrdenesCard from '@/componentes/DetallesOrdenesCard';
+import GuestGuard from '@/componentes/GuestGuard';
 import useUserStore from '@/hooks/use-userstore';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import BottomSheet from '@gorhom/bottom-sheet';
@@ -259,13 +260,14 @@ export default function ComandasScreen() {
         return (
             <View style={styles.contadorResultados}>
                 <Text style={styles.contadorText}>{total} {label}</Text>
-            </View>
-        );
+        </View>
+    );
     }, [ordenesFiltradas, filtroFecha]);
 
     if (isLoading) return <ActivityIndicator style={{ flex: 1, justifyContent: 'center' }} color="#D4AF37" size="large" />;
 
     return (
+        <GuestGuard feature="tus comandas">
         <View style={styles.container}>
             <Text style={styles.headerTitle}>Centro de Comandas</Text>
 
@@ -292,6 +294,7 @@ export default function ComandasScreen() {
                 onEstadoCambiado={handleEstadoCambiado}
             />
         </View>
+        </GuestGuard>
     );
 }
 

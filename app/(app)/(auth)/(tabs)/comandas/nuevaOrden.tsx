@@ -1,4 +1,5 @@
 import { crearOrden, crearDetalle, getMesas, getCategorias, getProductos } from '@/app/api/ordenesApi';
+import GuestGuard from '@/componentes/GuestGuard';
 import useUserStore from '@/hooks/use-userstore';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
@@ -113,6 +114,7 @@ export default function NuevaOrdenScreen() {
     if (isLoading) return <ActivityIndicator style={{flex:1}} color="#D4AF37" size="large"/>;
 
     return (
+        <GuestGuard feature="crear una orden">
         <View style={styles.container}>
             
             {/* --- 1. SELECTOR DE MESAS --- */}
@@ -198,6 +200,7 @@ export default function NuevaOrdenScreen() {
                 </View>
             )}
         </View>
+        </GuestGuard>
     );
 }
 

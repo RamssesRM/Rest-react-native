@@ -1,6 +1,8 @@
 import { BASE_URL } from './apiConfig';
 import * as SecureStore from 'expo-secure-store';
 
+const TIMEOUT_MS = 5000;
+
 let isRefreshing = false;
 let failedQueue = [];
 
@@ -11,11 +13,22 @@ const processQueue = (error, token = null) => {
     failedQueue = [];
 };
 
+const fetchWithTimeout = async (url, options = {}, timeout = TIMEOUT_MS) => {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeout);
+    try {
+        const response = await fetch(url, { ...options, signal: controller.signal });
+        return response;
+    } finally {
+        clearTimeout(timer);
+    }
+};
+
 const refreshAccessToken = async () => {
     const refreshToken = await SecureStore.getItemAsync('jwt_refresh');
     if (!refreshToken) throw new Error('No refresh token');
 
-    const response = await fetch(`${BASE_URL}/auth/refresh/`, {
+    const response = await fetchWithTimeout(`${BASE_URL}/auth/refresh/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ refresh: refreshToken }),
@@ -35,6 +48,11 @@ const refreshAccessToken = async () => {
     return data.access;
 };
 
+const extractPaginated = (data) => {
+    if (data && typeof data === 'object' && 'results' in data) return data.results;
+    return data;
+};
+
 export const apiClient = async (url, options = {}) => {
     const token = await SecureStore.getItemAsync('jwt_access');
 
@@ -47,7 +65,7 @@ export const apiClient = async (url, options = {}) => {
         },
     };
 
-    let response = await fetch(`${BASE_URL}${url}`, config);
+    let response = await fetchWithTimeout(`${BASE_URL}${url}`, config);
 
     if (response.status === 401) {
         if (isRefreshing) {
@@ -55,7 +73,7 @@ export const apiClient = async (url, options = {}) => {
                 failedQueue.push({ resolve, reject });
             }).then((newToken) => {
                 config.headers['Authorization'] = `Bearer ${newToken}`;
-                return fetch(`${BASE_URL}${url}`, config);
+                return fetchWithTimeout(`${BASE_URL}${url}`, config);
             });
         }
 
@@ -65,7 +83,7 @@ export const apiClient = async (url, options = {}) => {
             const newToken = await refreshAccessToken();
             processQueue(null, newToken);
             config.headers['Authorization'] = `Bearer ${newToken}`;
-            response = await fetch(`${BASE_URL}${url}`, config);
+            response = await fetchWithTimeout(`${BASE_URL}${url}`, config);
         } catch (error) {
             processQueue(error, null);
             throw error;
@@ -89,7 +107,7 @@ export const apiClientAuth = async (url, options = {}) => {
         },
     };
 
-    let response = await fetch(`${BASE_URL}${url}`, config);
+    let response = await fetchWithTimeout(`${BASE_URL}${url}`, config);
 
     if (response.status === 401) {
         if (isRefreshing) {
@@ -97,7 +115,7 @@ export const apiClientAuth = async (url, options = {}) => {
                 failedQueue.push({ resolve, reject });
             }).then((newToken) => {
                 config.headers['Authorization'] = `Bearer ${newToken}`;
-                return fetch(`${BASE_URL}${url}`, config);
+                return fetchWithTimeout(`${BASE_URL}${url}`, config);
             });
         }
 
@@ -107,7 +125,7 @@ export const apiClientAuth = async (url, options = {}) => {
             const newToken = await refreshAccessToken();
             processQueue(null, newToken);
             config.headers['Authorization'] = `Bearer ${newToken}`;
-            response = await fetch(`${BASE_URL}${url}`, config);
+            response = await fetchWithTimeout(`${BASE_URL}${url}`, config);
         } catch (error) {
             processQueue(error, null);
             throw error;
@@ -131,7 +149,7 @@ export const apiClientFormData = async (url, formData) => {
         body: formData,
     };
 
-    let response = await fetch(`${BASE_URL}${url}`, config);
+    let response = await fetchWithTimeout(`${BASE_URL}${url}`, config);
 
     if (response.status === 401) {
         if (isRefreshing) {
@@ -139,7 +157,7 @@ export const apiClientFormData = async (url, formData) => {
                 failedQueue.push({ resolve, reject });
             }).then((newToken) => {
                 config.headers['Authorization'] = `Bearer ${newToken}`;
-                return fetch(`${BASE_URL}${url}`, config);
+                return fetchWithTimeout(`${BASE_URL}${url}`, config);
             });
         }
 
@@ -149,7 +167,7 @@ export const apiClientFormData = async (url, formData) => {
             const newToken = await refreshAccessToken();
             processQueue(null, newToken);
             config.headers['Authorization'] = `Bearer ${newToken}`;
-            response = await fetch(`${BASE_URL}${url}`, config);
+            response = await fetchWithTimeout(`${BASE_URL}${url}`, config);
         } catch (error) {
             processQueue(error, null);
             throw error;

@@ -29,8 +29,6 @@ export const orderService = {
     //   body: JSON.stringify(orderData)
     // }).then(res => res.json());
 
-    console.log('Creating order:', orderData);
-
     // Simulate API delay
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
