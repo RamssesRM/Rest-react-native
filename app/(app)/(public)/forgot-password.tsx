@@ -17,10 +17,13 @@ import {
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [emailSent, setEmailSent] = useState(false);
+  const [step, setStep] = useState<"email" | "password" | "done">("email");
 
-  const handleResetPassword = async () => {
+  const handleVerifyEmail = async () => {
     if (!email.trim()) {
       Alert.alert("Error", "Ingresa tu correo electrónico");
       return;
@@ -35,16 +38,48 @@ export default function ForgotPassword() {
     setIsLoading(true);
 
     try {
-      await resetPassword(email);
-      setEmailSent(true);
+      const data = await resetPassword(email);
+      if (data.email_exists) {
+        setStep("password");
+      } else {
+        Alert.alert("Aviso", "Si el correo está registrado, podrás restablecer tu contraseña.");
+      }
     } catch (error: any) {
-      Alert.alert("Error", error.message || "No se pudo enviar el correo de recuperación");
+      Alert.alert("Error", error.message || "No se pudo verificar el correo");
     } finally {
       setIsLoading(false);
     }
   };
 
-  if (emailSent) {
+  const handleResetPassword = async () => {
+    if (!newPassword.trim()) {
+      Alert.alert("Error", "Ingresa la nueva contraseña");
+      return;
+    }
+
+    if (newPassword.length < 8) {
+      Alert.alert("Error", "La contraseña debe tener al menos 8 caracteres");
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      Alert.alert("Error", "Las contraseñas no coinciden");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      await resetPassword(email, newPassword);
+      setStep("done");
+    } catch (error: any) {
+      Alert.alert("Error", error.message || "No se pudo cambiar la contraseña");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (step === "done") {
     return (
       <KeyboardAvoidingView
         style={styles.container}
@@ -66,12 +101,12 @@ export default function ForgotPassword() {
 
             <View style={styles.titleContainer}>
               <View style={styles.logoContainer}>
-                <Ionicons name="mail-open" size={32} color="#382f2f" />
+                <Ionicons name="checkmark-circle" size={32} color="#382f2f" />
               </View>
-              <Text style={styles.title}>Correo Enviado</Text>
+              <Text style={styles.title}>¡Listo!</Text>
               <Text style={styles.subtitle}>
-                Revisa tu bandeja de entrada y sigue las instrucciones para
-                restablecer tu contraseña.
+                Tu contraseña ha sido actualizada. Ya puedes iniciar sesión con
+                tu nueva contraseña.
               </Text>
             </View>
 
@@ -79,7 +114,7 @@ export default function ForgotPassword() {
               style={styles.loginButton}
               onPress={() => router.replace("./helus-login")}
             >
-              <Text style={styles.loginButtonText}>Volver al Inicio de Sesión</Text>
+              <Text style={styles.loginButtonText}>Iniciar Sesión</Text>
             </TouchableOpacity>
           </ScrollView>
         </LinearGradient>
@@ -99,7 +134,7 @@ export default function ForgotPassword() {
         >
           <View style={styles.header}>
             <TouchableOpacity
-              onPress={() => router.back()}
+              onPress={() => (step === "password" ? setStep("email") : router.back())}
               style={styles.backButton}
             >
               <Ionicons name="arrow-back" size={28} color="#fff" />
@@ -110,41 +145,96 @@ export default function ForgotPassword() {
             <View style={styles.logoContainer}>
               <Ionicons name="key" size={32} color="#382f2f" />
             </View>
-            <Text style={styles.title}>Recuperar Contraseña</Text>
+            <Text style={styles.title}>
+              {step === "email" ? "Recuperar Contraseña" : "Nueva Contraseña"}
+            </Text>
             <Text style={styles.subtitle}>
-              Ingresa tu correo electrónico y te enviaremos las instrucciones
-              para restablecer tu contraseña.
+              {step === "email"
+                ? "Ingresa tu correo electrónico para verificar tu cuenta."
+                : "Ingresa tu nueva contraseña."}
             </Text>
           </View>
 
           <View style={styles.formContainer}>
-            <View style={styles.inputContainer}>
-              <Ionicons
-                name="mail-outline"
-                size={22}
-                color="#999"
-                style={styles.inputIcon}
-              />
-              <TextInput
-                style={styles.input}
-                placeholder="Correo electrónico"
-                placeholderTextColor="#666"
-                value={email}
-                onChangeText={setEmail}
-                autoCapitalize="none"
-                keyboardType="email-address"
-              />
-            </View>
+            {step === "email" ? (
+              <View style={styles.inputContainer}>
+                <Ionicons
+                  name="mail-outline"
+                  size={22}
+                  color="#999"
+                  style={styles.inputIcon}
+                />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Correo electrónico"
+                  placeholderTextColor="#666"
+                  value={email}
+                  onChangeText={setEmail}
+                  autoCapitalize="none"
+                  keyboardType="email-address"
+                />
+              </View>
+            ) : (
+              <>
+                <View style={styles.inputContainer}>
+                  <Ionicons
+                    name="lock-closed-outline"
+                    size={22}
+                    color="#999"
+                    style={styles.inputIcon}
+                  />
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Nueva contraseña"
+                    placeholderTextColor="#666"
+                    value={newPassword}
+                    onChangeText={setNewPassword}
+                    secureTextEntry={!showPassword}
+                  />
+                  <TouchableOpacity
+                    onPress={() => setShowPassword(!showPassword)}
+                    style={styles.eyeButton}
+                  >
+                    <Ionicons
+                      name={showPassword ? "eye-off-outline" : "eye-outline"}
+                      size={22}
+                      color="#999"
+                    />
+                  </TouchableOpacity>
+                </View>
+
+                <View style={styles.inputContainer}>
+                  <Ionicons
+                    name="lock-closed-outline"
+                    size={22}
+                    color="#999"
+                    style={styles.inputIcon}
+                  />
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Confirmar contraseña"
+                    placeholderTextColor="#666"
+                    value={confirmPassword}
+                    onChangeText={setConfirmPassword}
+                    secureTextEntry={!showPassword}
+                  />
+                </View>
+              </>
+            )}
 
             <TouchableOpacity
               style={[styles.loginButton, isLoading && styles.buttonDisabled]}
-              onPress={handleResetPassword}
+              onPress={step === "email" ? handleVerifyEmail : handleResetPassword}
               disabled={isLoading}
             >
               {isLoading ? (
-                <Text style={styles.loginButtonText}>Enviando...</Text>
+                <Text style={styles.loginButtonText}>
+                  {step === "email" ? "Verificando..." : "Guardando..."}
+                </Text>
               ) : (
-                <Text style={styles.loginButtonText}>Enviar Correo</Text>
+                <Text style={styles.loginButtonText}>
+                  {step === "email" ? "Verificar Correo" : "Cambiar Contraseña"}
+                </Text>
               )}
             </TouchableOpacity>
 
@@ -232,6 +322,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#fff",
     height: "100%",
+  },
+  eyeButton: {
+    padding: 8,
   },
   loginButton: {
     backgroundColor: "#f4d642",
