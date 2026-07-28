@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   closeBtn: {
-    backgroundColor: Colors.light,
+    backgroundColor: Colors.surface,
     borderRadius: 40,
     padding: 8,
     alignSelf: "flex-end",

@@ -36,8 +36,8 @@ export const loginUser = async (username, password)=>{
     try{
         const response = await fetchWithTimeout(`${BASE_URL}/auth/login/`, {
             method: 'POST',
-            headers: {'Content-Type':'application/json'},
-            body:JSON.stringify({username, password}),
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password }),
         });
         const data = await response.json();
         if (response.ok){
@@ -59,7 +59,7 @@ export const loginUser = async (username, password)=>{
         if (error.name === 'AbortError') throw new Error('No se pudo conectar con el servidor');
         throw error
     }
-}
+};
 
 export const registerUser = async (userData) => {
     try{

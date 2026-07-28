@@ -6,7 +6,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import BottomSheet from '@gorhom/bottom-sheet';
 import { useFocusEffect, useRouter } from 'expo-router';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, Alert, FlatList, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, FlatList, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 const getStatusColor = (status: string) => {
     switch (status) {
@@ -260,8 +260,8 @@ export default function ComandasScreen() {
         return (
             <View style={styles.contadorResultados}>
                 <Text style={styles.contadorText}>{total} {label}</Text>
-        </View>
-    );
+            </View>
+        );
     }, [ordenesFiltradas, filtroFecha]);
 
     if (isLoading) return <ActivityIndicator style={{ flex: 1, justifyContent: 'center' }} color="#D4AF37" size="large" />;

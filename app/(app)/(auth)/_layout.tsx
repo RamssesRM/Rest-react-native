@@ -1,4 +1,4 @@
-import { Colors } from "@/constants/theme";
+import { useTheme } from "@/hooks/use-theme";
 import { Ionicons } from "@expo/vector-icons";
 import { Stack, useRouter } from "expo-router";
 import { TouchableOpacity } from "react-native";
@@ -6,9 +6,10 @@ import React from "react";
 
 const Layout = () => {
   const router = useRouter();
+  const { colors } = useTheme();
+
   return (
     <Stack screenOptions={{ headerShown: false }}>
-      {/* Cambiado de 'index' a '(tabs)' */}
       <Stack.Screen name="(tabs)" />
       <Stack.Screen name="(modal)/map" options={{ presentation: "modal" }} />
       <Stack.Screen
@@ -17,45 +18,45 @@ const Layout = () => {
           presentation: "modal",
           animation: "slide_from_bottom",
           headerShown: true,
-          title: "Ubicacion",
+          title: "Ubicación",
           headerShadowVisible: false,
-          headerStyle: { backgroundColor: 'white' },
-          headerTitleStyle: { color: '#000', fontWeight: 'bold' },
+          headerStyle: { backgroundColor: colors.background },
+          headerTitleStyle: { color: colors.text, fontWeight: 'bold' },
           headerRight: () => (
             <TouchableOpacity
               style={{
                 padding: 6,
                 borderRadius: 20,
-                backgroundColor: Colors.light,
+                backgroundColor: colors.gray100,
               }}
               onPress={() => router.dismiss()}
             >
-              <Ionicons name="close-sharp" size={24} color={Colors.dark} />
+              <Ionicons name="close-sharp" size={24} color={colors.text} />
             </TouchableOpacity>
           ),
         }}
       />
-       <Stack.Screen
+      <Stack.Screen
         name="(modal)/filter"
         options={{
           presentation: "modal",
           animation: "slide_from_bottom",
           headerShown: true,
-          title: "Ubicacion",
+          title: "Filtrar Menú",
           headerShadowVisible: false,
-          headerStyle: { backgroundColor: 'white' },
-          headerTitleStyle: { color: '#000', fontWeight: 'bold' },
-          contentStyle: { backgroundColor: 'white' },
+          headerStyle: { backgroundColor: colors.background },
+          headerTitleStyle: { color: colors.text, fontWeight: 'bold' },
+          contentStyle: { backgroundColor: colors.background },
           headerRight: () => (
             <TouchableOpacity
               style={{
                 padding: 6,
                 borderRadius: 20,
-                backgroundColor: Colors.light,
+                backgroundColor: colors.gray100,
               }}
               onPress={() => router.dismiss()}
             >
-              <Ionicons name="close-sharp" size={24} color={Colors.dark} />
+              <Ionicons name="close-sharp" size={24} color={colors.text} />
             </TouchableOpacity>
           ),
         }}

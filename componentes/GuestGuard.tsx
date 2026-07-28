@@ -1,6 +1,5 @@
 import useUserStore from '@/hooks/use-userstore';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { useRouter } from 'expo-router';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
@@ -11,7 +10,6 @@ interface GuestGuardProps {
 
 export default function GuestGuard({ children, feature = 'este apartado' }: GuestGuardProps) {
     const { user, isGuest, setIsGuest } = useUserStore();
-    const router = useRouter();
 
     if (user && !isGuest) {
         return <>{children}</>;
@@ -19,12 +17,10 @@ export default function GuestGuard({ children, feature = 'este apartado' }: Gues
 
     const handleLogin = () => {
         setIsGuest(false);
-        router.replace('/helus-login');
     };
 
     const handleRegister = () => {
         setIsGuest(false);
-        router.replace('/helus-registro');
     };
 
     return (

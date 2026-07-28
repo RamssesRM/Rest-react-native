@@ -1,4 +1,4 @@
-import { Colors } from "@/constants/theme";
+import { useTheme } from "@/hooks/use-theme";
 import { useRestaurantMarkers, useRestaurants } from "@/hooks/useRestaurants";
 import { Ionicons } from "@expo/vector-icons";
 import * as Location from "expo-location";
@@ -21,6 +21,7 @@ const Page = () => {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const mapRef = useRef<MapView>(null);
+  const { colors } = useTheme();
 
   const { data: restaurants } = useRestaurants();
   const { data: restaurantMarkers, isLoading: markersLoading } =
@@ -97,17 +98,19 @@ const Page = () => {
     ? restaurants?.find((r) => r.id === selectedId)
     : null;
 
+  const s = styles(colors);
+
   if (markersLoading) {
     return (
-      <View style={styles.loaderContainer}>
-        <ActivityIndicator size={"large"} color={Colors.secondary} />
+      <View style={s.loaderContainer}>
+        <ActivityIndicator size={"large"} color={colors.secondary} />
       </View>
     );
   }
 
   if (Platform.OS === "android" || Platform.OS === "ios") {
     return (
-      <View style={styles.container}>
+      <View style={s.container}>
         <MapView
           ref={mapRef}
           provider={PROVIDER_GOOGLE}
@@ -144,52 +147,52 @@ const Page = () => {
                     }
                   }}
                 >
-                  <View style={styles.calloutContainer}>
-                    <Text style={styles.calloutTitle} numberOfLines={1}>
+                  <View style={s.calloutContainer}>
+                    <Text style={s.calloutTitle} numberOfLines={1}>
                       {marker.name}
                     </Text>
 
                     {restaurant && (
                       <>
-                        <Text style={styles.calloutAddress} numberOfLines={1}>
+                        <Text style={s.calloutAddress} numberOfLines={1}>
                           {restaurant.location.address}
                         </Text>
 
-                        <View style={styles.calloutRow}>
+                        <View style={s.calloutRow}>
                           <Ionicons name="star" size={14} color="#FFB800" />
-                          <Text style={styles.calloutRating}>
+                          <Text style={s.calloutRating}>
                             {marker.rating}
                           </Text>
-                          <Text style={styles.calloutDot}> • </Text>
+                          <Text style={s.calloutDot}> • </Text>
                           <Ionicons
                             name="time-outline"
                             size={14}
-                            color="#666"
+                            color={colors.textMuted}
                           />
-                          <Text style={styles.calloutDelivery}>
+                          <Text style={s.calloutDelivery}>
                             {marker.deliveryTime}
                           </Text>
                         </View>
 
-                        <Text style={styles.calloutCuisine} numberOfLines={1}>
+                        <Text style={s.calloutCuisine} numberOfLines={1}>
                           {marker.cuisine.join(" • ")}
                         </Text>
 
-                        <View style={styles.calloutDivider} />
+                        <View style={s.calloutDivider} />
 
-                        <View style={styles.calloutDirectionsRow}>
+                        <View style={s.calloutDirectionsRow}>
                           <Ionicons
                             name="navigate-outline"
                             size={16}
                             color="#4285F4"
                           />
-                          <Text style={styles.calloutDirectionsText}>
+                          <Text style={s.calloutDirectionsText}>
                             Cómo llegar
                           </Text>
                         </View>
 
                         {!restaurant.isOpen && (
-                          <Text style={styles.calloutClosed}>
+                          <Text style={s.calloutClosed}>
                             Cerrado ahora
                           </Text>
                         )}
@@ -203,31 +206,31 @@ const Page = () => {
         </MapView>
 
         <TouchableOpacity
-          style={[styles.floatingButton, { top: insets.top + 10, left: 16 }]}
+          style={[s.floatingButton, { top: insets.top + 10, left: 16 }]}
           onPress={() => router.back()}
         >
-          <Ionicons name="close-outline" size={24} color="#000" />
+          <Ionicons name="close-outline" size={24} color={colors.text} />
         </TouchableOpacity>
 
         <TouchableOpacity
           style={[
-            styles.floatingButton,
+            s.floatingButton,
             { bottom: insets.bottom + 20, right: 16 },
           ]}
           onPress={locateMe}
         >
-          <Ionicons name="locate-outline" size={24} color="#000" />
+          <Ionicons name="locate-outline" size={24} color={colors.text} />
         </TouchableOpacity>
       </View>
     );
   } else {
-    return <Text>El mapa no es compatible con esta plataforma.</Text>;
+    return <Text style={{ color: colors.text }}>El mapa no es compatible con esta plataforma.</Text>;
   }
 };
 
 export default Page;
 
-const styles = StyleSheet.create({
+const styles = (c: ReturnType<typeof useTheme>['colors']) => StyleSheet.create({
   container: {
     flex: 1,
   },
@@ -235,11 +238,11 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#fff",
+    backgroundColor: c.background,
   },
   floatingButton: {
     position: "absolute",
-    backgroundColor: "#fff",
+    backgroundColor: c.card,
     padding: 12,
     borderRadius: 30,
     elevation: 4,
@@ -249,7 +252,7 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
   },
   calloutContainer: {
-    backgroundColor: "#fff",
+    backgroundColor: c.card,
     borderRadius: 12,
     padding: 14,
     minWidth: 220,
@@ -263,12 +266,12 @@ const styles = StyleSheet.create({
   calloutTitle: {
     fontSize: 16,
     fontWeight: "700",
-    color: "#1a1a1a",
+    color: c.text,
     marginBottom: 2,
   },
   calloutAddress: {
     fontSize: 12,
-    color: "#888",
+    color: c.textMuted,
     marginBottom: 6,
   },
   calloutRow: {
@@ -279,26 +282,26 @@ const styles = StyleSheet.create({
   calloutRating: {
     fontSize: 13,
     fontWeight: "600",
-    color: "#333",
+    color: c.text,
     marginLeft: 3,
   },
   calloutDot: {
     fontSize: 13,
-    color: "#ccc",
+    color: c.gray300,
   },
   calloutDelivery: {
     fontSize: 13,
-    color: "#666",
+    color: c.textSecondary,
     marginLeft: 2,
   },
   calloutCuisine: {
     fontSize: 12,
-    color: "#666",
+    color: c.textSecondary,
     marginBottom: 4,
   },
   calloutDivider: {
     height: 1,
-    backgroundColor: "#eee",
+    backgroundColor: c.border,
     marginVertical: 8,
   },
   calloutDirectionsRow: {
@@ -315,7 +318,7 @@ const styles = StyleSheet.create({
   },
   calloutClosed: {
     fontSize: 11,
-    color: "#E53935",
+    color: c.danger,
     fontWeight: "500",
     marginTop: 4,
     textAlign: "center",
