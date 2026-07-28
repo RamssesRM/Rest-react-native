@@ -516,7 +516,7 @@ TOTAL: $${Number(orden!.monto_total || 0).toFixed(2)}
                     </View>
 
                     <View style={styles.actionsSection}>
-                        {role === 'cajero' && (orden.estatus === 'cocinando' || orden.estatus === 'finalizado') && (
+                        {role === 'cajero' && orden.estatus === 'finalizado' && (
                             <TouchableOpacity style={styles.actionBtnSuccess} onPress={handleAbrirCobro}>
                                 <Ionicons name="cash-outline" size={20} color="#fff" />
                                 <Text style={styles.actionBtnText}>Cobrar</Text>

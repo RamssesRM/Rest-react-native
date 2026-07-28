@@ -238,7 +238,7 @@ export default function ComandasScreen() {
                                 <Text style={styles.actionText}>Cocinar</Text>
                             </TouchableOpacity>
                         )}
-                        {role === 'cajero' && (item.estatus === 'cocinando' || item.estatus === 'finalizado') && (
+                        {role === 'cajero' && item.estatus === 'finalizado' && (
                             <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#4CAF50' }]} onPress={(e) => { e.stopPropagation?.(); handleAbrirDetalle(item); }}>
                                 <Text style={{ ...styles.actionText, color: '#fff' }}>Cobrar</Text>
                             </TouchableOpacity>
