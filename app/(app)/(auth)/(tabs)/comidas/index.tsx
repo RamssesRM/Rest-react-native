@@ -20,7 +20,7 @@ const ComidasListPage = () => {
         <Text style={s.pageTitle}>Menus</Text>
         <CategoriasList />
 
-        <Text style={s.allComidasTitle}>Todos los menus</Text>
+        <Text style={s.allComidasTitle}>Todos los platillos</Text>
         <ComidasList />
       </ScrollView>
     </View>

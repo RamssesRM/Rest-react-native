@@ -45,7 +45,7 @@ export default function HelusLogin() {
         name: data.user.first_name,
         role: data.user.role
       });
-      router.replace('/descubrir')
+      router.replace('/comentarios')
 
     } catch (error) {
       setIsLoading(false);

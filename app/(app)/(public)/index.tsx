@@ -37,7 +37,7 @@ export default function Index() {
   const continueAsGuest = () => {
     setIsGuest(true);
     setUser(null);
-    router.replace("/descubrir");
+    router.replace("/comentarios");
   };
   return (
     <View style={styles.container}>

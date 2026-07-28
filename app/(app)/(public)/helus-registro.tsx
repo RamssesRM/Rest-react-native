@@ -73,7 +73,7 @@ export default function HelusRegister() {
         role: data.user.role
       });
       Alert.alert('¡Bienvenido!', `Hola ${data.user.first_name} te has registrado exitosamente`);
-      router.replace('/descubrir');
+      router.replace('/comentarios');
 
     } catch (error) {
       Alert.alert("Error al registrarse", (error as any).message);

@@ -1,19 +1,26 @@
 import { FontAwesome5, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
 import React from 'react';
+import { useTheme } from "@/hooks/use-theme";
 
 const Layout = () => {
+  const { colors } = useTheme();
+
   return (
     <Tabs screenOptions={{ 
       headerShown: false, 
+      tabBarStyle: {
+        backgroundColor: colors.surface,
+        borderTopColor: colors.border,
+      },
+      tabBarActiveTintColor: colors.primary,
+      tabBarInactiveTintColor: colors.textMuted,
       tabBarLabelStyle:{
         fontSize:9,
         fontWeight:'600'
       }
     }}>
-      {/* 1. Esta pantalla mapea el archivo index.tsx de la raíz de (tabs) y será "Comidas" */}
-      {/* 2. Rutas directas sin el '/index' para que coincidan con lo que busca Expo */}
-      <Tabs.Screen name="descubrir" options={{ 
+      <Tabs.Screen name="comentarios" options={{ 
         title: "Comentarios",
         headerShown: false,
         tabBarIcon:({color, size, focused}) => (
