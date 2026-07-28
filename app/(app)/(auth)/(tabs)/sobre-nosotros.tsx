@@ -45,7 +45,7 @@ const AboutUs = () => {
             style={s.heroImage}
           />
           <LinearGradient
-            colors={["transparent", colors.background]}
+            colors={["transparent", "rgba(0,0,0,0.6)", colors.background]}
             style={s.heroGradient}
           />
           <View style={[s.heroContent, { paddingTop: insets.top + 20 }]}>

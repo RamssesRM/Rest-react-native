@@ -1,6 +1,7 @@
 import { cambiarEstadoOrden, getMisOrdenes, getOrdenesActivas, getOrdenesCajero, getTodasLasOrdenes } from '@/app/api/ordenesApi';
 import DetallesOrdenesCard from '@/componentes/DetallesOrdenesCard';
 import GuestGuard from '@/componentes/GuestGuard';
+import { useTheme } from '@/hooks/use-theme';
 import useUserStore from '@/hooks/use-userstore';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import BottomSheet from '@gorhom/bottom-sheet';
@@ -70,6 +71,7 @@ export default function ComandasScreen() {
     const router = useRouter();
     const { user } = useUserStore();
     const role = user?.role;
+    const { colors } = useTheme();
 
     const [ordenes, setOrdenes] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -146,20 +148,20 @@ export default function ComandasScreen() {
     }, [user, role, filtroAdmin, busquedaAdmin]);
 
     const RenderFiltrosFecha = () => (
-        <View style={styles.filtrosFechaContainer}>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filtrosFechaScroll}>
+        <View style={s.filtrosFechaContainer}>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.filtrosFechaScroll}>
                 {FILTROS_FECHA.map((f) => (
                     <TouchableOpacity
                         key={f.key}
-                        style={[styles.filtroFechaBtn, filtroFecha === f.key && styles.filtroFechaBtnActive]}
+                        style={[s.filtroFechaBtn, filtroFecha === f.key && s.filtroFechaBtnActive]}
                         onPress={() => setFiltroFecha(f.key)}
                     >
                         <Ionicons
                             name={f.icon as any}
                             size={14}
-                            color={filtroFecha === f.key ? '#000' : '#8E8E8E'}
+                            color={filtroFecha === f.key ? colors.textInverse : colors.textMuted}
                         />
-                        <Text style={[styles.filtroFechaText, filtroFecha === f.key && styles.filtroFechaTextActive]}>
+                        <Text style={[s.filtroFechaText, filtroFecha === f.key && s.filtroFechaTextActive]}>
                             {f.label}
                         </Text>
                     </TouchableOpacity>
@@ -169,29 +171,29 @@ export default function ComandasScreen() {
     );
 
     const RenderAdminHeader = () => (
-        <View style={styles.adminHeader}>
-            <View style={styles.searchBox}>
+        <View style={s.adminHeader}>
+            <View style={s.searchBox}>
                 <TextInput
-                    style={styles.searchInput}
+                    style={s.searchInput}
                     placeholder="Buscar por cliente o mesa..."
                     value={textoTemporal}
                     onChangeText={setTextoTemporal}
-                    placeholderTextColor="#8E8E8E"
+                    placeholderTextColor={colors.textMuted}
                     onSubmitEditing={() => setBusquedaAdmin(textoTemporal)}
                 />
-                <TouchableOpacity style={styles.searchButton} onPress={() => setBusquedaAdmin(textoTemporal)}>
-                    <Ionicons name="search" size={22} color="#fff" />
+                <TouchableOpacity style={s.searchButton} onPress={() => setBusquedaAdmin(textoTemporal)}>
+                    <Ionicons name="search" size={22} color={colors.textInverse} />
                 </TouchableOpacity>
             </View>
 
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chipsContainer}>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={s.chipsContainer}>
                 {['', 'pidiendo', 'cocinando', 'finalizado', 'delivery', 'entregado', 'pagado'].map((estado) => (
                     <TouchableOpacity
                         key={estado || 'todos'}
-                        style={[styles.chip, filtroAdmin === estado && styles.chipActive]}
+                        style={[s.chip, filtroAdmin === estado && s.chipActive]}
                         onPress={() => setFiltroAdmin(estado)}
                     >
-                        <Text style={[styles.chipText, filtroAdmin === estado && styles.chipTextActive]}>
+                        <Text style={[s.chipText, filtroAdmin === estado && s.chipTextActive]}>
                             {estado === '' ? 'Todos' : estado.charAt(0).toUpperCase() + estado.slice(1)}
                         </Text>
                     </TouchableOpacity>
@@ -201,9 +203,9 @@ export default function ComandasScreen() {
     );
 
     const RenderClienteHeader = () => (
-        <TouchableOpacity style={styles.createButton} onPress={() => router.push('/comandas/nuevaOrden')}>
-            <Ionicons name="add-circle" size={24} color="#000" />
-            <Text style={styles.createButtonText}>Nueva Orden</Text>
+        <TouchableOpacity style={s.createButton} onPress={() => router.push('/comandas/nuevaOrden')}>
+            <Ionicons name="add-circle" size={24} color={colors.textInverse} />
+            <Text style={s.createButtonText}>Nueva Orden</Text>
         </TouchableOpacity>
     );
 
@@ -211,41 +213,41 @@ export default function ComandasScreen() {
         if (role === 'mesero' && (item.estatus === 'pagado' || item.estatus === 'eliminado')) return null;
 
         return (
-            <TouchableOpacity style={styles.card} onPress={() => handleAbrirDetalle(item)} activeOpacity={0.7}>
-                <View style={styles.cardHeader}>
-                    <Text style={styles.mesaText}>Mesa: {item.mesa_info?.numero_mesa || 'N/A'}</Text>
-                    <View style={[styles.statusBadge, { backgroundColor: getStatusColor(item.estatus) + '20' }]}>
-                        <Text style={[styles.statusText, { color: getStatusColor(item.estatus) }]}>
+            <TouchableOpacity style={s.card} onPress={() => handleAbrirDetalle(item)} activeOpacity={0.7}>
+                <View style={s.cardHeader}>
+                    <Text style={s.mesaText}>Mesa: {item.mesa_info?.numero_mesa || 'N/A'}</Text>
+                    <View style={[s.statusBadge, { backgroundColor: getStatusColor(item.estatus) + '20' }]}>
+                        <Text style={[s.statusText, { color: getStatusColor(item.estatus) }]}>
                             {item.estatus.toUpperCase()}
                         </Text>
                     </View>
                 </View>
 
-                <Text style={styles.clienteText}>
+                <Text style={s.clienteText}>
                     {role === 'cliente' ? `Atendido por: ${item.mesero_info?.first_name || 'N/A'}` : `Cliente: ${item.cliente_info?.first_name || item.cliente_info?.email || 'N/A'}`}
                 </Text>
-                <Text style={styles.fechaText}>{new Date(item.fecha_creacion).toLocaleString()}</Text>
+                <Text style={s.fechaText}>{new Date(item.fecha_creacion).toLocaleString()}</Text>
 
-                <View style={styles.cardFooter}>
-                    <Text style={styles.totalText}>Total: ${item.monto_total}</Text>
+                <View style={s.cardFooter}>
+                    <Text style={s.totalText}>Total: ${item.monto_total}</Text>
 
-                    <View style={styles.actionsContainer}>
+                    <View style={s.actionsContainer}>
                         {role === 'mesero' && item.estatus === 'pidiendo' && (
                             <TouchableOpacity
-                                style={styles.actionBtn}
+                                style={s.actionBtn}
                                 onPress={(e) => { e.stopPropagation?.(); handleCambiarEstado(item.id, 'cocinando', { mesero: user?.id }); }}
                             >
-                                <Text style={styles.actionText}>Cocinar</Text>
+                                <Text style={s.actionText}>Cocinar</Text>
                             </TouchableOpacity>
                         )}
                         {role === 'cajero' && item.estatus === 'finalizado' && (
-                            <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#4CAF50' }]} onPress={(e) => { e.stopPropagation?.(); handleAbrirDetalle(item); }}>
-                                <Text style={{ ...styles.actionText, color: '#fff' }}>Cobrar</Text>
+                            <TouchableOpacity style={[s.actionBtn, { backgroundColor: colors.success }]} onPress={(e) => { e.stopPropagation?.(); handleAbrirDetalle(item); }}>
+                                <Text style={[s.actionText, { color: colors.textInverse }]}>Cobrar</Text>
                             </TouchableOpacity>
                         )}
                         {role === 'cliente' && item.estatus === 'pidiendo' && (
-                            <TouchableOpacity style={styles.deleteBtn} onPress={(e) => { e.stopPropagation?.(); handleEliminar(item.id); }}>
-                                <Text style={styles.deleteText}>Cancelar</Text>
+                            <TouchableOpacity style={s.deleteBtn} onPress={(e) => { e.stopPropagation?.(); handleEliminar(item.id); }}>
+                                <Text style={s.deleteText}>Cancelar</Text>
                             </TouchableOpacity>
                         )}
                     </View>
@@ -254,22 +256,24 @@ export default function ComandasScreen() {
         );
     };
 
+    const s = styles(colors);
+
     const contenedorFiltros = useMemo(() => {
         const total = ordenesFiltradas.length;
         const label = filtroFecha === 'todo' ? 'todas las comandas' : `comandas de ${FILTROS_FECHA.find(f => f.key === filtroFecha)?.label.toLowerCase()}`;
         return (
-            <View style={styles.contadorResultados}>
-                <Text style={styles.contadorText}>{total} {label}</Text>
+            <View style={s.contadorResultados}>
+                <Text style={s.contadorText}>{total} {label}</Text>
             </View>
         );
     }, [ordenesFiltradas, filtroFecha]);
 
-    if (isLoading) return <ActivityIndicator style={{ flex: 1, justifyContent: 'center' }} color="#D4AF37" size="large" />;
+    if (isLoading) return <ActivityIndicator style={{ flex: 1, justifyContent: 'center' }} color={colors.goldDark} size="large" />;
 
     return (
         <GuestGuard feature="tus comandas">
-        <View style={styles.container}>
-            <Text style={styles.headerTitle}>Centro de Comandas</Text>
+        <View style={s.container}>
+            <Text style={s.headerTitle}>Centro de Comandas</Text>
 
             <RenderFiltrosFecha />
 
@@ -282,8 +286,8 @@ export default function ComandasScreen() {
                 data={ordenesFiltradas}
                 keyExtractor={(item) => item.id}
                 renderItem={RenderCard}
-                contentContainerStyle={styles.list}
-                ListEmptyComponent={<Text style={styles.emptyText}>No hay comandas para mostrar</Text>}
+                contentContainerStyle={s.list}
+                ListEmptyComponent={<Text style={s.emptyText}>No hay comandas para mostrar</Text>}
             />
 
             <DetallesOrdenesCard
@@ -298,16 +302,16 @@ export default function ComandasScreen() {
     );
 }
 
-const styles = StyleSheet.create({
+const styles = (c: ReturnType<typeof useTheme>['colors']) => StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#FAFAFA',
+        backgroundColor: c.background,
         paddingTop: 20
     },
     headerTitle: {
         fontSize: 24,
         fontWeight: 'bold',
-        color: '#262626',
+        color: c.text,
         paddingHorizontal: 20,
         marginBottom: 12
     },
@@ -328,24 +332,24 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         gap: 5,
-        backgroundColor: '#FFF',
+        backgroundColor: c.surface,
         borderWidth: 1,
-        borderColor: '#EFEFEF',
+        borderColor: c.border,
         borderRadius: 20,
         paddingHorizontal: 14,
         paddingVertical: 8,
     },
     filtroFechaBtnActive: {
-        backgroundColor: '#D4AF37',
-        borderColor: '#D4AF37',
+        backgroundColor: c.gold,
+        borderColor: c.gold,
     },
     filtroFechaText: {
-        color: '#8E8E8E',
+        color: c.textMuted,
         fontWeight: '600',
         fontSize: 13,
     },
     filtroFechaTextActive: {
-        color: '#000',
+        color: c.textInverse,
     },
 
     // Contador
@@ -354,7 +358,7 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
     contadorText: {
-        color: '#8E8E8E',
+        color: c.textMuted,
         fontSize: 12,
         fontWeight: '500',
     },
@@ -366,9 +370,9 @@ const styles = StyleSheet.create({
     searchBox: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#FFF',
+        backgroundColor: c.surface,
         borderWidth: 1,
-        borderColor: '#EFEFEF',
+        borderColor: c.border,
         borderRadius: 12,
         marginHorizontal: 16,
         marginBottom: 10,
@@ -378,12 +382,12 @@ const styles = StyleSheet.create({
     searchInput: {
         flex: 1,
         paddingHorizontal: 15,
-        color: '#262626',
+        color: c.text,
         fontSize: 15,
         height: '100%'
     },
     searchButton: {
-        backgroundColor: '#D4AF37',
+        backgroundColor: c.goldDark,
         paddingHorizontal: 16,
         height: '100%',
         justifyContent: 'center',
@@ -394,9 +398,9 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
     chip: {
-        backgroundColor: '#FFF',
+        backgroundColor: c.surface,
         borderWidth: 1,
-        borderColor: '#EFEFEF',
+        borderColor: c.border,
         borderRadius: 20,
         paddingHorizontal: 15,
         paddingVertical: 8,
@@ -404,20 +408,20 @@ const styles = StyleSheet.create({
         alignSelf: 'center'
     },
     chipActive: {
-        backgroundColor: '#D4AF37',
-        borderColor: '#D4AF37'
+        backgroundColor: c.gold,
+        borderColor: c.gold
     },
     chipText: {
-        color: '#8E8E8E',
+        color: c.textMuted,
         fontWeight: '600'
     },
     chipTextActive: {
-        color: '#000'
+        color: c.textInverse
     },
 
     // Cliente
     createButton: {
-        backgroundColor: '#D4AF37',
+        backgroundColor: c.goldDark,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
@@ -427,7 +431,7 @@ const styles = StyleSheet.create({
         marginBottom: 15
     },
     createButtonText: {
-        color: '#000',
+        color: c.textInverse,
         fontSize: 16,
         fontWeight: 'bold',
         marginLeft: 8
@@ -435,12 +439,12 @@ const styles = StyleSheet.create({
 
     // Cards
     card: {
-        backgroundColor: '#FFF',
+        backgroundColor: c.card,
         borderRadius: 12,
         padding: 16,
         marginBottom: 12,
         borderWidth: 1,
-        borderColor: '#EFEFEF',
+        borderColor: c.border,
         shadowColor: '#000',
         shadowOpacity: 0.05,
         shadowRadius: 5,
@@ -455,7 +459,7 @@ const styles = StyleSheet.create({
     mesaText: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: '#262626'
+        color: c.text
     },
     statusBadge: {
         paddingHorizontal: 10,
@@ -467,12 +471,12 @@ const styles = StyleSheet.create({
         fontWeight: '800'
     },
     clienteText: {
-        color: '#555',
+        color: c.textSecondary,
         fontSize: 14,
         marginBottom: 4
     },
     fechaText: {
-        color: '#8E8E8E',
+        color: c.textMuted,
         fontSize: 12,
         marginBottom: 15
     },
@@ -481,41 +485,41 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         borderTopWidth: 1,
-        borderTopColor: '#EFEFEF',
+        borderTopColor: c.border,
         paddingTop: 15
     },
     totalText: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: '#262626'
+        color: c.text
     },
     actionsContainer: {
         flexDirection: 'row',
         gap: 10
     },
     actionBtn: {
-        backgroundColor: '#EFEFEF',
+        backgroundColor: c.chipBg,
         paddingHorizontal: 15,
         paddingVertical: 8,
         borderRadius: 8
     },
     actionText: {
-        color: '#262626',
+        color: c.text,
         fontWeight: '700'
     },
     deleteBtn: {
-        backgroundColor: '#FFEBEE',
+        backgroundColor: c.dangerLight,
         paddingHorizontal: 15,
         paddingVertical: 8,
         borderRadius: 8
     },
     deleteText: {
-        color: '#F44336',
+        color: c.danger,
         fontWeight: '700'
     },
     emptyText: {
         textAlign: 'center',
-        color: '#8E8E8E',
+        color: c.textMuted,
         marginTop: 50,
         fontSize: 16
     }

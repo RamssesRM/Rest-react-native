@@ -65,7 +65,7 @@ const GoogleAutenBoton = () => {
         role: data.user.role,
       });
 
-      router.replace("/descubrir");
+      router.replace("/comentarios");
     } catch (error: any) {
       if (error?.code === statusCodes.SIGN_IN_CANCELLED) return;
       if (error?.code === statusCodes.IN_PROGRESS) return;

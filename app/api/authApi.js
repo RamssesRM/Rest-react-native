@@ -44,7 +44,13 @@ export const loginUser = async (username, password)=>{
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username, password }),
         });
-        const data = await response.json();
+        const text = await response.text();
+        let data;
+        try {
+            data = JSON.parse(text);
+        } catch {
+            throw new Error('Error del servidor. Intenta de nuevo.');
+        }
         if (response.ok){
             return data
         }else{
@@ -76,7 +82,13 @@ export const resetPassword = async (email, newPassword = null) => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(body),
         });
-        const data = await response.json();
+        const text = await response.text();
+        let data;
+        try {
+            data = JSON.parse(text);
+        } catch {
+            throw new Error('Error del servidor. Intenta de nuevo.');
+        }
         if (response.ok) {
             return data;
         } else {
@@ -95,7 +107,13 @@ export const registerUser = async (userData) => {
             headers:{'Content-Type':'application/json'},
             body:JSON.stringify(userData),
         });
-        const data = await response.json();
+        const text = await response.text();
+        let data;
+        try {
+            data = JSON.parse(text);
+        } catch {
+            throw new Error('Error del servidor. Intenta de nuevo.');
+        }
         if(response.ok){
             return data
         }else{

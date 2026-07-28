@@ -1,7 +1,8 @@
 import GoogleAutenBoton from "@/componentes/auten/GoogleAutenBoton";
 import Helusboton from "@/componentes/auten/HelusAutenBoton";
-import ScrollInfinitoSuave from "@/componentes/ScrollinfinitoSuave"; // O la ruta exacta donde guardaste el componente
+import ScrollInfinitoSuave from "@/componentes/ScrollinfinitoSuave";
 import { Fonts } from "@/constants/theme";
+import { useTheme } from "@/hooks/use-theme";
 import useUserStore from "@/hooks/use-userstore";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import { LinearGradient } from "expo-linear-gradient";
@@ -17,9 +18,9 @@ import {
 } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 
-// Pantalla de bienvenida con animación de fade-in para el logo y el texto
-
 export default function Index() {
+  const { colors } = useTheme();
+
   const openWebBrowser = () => {
     Linking.openURL("https://galaxies.dev");
   };
@@ -28,10 +29,10 @@ export default function Index() {
   const snapPoints = useMemo(() => ["50%"], []);
 
   const handleOpenBottomSheet = () => {
-    bottomSheetRef.current?.expand(); // Esto lo levanta de forma fluida
+    bottomSheetRef.current?.expand();
   };
 
-  const router = useRouter(); // <-- AGREGA ESTA LÍNEA
+  const router = useRouter();
 
   const { setIsGuest, setUser } = useUserStore();
   const continueAsGuest = () => {
@@ -39,9 +40,12 @@ export default function Index() {
     setUser(null);
     router.replace("/comentarios");
   };
+
+  const s = styles(colors);
+
   return (
-    <View style={styles.container}>
-      <View style={styles.infiniteScrollContainer}>
+    <View style={s.container}>
+      <View style={s.infiniteScrollContainer}>
         <View>
           <ScrollInfinitoSuave scrollDirection="down" iconSet="set1" />
         </View>
@@ -52,7 +56,7 @@ export default function Index() {
           <ScrollInfinitoSuave scrollDirection="down" iconSet="set3" />
         </View>
         <LinearGradient
-          colors={["transparent", "#382f2f"]}
+          colors={["transparent", colors.loginBg]}
           style={{
             position: "absolute",
             height: 200,
@@ -63,18 +67,17 @@ export default function Index() {
         />
       </View>
 
-      <View style={styles.contentContainer}>
+      <View style={s.contentContainer}>
         <Image
           source={require("../../../assets/images/Helus_restaurant4.png")}
-          style={styles.brandLogo}
+          style={s.brandLogo}
         />
-        <Animated.Text entering={FadeInDown.delay(200)} style={styles.tagline}>
+        <Animated.Text entering={FadeInDown.delay(200)} style={s.tagline}>
           {" "}
-          Bienvenidos a Helus Restobar {" "}
+          Bienvenidos a Helus Restobar{" "}
         </Animated.Text>
 
-        {/* botones de logeo */}
-        <View style={styles.buttonContainer}>
+        <View style={s.buttonContainer}>
           <Animated.View entering={FadeInDown.delay(300)}>
             <GoogleAutenBoton />
           </Animated.View>
@@ -82,54 +85,51 @@ export default function Index() {
             <Helusboton />
           </Animated.View>
           <Animated.View entering={FadeInDown.delay(500)}>
-            {/* Quitamos el <Link> y le pasamos el trigger directo al botón */}
             <TouchableOpacity
-              style={styles.otherButton}
+              style={s.otherButton}
               onPress={handleOpenBottomSheet}
             >
-              <Text style={styles.otherButtonText}>
+              <Text style={s.otherButtonText}>
                 Otro método de autenticación
               </Text>
             </TouchableOpacity>
           </Animated.View>
         </View>
 
-        
-
         <Animated.View
-          style={styles.privacyContainer}
+          style={s.privacyContainer}
           entering={FadeInDown.delay(500)}
         >
-          <Text style={styles.privacyText}>
+          <Text style={s.privacyText}>
             Por favor visita{" "}
-            <Text style={styles.privacyLink} onPress={openWebBrowser}>
+            <Text style={s.privacyLink} onPress={openWebBrowser}>
               Términos de Servicio
             </Text>{" "}
-            y <Text style={styles.privacyLink}>Política de Privacidad</Text>
+            y <Text style={s.privacyLink}>Política de Privacidad</Text>
           </Text>
         </Animated.View>
       </View>
-      {/* 4. EL COMPONENTE BOTTOM SHEET (Metido correctamente dentro del contenedor padre) */}
+
       <BottomSheet
         ref={bottomSheetRef}
         index={-1}
         snapPoints={snapPoints}
         enablePanDownToClose={true}
-        backgroundStyle={styles.sheetBackground}
-        handleIndicatorStyle={{ backgroundColor: "#D4AF37" }}
+        backgroundStyle={s.sheetBackground}
+        handleIndicatorStyle={{ backgroundColor: colors.goldDark }}
       >
-        <BottomSheetView style={styles.sheetContent}>
-          <Text style={styles.sheetTitle}>
+        <BottomSheetView style={s.sheetContent}>
+          <Text style={s.sheetTitle}>
             Inicia Sesión o crea una cuenta Helus
           </Text>
 
           <GoogleAutenBoton />
 
           <TouchableOpacity
-            style={styles.guestButton}
+            style={s.guestButton}
             onPress={continueAsGuest}
           >
-            <Text style={styles.guestButtonText}>Continuar como invitado</Text>
+            <Text style={s.guestButtonText}>Continuar como invitado</Text>
           </TouchableOpacity>
         </BottomSheetView>
       </BottomSheet>
@@ -137,16 +137,18 @@ export default function Index() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = (c: ReturnType<typeof useTheme>['colors']) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#382f2f",
+    backgroundColor: c.loginBg,
   },
   contentContainer: {
     flex: 1,
     alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 30,
-    paddingVertical: 0,
+    paddingTop: 20,
+    paddingBottom: 40,
   },
   brandLogo: {
     width: "100%",
@@ -159,16 +161,16 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.brandBlack,
     fontStyle: "italic",
     textAlign: "center",
-    marginBottom: 50,
+    marginBottom: 30,
     lineHeight: 30,
-    color: "#e4ba30",
+    color: c.text,
   },
   buttonContainer: {
     gap: 12,
     width: "100%",
   },
   otherButton: {
-    backgroundColor: "#f0f0f0",
+    backgroundColor: c.gray100,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
@@ -177,32 +179,31 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   otherButtonText: {
-    color: "#666",
+    color: c.gray600,
     fontSize: 18,
     fontWeight: "600",
   },
 
   privacyContainer: {
-    marginTop: 20,
     paddingHorizontal: 20,
   },
   privacyText: {
     fontSize: 12,
-    color: "#999",
+    color: c.gray500,
     textAlign: "center",
     lineHeight: 16,
   },
   privacyLink: {
-    color: "#4285F4",
+    color: c.primary,
     textDecorationLine: "underline",
   },
 
   sheetBackground: {
-    backgroundColor: "#382f2f", // <-- Cambiado de '#f0f0f0' a negro premium mate
+    backgroundColor: c.loginBg,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     borderWidth: 1,
-    borderColor: "#262626"
+    borderColor: c.border,
   },
   sheetContent: {
     flex: 1,
@@ -213,7 +214,7 @@ const styles = StyleSheet.create({
   },
 
   sheetTitle: {
-    color: "#ffffff",
+    color: c.text,
     fontSize: 20,
     fontWeight: "bold",
     marginBottom: 40,
@@ -223,7 +224,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   guestButtonText: {
-    color: "#007AFF",
+    color: c.primary,
     fontSize: 18,
     fontWeight: "600",
     alignItems: "center",

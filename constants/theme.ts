@@ -31,6 +31,9 @@ export const lightColors = {
   brandYellowLight: "rgba(244, 214, 66, 0.1)",
   brandYellowBorder: "rgba(244, 214, 66, 0.3)",
 
+  // Login
+  loginBg: "#FAF5EB",
+
   // Status
   success: "#4CAF50",
   successLight: "#E8F5E9",
@@ -92,6 +95,9 @@ export const darkColors = {
   brandYellow: "#f4d642",
   brandYellowLight: "rgba(244, 214, 66, 0.1)",
   brandYellowBorder: "rgba(244, 214, 66, 0.3)",
+
+  // Login
+  loginBg: "#382f2f",
 
   // Status
   success: "#66BB6A",
