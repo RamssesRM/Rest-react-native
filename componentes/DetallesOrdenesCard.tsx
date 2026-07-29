@@ -38,10 +38,11 @@ type DetallesOrdenesCardProps = {
     role: string;
     onDismiss: () => void;
     onEstadoCambiado?: () => void;
+    coloresEstatus?: Record<string, string>;
 };
 
 const DetallesOrdenesCard = forwardRef<BottomSheet, DetallesOrdenesCardProps>(
-    ({ orden, role, onDismiss, onEstadoCambiado }, ref) => {
+    ({ orden, role, onDismiss, onEstadoCambiado, coloresEstatus = {} }, ref) => {
         const { user } = useUserStore();
         const [detalles, setDetalles] = useState<DetalleOrden[]>([]);
         const [isLoading, setIsLoading] = useState(false);
@@ -380,8 +381,8 @@ TOTAL: $${Number(orden!.monto_total || 0).toFixed(2)}
                     <View style={styles.header}>
                         <View style={styles.headerLeft}>
                             <Text style={styles.mesaTitle}>Mesa {orden.mesa_info?.numero_mesa || 'N/A'}</Text>
-                            <View style={[styles.statusBadge, { backgroundColor: getStatusColor(orden.estatus) + '20' }]}>
-                                <Text style={[styles.statusText, { color: getStatusColor(orden.estatus) }]}>
+                            <View style={[styles.statusBadge, { backgroundColor: getStatusColor(orden.estatus, coloresEstatus) + '20' }]}>
+                                <Text style={[styles.statusText, { color: getStatusColor(orden.estatus, coloresEstatus) }]}>
                                     {orden.estatus.toUpperCase()}
                                 </Text>
                             </View>
@@ -446,7 +447,7 @@ TOTAL: $${Number(orden!.monto_total || 0).toFixed(2)}
                                         <View style={styles.quantityControls}>
                                             <TouchableOpacity
                                                 style={styles.qtyBtn}
-                                                onPress={() => handleCantidadChange(detalle.id, detalle.cantidad - 1)}
+                                                onPress={() => handleCantidadChange(detalle.id, cantidadActual - 1)}
                                             >
                                                 <Ionicons name="remove-circle" size={28} color="#F44336" />
                                             </TouchableOpacity>
@@ -455,7 +456,7 @@ TOTAL: $${Number(orden!.monto_total || 0).toFixed(2)}
                                             </Text>
                                             <TouchableOpacity
                                                 style={styles.qtyBtn}
-                                                onPress={() => handleCantidadChange(detalle.id, detalle.cantidad + 1)}
+                                                onPress={() => handleCantidadChange(detalle.id, cantidadActual + 1)}
                                             >
                                                 <Ionicons name="add-circle" size={28} color="#4CAF50" />
                                             </TouchableOpacity>
@@ -676,17 +677,17 @@ const InfoRow = ({ label, value }: { label: string; value: string }) => (
     </View>
 );
 
-const getStatusColor = (status: string) => {
-    switch (status) {
-        case 'pidiendo': return '#FF9800';
-        case 'cocinando': return '#F44336';
-        case 'finalizado': return '#2196F3';
-        case 'pagado': return '#4CAF50';
-        case 'delivery': return '#9C27B0';
-        case 'entregado': return '#607D8B';
-        case 'eliminado': return '#BDBDBD';
-        default: return '#EFEFEF';
-    }
+const FALLBACK_COLORES: Record<string, string> = {
+    pidiendo: '#FF9800',
+    cocinando: '#F44336',
+    finalizado: '#2196F3',
+    pagado: '#4CAF50',
+    delivery: '#9C27B0',
+    eliminado: '#BDBDBD',
+};
+
+const getStatusColor = (status: string, colores: Record<string, string> = {}) => {
+    return colores[status] || FALLBACK_COLORES[status] || '#EFEFEF';
 };
 
 const styles = StyleSheet.create({

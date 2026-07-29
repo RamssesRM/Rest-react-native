@@ -1,4 +1,4 @@
-import { cambiarEstadoOrden, getMisOrdenes, getOrdenesActivas, getOrdenesCajero, getTodasLasOrdenes } from '@/app/api/ordenesApi';
+import { cambiarEstadoOrden, getMisOrdenes, getOrdenesActivas, getOrdenesCajero, getTodasLasOrdenes, tomarEstatusOrdenes } from '@/app/api/ordenesApi';
 import DetallesOrdenesCard from '@/componentes/DetallesOrdenesCard';
 import GuestGuard from '@/componentes/GuestGuard';
 import { useTheme } from '@/hooks/use-theme';
@@ -9,17 +9,17 @@ import { useFocusEffect, useRouter } from 'expo-router';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, FlatList, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
-const getStatusColor = (status: string) => {
-    switch (status) {
-        case 'pidiendo': return '#FF9800';
-        case 'cocinando': return '#F44336';
-        case 'finalizado': return '#2196F3';
-        case 'pagado': return '#4CAF50';
-        case 'delivery': return '#9C27B0';
-        case 'entregado': return '#607D8B';
-        case 'eliminado': return '#BDBDBD';
-        default: return '#EFEFEF';
-    }
+const FALLBACK_COLORES: Record<string, string> = {
+    pidiendo: '#FF9800',
+    cocinando: '#F44336',
+    finalizado: '#2196F3',
+    pagado: '#4CAF50',
+    delivery: '#9C27B0',
+    eliminado: '#BDBDBD',
+};
+
+const getStatusColor = (status: string, colores: Record<string, string> = {}) => {
+    return colores[status] || FALLBACK_COLORES[status] || '#EFEFEF';
 };
 
 type FiltroFecha = 'hoy' | 'ayer' | 'semana' | 'mes' | 'todo';
@@ -85,6 +85,9 @@ export default function ComandasScreen() {
 
     const [filtroFecha, setFiltroFecha] = useState<FiltroFecha>('hoy');
 
+    const [estatusOrdenes, setEstatusOrdenes] = useState<{ value: string; label: string; color: string }[]>([]);
+    const [coloresEstatus, setColoresEstatus] = useState<Record<string, string>>({});
+
     const cargarDatos = async () => {
         if (!user) return;
         setIsLoading(true);
@@ -95,6 +98,12 @@ export default function ComandasScreen() {
             else if (role === 'cajero') data = await getOrdenesCajero();
             else if (role === 'admin') data = await getTodasLasOrdenes(filtroAdmin, busquedaAdmin);
             setOrdenes(data);
+
+            const estatus = await tomarEstatusOrdenes();
+            setEstatusOrdenes(estatus);
+            const mapa: Record<string, string> = {};
+            estatus.forEach((e: any) => { mapa[e.value] = e.color; });
+            setColoresEstatus(mapa);
         } catch (error) {
             Alert.alert('Error', 'No se pudieron cargar las comandas');
         } finally {
@@ -187,14 +196,23 @@ export default function ComandasScreen() {
             </View>
 
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={s.chipsContainer}>
-                {['', 'pidiendo', 'cocinando', 'finalizado', 'delivery', 'entregado', 'pagado'].map((estado) => (
+                <TouchableOpacity
+                    key="todos"
+                    style={[s.chip, filtroAdmin === '' && s.chipActive]}
+                    onPress={() => setFiltroAdmin('')}
+                >
+                    <Text style={[s.chipText, filtroAdmin === '' && s.chipTextActive]}>
+                        Todos
+                    </Text>
+                </TouchableOpacity>
+                {estatusOrdenes.map((estatus) => (
                     <TouchableOpacity
-                        key={estado || 'todos'}
-                        style={[s.chip, filtroAdmin === estado && s.chipActive]}
-                        onPress={() => setFiltroAdmin(estado)}
+                        key={estatus.value}
+                        style={[s.chip, filtroAdmin === estatus.value && s.chipActive]}
+                        onPress={() => setFiltroAdmin(estatus.value)}
                     >
-                        <Text style={[s.chipText, filtroAdmin === estado && s.chipTextActive]}>
-                            {estado === '' ? 'Todos' : estado.charAt(0).toUpperCase() + estado.slice(1)}
+                        <Text style={[s.chipText, filtroAdmin === estatus.value && s.chipTextActive]}>
+                            {estatus.label}
                         </Text>
                     </TouchableOpacity>
                 ))}
@@ -216,8 +234,8 @@ export default function ComandasScreen() {
             <TouchableOpacity style={s.card} onPress={() => handleAbrirDetalle(item)} activeOpacity={0.7}>
                 <View style={s.cardHeader}>
                     <Text style={s.mesaText}>Mesa: {item.mesa_info?.numero_mesa || 'N/A'}</Text>
-                    <View style={[s.statusBadge, { backgroundColor: getStatusColor(item.estatus) + '20' }]}>
-                        <Text style={[s.statusText, { color: getStatusColor(item.estatus) }]}>
+                    <View style={[s.statusBadge, { backgroundColor: getStatusColor(item.estatus, coloresEstatus) + '20' }]}>
+                        <Text style={[s.statusText, { color: getStatusColor(item.estatus, coloresEstatus) }]}>
                             {item.estatus.toUpperCase()}
                         </Text>
                     </View>
@@ -296,6 +314,7 @@ export default function ComandasScreen() {
                 role={role || ''}
                 onDismiss={handleCerrarDetalle}
                 onEstadoCambiado={handleEstadoCambiado}
+                coloresEstatus={coloresEstatus}
             />
         </View>
         </GuestGuard>
