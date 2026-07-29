@@ -154,6 +154,12 @@ export const getProductos = async () => {
     return extractPaginated(await response.json());
 };
 
+export const tomarEstatusOrdenes = async () => {
+    const response = await apiClient('/ordenes/estatus/');
+    if (!response.ok) throw new Error('Error al traer estatus de órdenes');
+    return await response.json();
+};
+
 export const crearDetalle = async (data) => {
     const response = await apiClient('/detalles/', {
         method: 'POST',

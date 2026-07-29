@@ -39,10 +39,11 @@ type DetallesOrdenesCardProps = {
     role: string;
     onDismiss: () => void;
     onEstadoCambiado?: () => void;
+    coloresEstatus?: Record<string, string>;
 };
 
 const DetallesOrdenesCard = forwardRef<BottomSheet, DetallesOrdenesCardProps>(
-    ({ orden, role, onDismiss, onEstadoCambiado }, ref) => {
+    ({ orden, role, onDismiss, onEstadoCambiado, coloresEstatus = {} }, ref) => {
         const { user } = useUserStore();
         const { colors } = useTheme();
         const s = styles(colors);
@@ -678,17 +679,17 @@ const InfoRow = ({ label, value, colors }: { label: string; value: string; color
     </View>
 );
 
-const getStatusColor = (status: string) => {
-    switch (status) {
-        case 'pidiendo': return '#FF9800';
-        case 'cocinando': return '#F44336';
-        case 'finalizado': return '#2196F3';
-        case 'pagado': return '#4CAF50';
-        case 'delivery': return '#9C27B0';
-        case 'entregado': return '#607D8B';
-        case 'eliminado': return '#BDBDBD';
-        default: return '#EFEFEF';
-    }
+const FALLBACK_COLORES: Record<string, string> = {
+    pidiendo: '#FF9800',
+    cocinando: '#F44336',
+    finalizado: '#2196F3',
+    pagado: '#4CAF50',
+    delivery: '#9C27B0',
+    eliminado: '#BDBDBD',
+};
+
+const getStatusColor = (status: string, colores: Record<string, string> = {}) => {
+    return colores[status] || FALLBACK_COLORES[status] || '#EFEFEF';
 };
 
 const styles = (c: ReturnType<typeof useTheme>['colors']) => StyleSheet.create({
