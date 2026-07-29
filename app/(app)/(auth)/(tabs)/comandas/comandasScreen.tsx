@@ -69,7 +69,7 @@ const FILTROS_FECHA: { key: FiltroFecha; label: string; icon: string }[] = [
 
 export default function ComandasScreen() {
     const router = useRouter();
-    const { user } = useUserStore();
+    const { user, isGuest } = useUserStore();
     const role = user?.role;
     const { colors } = useTheme();
 
@@ -86,7 +86,10 @@ export default function ComandasScreen() {
     const [filtroFecha, setFiltroFecha] = useState<FiltroFecha>('hoy');
 
     const cargarDatos = async () => {
-        if (!user) return;
+        if (!user || isGuest) {
+            setIsLoading(false);
+            return;
+        }
         setIsLoading(true);
         try {
             let data = [];
@@ -268,7 +271,7 @@ export default function ComandasScreen() {
         );
     }, [ordenesFiltradas, filtroFecha]);
 
-    if (isLoading) return <ActivityIndicator style={{ flex: 1, justifyContent: 'center' }} color={colors.goldDark} size="large" />;
+    if (isLoading && !isGuest) return <ActivityIndicator style={{ flex: 1, justifyContent: 'center' }} color={colors.goldDark} size="large" />;
 
     return (
         <GuestGuard feature="tus comandas">

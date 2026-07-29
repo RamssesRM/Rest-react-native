@@ -1,5 +1,5 @@
-// app/(auth)/helus-register.tsx
 import { registerUser } from "@/app/api/authApi";
+import { useTheme } from '@/hooks/use-theme';
 import useUserStore from '@/hooks/use-userstore';
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { LinearGradient } from "expo-linear-gradient";
@@ -28,6 +28,8 @@ export default function HelusRegister() {
   const [isLoading, setIsLoading] = useState(false);
 
   const { setUser } = useUserStore();
+  const { colors } = useTheme();
+  const s = styles(colors);
 
   const handleRegister = async () => {
     if (!name.trim()) {
@@ -84,59 +86,59 @@ export default function HelusRegister() {
 
   return (
     <KeyboardAvoidingView
-      style={styles.container}
+      style={s.container}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
-      <LinearGradient colors={["#382f2f", "#2a2222"]} style={styles.gradient}>
+      <LinearGradient colors={[colors.brandDark, colors.surface]} style={s.gradient}>
         <ScrollView
-          contentContainerStyle={styles.scrollContent}
+          contentContainerStyle={s.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-          <View style={styles.header}>
+          <View style={s.header}>
             <TouchableOpacity
               onPress={() => router.back()}
-              style={styles.backButton}
+              style={s.backButton}
             >
-              <Ionicons name="arrow-back" size={28} color="#fff" />
+              <Ionicons name="arrow-back" size={28} color={colors.text} />
             </TouchableOpacity>
           </View>
 
-          <View style={styles.titleContainer}>
-            <View style={styles.logoContainer}>
-              <Ionicons name="person-add" size={32} color="#382f2f" />
+          <View style={s.titleContainer}>
+            <View style={s.logoContainer}>
+              <Ionicons name="person-add" size={32} color={colors.brandDark} />
             </View>
-            <Text style={styles.title}>Crear Cuenta</Text>
-            <Text style={styles.subtitle}>Regístrate como empleado Helus</Text>
+            <Text style={s.title}>Crear Cuenta</Text>
+            <Text style={s.subtitle}>Regístrate como empleado Helus</Text>
           </View>
 
-          <View style={styles.formContainer}>
-            <View style={styles.inputContainer}>
-              <Ionicons name="person-outline" size={22} color="#999" style={styles.inputIcon} />
+          <View style={s.formContainer}>
+            <View style={s.inputContainer}>
+              <Ionicons name="person-outline" size={22} color={colors.textMuted} style={s.inputIcon} />
               <TextInput
-                style={styles.input}
+                style={s.input}
                 placeholder="Nombre de usuario"
-                placeholderTextColor="#666"
+                placeholderTextColor={colors.textMuted}
                 value={name}
                 onChangeText={setName}
               />
             </View>
-            <View style={styles.inputContainer}>
-              <Ionicons name="person-outline" size={22} color="#999" style={styles.inputIcon} />
+            <View style={s.inputContainer}>
+              <Ionicons name="person-outline" size={22} color={colors.textMuted} style={s.inputIcon} />
               <TextInput
-                style={styles.input}
+                style={s.input}
                 placeholder="Nombre y apellido"
-                placeholderTextColor="#666"
+                placeholderTextColor={colors.textMuted}
                 value={first_name}
                 onChangeText={setFirstName}
               />
             </View>
 
-            <View style={styles.inputContainer}>
-              <Ionicons name="mail-outline" size={22} color="#999" style={styles.inputIcon} />
+            <View style={s.inputContainer}>
+              <Ionicons name="mail-outline" size={22} color={colors.textMuted} style={s.inputIcon} />
               <TextInput
-                style={styles.input}
+                style={s.input}
                 placeholder="Correo electrónico"
-                placeholderTextColor="#666"
+                placeholderTextColor={colors.textMuted}
                 value={email}
                 onChangeText={setEmail}
                 autoCapitalize="none"
@@ -144,27 +146,27 @@ export default function HelusRegister() {
               />
             </View>
 
-            <View style={styles.inputContainer}>
-              <Ionicons name="lock-closed-outline" size={22} color="#999" style={styles.inputIcon} />
+            <View style={s.inputContainer}>
+              <Ionicons name="lock-closed-outline" size={22} color={colors.textMuted} style={s.inputIcon} />
               <TextInput
-                style={styles.input}
+                style={s.input}
                 placeholder="Contraseña"
-                placeholderTextColor="#666"
+                placeholderTextColor={colors.textMuted}
                 value={password}
                 onChangeText={setPassword}
                 secureTextEntry={!showPassword}
               />
-              <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeButton}>
-                <Ionicons name={showPassword ? "eye-off-outline" : "eye-outline"} size={22} color="#999" />
+              <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={s.eyeButton}>
+                <Ionicons name={showPassword ? "eye-off-outline" : "eye-outline"} size={22} color={colors.textMuted} />
               </TouchableOpacity>
             </View>
 
-            <View style={styles.inputContainer}>
-              <Ionicons name="lock-closed-outline" size={22} color="#999" style={styles.inputIcon} />
+            <View style={s.inputContainer}>
+              <Ionicons name="lock-closed-outline" size={22} color={colors.textMuted} style={s.inputIcon} />
               <TextInput
-                style={styles.input}
+                style={s.input}
                 placeholder="Confirmar contraseña"
-                placeholderTextColor="#666"
+                placeholderTextColor={colors.textMuted}
                 value={confirmPassword}
                 onChangeText={setConfirmPassword}
                 secureTextEntry={!showPassword}
@@ -172,21 +174,21 @@ export default function HelusRegister() {
             </View>
 
             <TouchableOpacity
-              style={[styles.registerButton, isLoading && styles.buttonDisabled]}
+              style={[s.registerButton, isLoading && s.buttonDisabled]}
               onPress={handleRegister}
               disabled={isLoading}
             >
               {isLoading ? (
-                <Text style={styles.registerButtonText}>Creando cuenta...</Text>
+                <Text style={s.registerButtonText}>Creando cuenta...</Text>
               ) : (
-                <Text style={styles.registerButtonText}>Crear Cuenta</Text>
+                <Text style={s.registerButtonText}>Crear Cuenta</Text>
               )}
             </TouchableOpacity>
 
-            <View style={styles.loginLinkContainer}>
-              <Text style={styles.loginLinkText}>¿Ya tienes cuenta? </Text>
+            <View style={s.loginLinkContainer}>
+              <Text style={s.loginLinkText}>¿Ya tienes cuenta? </Text>
               <TouchableOpacity onPress={() => router.back()}>
-                <Text style={styles.loginLink}>Inicia sesión</Text>
+                <Text style={s.loginLink}>Inicia sesión</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -198,7 +200,7 @@ export default function HelusRegister() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = (c: ReturnType<typeof useTheme>['colors']) => StyleSheet.create({
   container: {
     flex: 1,
   },
@@ -216,7 +218,7 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
-    backgroundColor: "rgba(255,255,255,0.1)",
+    backgroundColor: c.inputBg,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -228,7 +230,7 @@ const styles = StyleSheet.create({
     width: 70,
     height: 70,
     borderRadius: 16,
-    backgroundColor: "#f4d642",
+    backgroundColor: c.brandYellow,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 20,
@@ -236,12 +238,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: "bold",
-    color: "#fff",
+    color: c.text,
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
-    color: "#999",
+    color: c.textMuted,
     textAlign: "center",
   },
   formContainer: {
@@ -250,12 +252,12 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "rgba(255,255,255,0.08)",
+    backgroundColor: c.inputBg,
     borderRadius: 14,
     paddingHorizontal: 16,
     height: 58,
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.1)",
+    borderColor: c.inputBorder,
   },
   inputIcon: {
     marginRight: 12,
@@ -263,14 +265,14 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     fontSize: 16,
-    color: "#fff",
+    color: c.text,
     height: "100%",
   },
   eyeButton: {
     padding: 8,
   },
   registerButton: {
-    backgroundColor: "#f4d642",
+    backgroundColor: c.brandYellow,
     height: 58,
     borderRadius: 14,
     alignItems: "center",
@@ -283,7 +285,7 @@ const styles = StyleSheet.create({
   registerButtonText: {
     fontSize: 18,
     fontWeight: "600",
-    color: "#382f2f",
+    color: c.brandDark,
   },
   loginLinkContainer: {
     flexDirection: "row",
@@ -291,11 +293,11 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   loginLinkText: {
-    color: "#999",
+    color: c.textMuted,
     fontSize: 14,
   },
   loginLink: {
-    color: "#f4d642",
+    color: c.brandYellow,
     fontSize: 14,
     fontWeight: "600",
   },

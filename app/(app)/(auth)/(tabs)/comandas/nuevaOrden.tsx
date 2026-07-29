@@ -1,5 +1,6 @@
 import { crearOrden, crearDetalle, getMesas, getCategorias, getProductos } from '@/app/api/ordenesApi';
 import GuestGuard from '@/componentes/GuestGuard';
+import { useTheme } from '@/hooks/use-theme';
 import useUserStore from '@/hooks/use-userstore';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
@@ -9,6 +10,8 @@ import { ActivityIndicator, Alert, FlatList, Image, ScrollView, StyleSheet, Text
 export default function NuevaOrdenScreen() {
     const router = useRouter();
     const { user } = useUserStore();
+    const { colors } = useTheme();
+    const s = styles(colors);
     
     const [mesas, setMesas] = useState([]);
     const [selectedMesa, setSelectedMesa] = useState(null);
@@ -40,7 +43,6 @@ export default function NuevaOrdenScreen() {
         if (user) initData();
     }, [user]);
 
-    // 2. Lógica del Carrito
     const addToCart = (producto) => {
         setCarrito(prev => {
             const existe = prev.find(p => p.id === producto.id);
@@ -61,14 +63,12 @@ export default function NuevaOrdenScreen() {
             if (item && item.cantidad > 1) {
                 return prev.map(p => p.id === id ? { ...p, cantidad: p.cantidad - 1 } : p);
             }
-            return prev.filter(p => p.id !== id); // Si es 1, lo elimina
+            return prev.filter(p => p.id !== id);
         });
     };
 
-    // Calcular total localmente para mostrar en la UI
     const totalCarrito = carrito.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
 
-    // 3. Enviar Orden a Django
     const handleEnviarOrden = async () => {
         if (!selectedMesa) return Alert.alert('Error', 'Selecciona una mesa');
         if (carrito.length === 0) return Alert.alert('Error', 'Agrega productos al carrito');
@@ -106,52 +106,49 @@ export default function NuevaOrdenScreen() {
         }
     };
 
-    // Filtrado de productos por categoría
     const productosFiltrados = selectedCat 
         ? productos.filter(p => String(p.categoria_fk).trim() === String(selectedCat).trim()) 
         : productos;
 
-    if (isLoading) return <ActivityIndicator style={{flex:1}} color="#D4AF37" size="large"/>;
+    if (isLoading) return <ActivityIndicator style={{flex:1}} color={colors.goldDark} size="large"/>;
 
     return (
         <GuestGuard feature="crear una orden">
-        <View style={styles.container}>
+        <View style={s.container}>
             
-            {/* --- 1. SELECTOR DE MESAS --- */}
-            <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Selecciona tu Mesa</Text>
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.mesaScroll}>
+            <View style={s.section}>
+                <Text style={s.sectionTitle}>Selecciona tu Mesa</Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={s.mesaScroll}>
                     {[...mesas].sort((a, b) => a.numero_mesa - b.numero_mesa).map(mesa => {
                         const ocupada = mesa.estatus !== 'disponible';
                         const seleccionada = selectedMesa?.id === mesa.id;
                         return (
                             <TouchableOpacity
                                 key={mesa.id}
-                                style={[styles.mesaCard, ocupada && styles.mesaOcupada, seleccionada && styles.mesaSeleccionada]}
+                                style={[s.mesaCard, ocupada && s.mesaOcupada, seleccionada && s.mesaSeleccionada]}
                                 disabled={ocupada}
                                 onPress={() => setSelectedMesa(mesa)}
                             >
-                                <Text style={[styles.mesaNum, ocupada && styles.textDisabled]}>{mesa.numero_mesa}</Text>
-                                <Text style={[styles.mesaStatus, ocupada && styles.textDisabled]}>{mesa.estatus}</Text>
+                                <Text style={[s.mesaNum, ocupada && s.textDisabled]}>{mesa.numero_mesa}</Text>
+                                <Text style={[s.mesaStatus, ocupada && s.textDisabled]}>{mesa.estatus}</Text>
                             </TouchableOpacity>
                         );
                     })}
                 </ScrollView>
             </View>
 
-            {/* --- 2. CATEGORÍAS Y PRODUCTOS --- */}
-            <View style={styles.sectionFlex}>
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.catScroll}>
-                    <TouchableOpacity style={[styles.chip, !selectedCat && styles.chipActive]} onPress={() => setSelectedCat('')}>
-                        <Text style={[styles.chipText, !selectedCat && styles.chipTextActive]}>Todos</Text>
+            <View style={s.sectionFlex}>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={s.catScroll}>
+                    <TouchableOpacity style={[s.chip, !selectedCat && s.chipActive]} onPress={() => setSelectedCat('')}>
+                        <Text style={[s.chipText, !selectedCat && s.chipTextActive]}>Todos</Text>
                     </TouchableOpacity>
                     {categorias.map(cat => (
                         <TouchableOpacity 
                             key={cat.id} 
-                            style={[styles.chip, selectedCat === cat.id && styles.chipActive]} 
+                            style={[s.chip, selectedCat === cat.id && s.chipActive]} 
                             onPress={() => setSelectedCat(cat.id)}
                         >
-                            <Text style={[styles.chipText, selectedCat === cat.id && styles.chipTextActive]}>{cat.nombre}</Text>
+                            <Text style={[s.chipText, selectedCat === cat.id && s.chipTextActive]}>{cat.nombre}</Text>
                         </TouchableOpacity>
                     ))}
                 </ScrollView>
@@ -160,42 +157,41 @@ export default function NuevaOrdenScreen() {
                     data={productosFiltrados}
                     keyExtractor={item => item.id}
                     numColumns={2}
-                    columnWrapperStyle={styles.productRow}
+                    columnWrapperStyle={s.productRow}
                     renderItem={({ item }) => (
-                        <TouchableOpacity style={styles.productCard} onPress={() => addToCart(item)}>
+                        <TouchableOpacity style={s.productCard} onPress={() => addToCart(item)}>
                             {item.imagen ? (
-                                <Image source={{ uri: item.imagen }} style={styles.productImg} />
+                                <Image source={{ uri: item.imagen }} style={s.productImg} />
                             ) : (
-                                <View style={[styles.productImg, styles.productImgPlaceholder]}><Ionicons name="restaurant" size={30} color="#ccc" /></View>
+                                <View style={[s.productImg, s.productImgPlaceholder]}><Ionicons name="restaurant" size={30} color={colors.gray300} /></View>
                             )}
-                            <Text style={styles.productName} numberOfLines={1}>{item.nombre}</Text>
-                            <Text style={styles.productPrice}>${item.precio}</Text>
+                            <Text style={s.productName} numberOfLines={1}>{item.nombre}</Text>
+                            <Text style={s.productPrice}>${item.precio}</Text>
                         </TouchableOpacity>
                     )}
                 />
             </View>
 
-            {/* --- 3. CARRITO FIJO ABAJO --- */}
             {carrito.length > 0 && (
-                <View style={styles.cartContainer}>
+                <View style={s.cartContainer}>
                     <FlatList
                         data={carrito}
                         keyExtractor={item => item.id}
                         horizontal
                         showsHorizontalScrollIndicator={false}
                         renderItem={({ item }) => (
-                            <View style={styles.cartItem}>
-                                <Text style={styles.cartItemName} numberOfLines={1}>{item.nombre}</Text>
-                                <View style={styles.cartItemControls}>
-                                    <TouchableOpacity onPress={() => decreaseQuantity(item.id)}><Ionicons name="remove-circle" size={24} color="#F44336" /></TouchableOpacity>
-                                    <Text style={styles.cartItemQty}>{item.cantidad}</Text>
-                                    <TouchableOpacity onPress={() => addToCart(item)}><Ionicons name="add-circle" size={24} color="#4CAF50" /></TouchableOpacity>
+                            <View style={s.cartItem}>
+                                <Text style={s.cartItemName} numberOfLines={1}>{item.nombre}</Text>
+                                <View style={s.cartItemControls}>
+                                    <TouchableOpacity onPress={() => decreaseQuantity(item.id)}><Ionicons name="remove-circle" size={24} color={colors.danger} /></TouchableOpacity>
+                                    <Text style={s.cartItemQty}>{item.cantidad}</Text>
+                                    <TouchableOpacity onPress={() => addToCart(item)}><Ionicons name="add-circle" size={24} color={colors.success} /></TouchableOpacity>
                                 </View>
                             </View>
                         )}
                     />
-                    <TouchableOpacity style={styles.payButton} onPress={handleEnviarOrden}>
-                        <Text style={styles.payButtonText}>Pagar ${totalCarrito.toFixed(2)}</Text>
+                    <TouchableOpacity style={s.payButton} onPress={handleEnviarOrden}>
+                        <Text style={s.payButtonText}>Pagar ${totalCarrito.toFixed(2)}</Text>
                     </TouchableOpacity>
                 </View>
             )}
@@ -204,24 +200,21 @@ export default function NuevaOrdenScreen() {
     );
 }
 
-// --- ESTILOS ---
-const styles = StyleSheet.create({
+const styles = (c: ReturnType<typeof useTheme>['colors']) => StyleSheet.create({
     container: { 
         flex: 1, 
-        backgroundColor: '#FAFAFA' 
+        backgroundColor: c.background 
     },
-    
-    // Mesas
     section: { 
         paddingVertical: 10, 
-        backgroundColor: '#FFF', 
+        backgroundColor: c.card, 
         borderBottomWidth: 1, 
-        borderBottomColor: '#EFEFEF' 
+        borderBottomColor: c.border 
     },
     sectionTitle: { 
         fontSize: 16, 
         fontWeight: 'bold', 
-        color: '#262626', 
+        color: c.text, 
         paddingHorizontal: 15, 
         marginBottom: 10 
     },
@@ -229,7 +222,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 15 
     },
     mesaCard: { 
-        backgroundColor: '#EFEFEF', 
+        backgroundColor: c.chipBg, 
         paddingHorizontal: 20, 
         paddingVertical: 10, 
         borderRadius: 10, 
@@ -239,37 +232,35 @@ const styles = StyleSheet.create({
         borderColor: 'transparent' 
     },
     mesaSeleccionada: { 
-        borderColor: '#D4AF37', 
-        backgroundColor: '#FFF8E1'
-     },
+        borderColor: c.goldDark, 
+        backgroundColor: c.goldLight
+    },
     mesaOcupada: { 
         opacity: 0.5 
     },
     mesaNum: { 
         fontSize: 20, 
         fontWeight: 'bold', 
-        color: '#262626' 
+        color: c.text 
     },
     mesaStatus: { 
         fontSize: 12, 
-        color: '#8E8E8E', 
+        color: c.textMuted, 
         textTransform: 'capitalize' 
     },
     textDisabled: { 
-        color: '#BDBDBD' 
+        color: c.gray400 
     },
-
-    // Categorías y Productos
     sectionFlex: { flex: 1 },
     catScroll: { 
         paddingHorizontal: 15, 
         paddingVertical: 10, 
-        backgroundColor: '#FAFAFA' 
+        backgroundColor: c.background 
     },
     chip: { 
-        backgroundColor: '#FFF', 
+        backgroundColor: c.card, 
         borderWidth: 1, 
-        borderColor: '#EFEFEF', 
+        borderColor: c.border, 
         borderRadius: 20, 
         paddingHorizontal: 15, 
         paddingVertical: 8, 
@@ -277,15 +268,15 @@ const styles = StyleSheet.create({
         marginRight: 10 
     },
     chipActive: { 
-        backgroundColor: '#D4AF37', 
-        borderColor: '#D4AF37' 
+        backgroundColor: c.goldDark, 
+        borderColor: c.goldDark 
     },
     chipText: { 
-        color: '#8E8E8E', 
+        color: c.textMuted, 
         fontWeight: '600' 
     },
     chipTextActive: { 
-        color: '#000' 
+        color: c.textInverse 
     },
     productRow: { 
         paddingHorizontal: 10, 
@@ -293,11 +284,11 @@ const styles = StyleSheet.create({
     },
     productCard: { 
         flex: 1, 
-        backgroundColor: '#FFF', 
+        backgroundColor: c.card, 
         borderRadius: 12, 
         marginBottom: 10, 
         borderWidth: 1, 
-        borderColor: '#EFEFEF', 
+        borderColor: c.border, 
         overflow: 'hidden' 
     },
     productImg: { 
@@ -305,36 +296,34 @@ const styles = StyleSheet.create({
         height: 100 
     },
     productImgPlaceholder: { 
-        backgroundColor: '#EFEFEF', 
+        backgroundColor: c.chipBg, 
         justifyContent: 'center', 
         alignItems: 'center' 
     },
     productName: { 
         fontSize: 14, 
         fontWeight: '600', 
-        color: '#262626', 
+        color: c.text, 
         padding: 8, 
         paddingHorizontal: 8 
     },
     productPrice: { 
         fontSize: 14, 
         fontWeight: 'bold', 
-        color: '#D4AF37', 
+        color: c.goldDark, 
         paddingBottom: 10, 
         paddingHorizontal: 8 
     },
-
-    // Carrito
     cartContainer: { 
-        backgroundColor: '#FFF', 
+        backgroundColor: c.card, 
         borderTopWidth: 1, 
-        borderTopColor: '#EFEFEF', 
+        borderTopColor: c.border, 
         paddingVertical: 10, 
         maxHeight: 140 
     },
     cartItem: { 
         width: 140, 
-        backgroundColor: '#F5F5F5', 
+        backgroundColor: c.chipBg, 
         borderRadius: 8, 
         padding: 8, 
         marginRight: 10, 
@@ -343,7 +332,7 @@ const styles = StyleSheet.create({
     cartItemName: { 
         fontSize: 13, 
         fontWeight: '600', 
-        color: '#262626', 
+        color: c.text, 
         width: '70%' 
     },
     cartItemControls: { 
@@ -354,12 +343,12 @@ const styles = StyleSheet.create({
     cartItemQty: { 
         fontSize: 16, 
         fontWeight: 'bold', 
-        color: '#262626', 
+        color: c.text, 
         minWidth: 20, 
         textAlign: 'center' 
     },
     payButton: { 
-        backgroundColor: '#D4AF37', 
+        backgroundColor: c.goldDark, 
         marginHorizontal: 15, 
         paddingVertical: 15, 
         borderRadius: 12, 
@@ -369,6 +358,6 @@ const styles = StyleSheet.create({
     payButtonText: { 
         fontSize: 18, 
         fontWeight: 'bold', 
-        color: '#000' 
+        color: c.textInverse 
     }
 });

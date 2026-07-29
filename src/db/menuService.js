@@ -93,3 +93,38 @@ export const getLocalCategorias = async () => {
         return [];
     }
 };
+
+export const getProductosByCategoria = async (categoriaId) => {
+    const db = getDB();
+    if (!db) throw new Error('DB no inicializada');
+
+    try {
+        const productos = await db.getAllAsync(
+            `SELECT p.id, p.nombre, p.descripcion, p.precio, p.imagen, p.categoria_id, c.nombre as categoria_nombre, p.estatus 
+             FROM productos p 
+             LEFT JOIN categorias c ON p.categoria_id = c.id 
+             WHERE p.categoria_id = ? AND p.estatus = 1`,
+            [categoriaId]
+        );
+        return productos;
+    } catch (error) {
+        console.error('❌ Error obteniendo productos por categoría:', error);
+        return [];
+    }
+};
+
+export const getCategoriaById = async (categoriaId) => {
+    const db = getDB();
+    if (!db) throw new Error('DB no inicializada');
+
+    try {
+        const result = await db.getFirstAsync(
+            'SELECT id, nombre, imagen FROM categorias WHERE id = ? AND estatus = 1',
+            [categoriaId]
+        );
+        return result;
+    } catch (error) {
+        console.error('❌ Error obteniendo categoría:', error);
+        return null;
+    }
+};

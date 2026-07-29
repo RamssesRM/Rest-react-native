@@ -1,4 +1,5 @@
 import { resetPassword } from "@/app/api/authApi";
+import { useTheme } from '@/hooks/use-theme';
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
@@ -22,6 +23,8 @@ export default function ForgotPassword() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [step, setStep] = useState<"email" | "password" | "done">("email");
+  const { colors } = useTheme();
+  const s = styles(colors);
 
   const handleVerifyEmail = async () => {
     if (!email.trim()) {
@@ -82,39 +85,39 @@ export default function ForgotPassword() {
   if (step === "done") {
     return (
       <KeyboardAvoidingView
-        style={styles.container}
+        style={s.container}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
-        <LinearGradient colors={["#382f2f", "#2a2222"]} style={styles.gradient}>
+        <LinearGradient colors={[colors.brandDark, colors.surface]} style={s.gradient}>
           <ScrollView
-            contentContainerStyle={styles.scrollContent}
+            contentContainerStyle={s.scrollContent}
             showsVerticalScrollIndicator={false}
           >
-            <View style={styles.header}>
+            <View style={s.header}>
               <TouchableOpacity
                 onPress={() => router.back()}
-                style={styles.backButton}
+                style={s.backButton}
               >
-                <Ionicons name="arrow-back" size={28} color="#fff" />
+                <Ionicons name="arrow-back" size={28} color={colors.text} />
               </TouchableOpacity>
             </View>
 
-            <View style={styles.titleContainer}>
-              <View style={styles.logoContainer}>
-                <Ionicons name="checkmark-circle" size={32} color="#382f2f" />
+            <View style={s.titleContainer}>
+              <View style={s.logoContainer}>
+                <Ionicons name="checkmark-circle" size={32} color={colors.brandDark} />
               </View>
-              <Text style={styles.title}>¡Listo!</Text>
-              <Text style={styles.subtitle}>
+              <Text style={s.title}>¡Listo!</Text>
+              <Text style={s.subtitle}>
                 Tu contraseña ha sido actualizada. Ya puedes iniciar sesión con
                 tu nueva contraseña.
               </Text>
             </View>
 
             <TouchableOpacity
-              style={styles.loginButton}
+              style={s.loginButton}
               onPress={() => router.replace("./helus-login")}
             >
-              <Text style={styles.loginButtonText}>Iniciar Sesión</Text>
+              <Text style={s.loginButtonText}>Iniciar Sesión</Text>
             </TouchableOpacity>
           </ScrollView>
         </LinearGradient>
@@ -124,50 +127,50 @@ export default function ForgotPassword() {
 
   return (
     <KeyboardAvoidingView
-      style={styles.container}
+      style={s.container}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
-      <LinearGradient colors={["#382f2f", "#2a2222"]} style={styles.gradient}>
+      <LinearGradient colors={[colors.brandDark, colors.surface]} style={s.gradient}>
         <ScrollView
-          contentContainerStyle={styles.scrollContent}
+          contentContainerStyle={s.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-          <View style={styles.header}>
+          <View style={s.header}>
             <TouchableOpacity
               onPress={() => (step === "password" ? setStep("email") : router.back())}
-              style={styles.backButton}
+              style={s.backButton}
             >
-              <Ionicons name="arrow-back" size={28} color="#fff" />
+              <Ionicons name="arrow-back" size={28} color={colors.text} />
             </TouchableOpacity>
           </View>
 
-          <View style={styles.titleContainer}>
-            <View style={styles.logoContainer}>
-              <Ionicons name="key" size={32} color="#382f2f" />
+          <View style={s.titleContainer}>
+            <View style={s.logoContainer}>
+              <Ionicons name="key" size={32} color={colors.brandDark} />
             </View>
-            <Text style={styles.title}>
+            <Text style={s.title}>
               {step === "email" ? "Recuperar Contraseña" : "Nueva Contraseña"}
             </Text>
-            <Text style={styles.subtitle}>
+            <Text style={s.subtitle}>
               {step === "email"
                 ? "Ingresa tu correo electrónico para verificar tu cuenta."
                 : "Ingresa tu nueva contraseña."}
             </Text>
           </View>
 
-          <View style={styles.formContainer}>
+          <View style={s.formContainer}>
             {step === "email" ? (
-              <View style={styles.inputContainer}>
+              <View style={s.inputContainer}>
                 <Ionicons
                   name="mail-outline"
                   size={22}
-                  color="#999"
-                  style={styles.inputIcon}
+                  color={colors.textMuted}
+                  style={s.inputIcon}
                 />
                 <TextInput
-                  style={styles.input}
+                  style={s.input}
                   placeholder="Correo electrónico"
-                  placeholderTextColor="#666"
+                  placeholderTextColor={colors.textMuted}
                   value={email}
                   onChangeText={setEmail}
                   autoCapitalize="none"
@@ -176,44 +179,44 @@ export default function ForgotPassword() {
               </View>
             ) : (
               <>
-                <View style={styles.inputContainer}>
+                <View style={s.inputContainer}>
                   <Ionicons
                     name="lock-closed-outline"
                     size={22}
-                    color="#999"
-                    style={styles.inputIcon}
+                    color={colors.textMuted}
+                    style={s.inputIcon}
                   />
                   <TextInput
-                    style={styles.input}
+                    style={s.input}
                     placeholder="Nueva contraseña"
-                    placeholderTextColor="#666"
+                    placeholderTextColor={colors.textMuted}
                     value={newPassword}
                     onChangeText={setNewPassword}
                     secureTextEntry={!showPassword}
                   />
                   <TouchableOpacity
                     onPress={() => setShowPassword(!showPassword)}
-                    style={styles.eyeButton}
+                    style={s.eyeButton}
                   >
                     <Ionicons
                       name={showPassword ? "eye-off-outline" : "eye-outline"}
                       size={22}
-                      color="#999"
+                      color={colors.textMuted}
                     />
                   </TouchableOpacity>
                 </View>
 
-                <View style={styles.inputContainer}>
+                <View style={s.inputContainer}>
                   <Ionicons
                     name="lock-closed-outline"
                     size={22}
-                    color="#999"
-                    style={styles.inputIcon}
+                    color={colors.textMuted}
+                    style={s.inputIcon}
                   />
                   <TextInput
-                    style={styles.input}
+                    style={s.input}
                     placeholder="Confirmar contraseña"
-                    placeholderTextColor="#666"
+                    placeholderTextColor={colors.textMuted}
                     value={confirmPassword}
                     onChangeText={setConfirmPassword}
                     secureTextEntry={!showPassword}
@@ -223,25 +226,25 @@ export default function ForgotPassword() {
             )}
 
             <TouchableOpacity
-              style={[styles.loginButton, isLoading && styles.buttonDisabled]}
+              style={[s.loginButton, isLoading && s.buttonDisabled]}
               onPress={step === "email" ? handleVerifyEmail : handleResetPassword}
               disabled={isLoading}
             >
               {isLoading ? (
-                <Text style={styles.loginButtonText}>
+                <Text style={s.loginButtonText}>
                   {step === "email" ? "Verificando..." : "Guardando..."}
                 </Text>
               ) : (
-                <Text style={styles.loginButtonText}>
+                <Text style={s.loginButtonText}>
                   {step === "email" ? "Verificar Correo" : "Cambiar Contraseña"}
                 </Text>
               )}
             </TouchableOpacity>
 
-            <View style={styles.loginLinkContainer}>
-              <Text style={styles.loginLinkText}>¿Recordaste tu contraseña? </Text>
+            <View style={s.loginLinkContainer}>
+              <Text style={s.loginLinkText}>¿Recordaste tu contraseña? </Text>
               <TouchableOpacity onPress={() => router.back()}>
-                <Text style={styles.loginLink}>Inicia sesión</Text>
+                <Text style={s.loginLink}>Inicia sesión</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -253,7 +256,7 @@ export default function ForgotPassword() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = (c: ReturnType<typeof useTheme>['colors']) => StyleSheet.create({
   container: {
     flex: 1,
   },
@@ -271,7 +274,7 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
-    backgroundColor: "rgba(255,255,255,0.1)",
+    backgroundColor: c.inputBg,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -283,7 +286,7 @@ const styles = StyleSheet.create({
     width: 70,
     height: 70,
     borderRadius: 16,
-    backgroundColor: "#f4d642",
+    backgroundColor: c.brandYellow,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 20,
@@ -291,13 +294,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: "bold",
-    color: "#fff",
+    color: c.text,
     marginBottom: 8,
     textAlign: "center",
   },
   subtitle: {
     fontSize: 16,
-    color: "#999",
+    color: c.textMuted,
     textAlign: "center",
     lineHeight: 22,
   },
@@ -307,12 +310,12 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "rgba(255,255,255,0.08)",
+    backgroundColor: c.inputBg,
     borderRadius: 14,
     paddingHorizontal: 16,
     height: 58,
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.1)",
+    borderColor: c.inputBorder,
   },
   inputIcon: {
     marginRight: 12,
@@ -320,14 +323,14 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     fontSize: 16,
-    color: "#fff",
+    color: c.text,
     height: "100%",
   },
   eyeButton: {
     padding: 8,
   },
   loginButton: {
-    backgroundColor: "#f4d642",
+    backgroundColor: c.brandYellow,
     height: 58,
     borderRadius: 14,
     alignItems: "center",
@@ -340,7 +343,7 @@ const styles = StyleSheet.create({
   loginButtonText: {
     fontSize: 18,
     fontWeight: "600",
-    color: "#382f2f",
+    color: c.brandDark,
   },
   loginLinkContainer: {
     flexDirection: "row",
@@ -348,11 +351,11 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   loginLinkText: {
-    color: "#999",
+    color: c.textMuted,
     fontSize: 14,
   },
   loginLink: {
-    color: "#f4d642",
+    color: c.brandYellow,
     fontSize: 14,
     fontWeight: "600",
   },

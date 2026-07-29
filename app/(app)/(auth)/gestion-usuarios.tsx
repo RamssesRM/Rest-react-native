@@ -1,4 +1,5 @@
 import { tomarUsuarios, patchUsuario } from '@/app/api/usuariosApi';
+import { useTheme } from '@/hooks/use-theme';
 import useUserStore from '@/hooks/use-userstore';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
@@ -36,6 +37,8 @@ type Usuario = {
 export default function GestionUsuariosScreen() {
     const router = useRouter();
     const { user } = useUserStore();
+    const { colors } = useTheme();
+    const s = styles(colors);
     const [usuarios, setUsuarios] = useState<Usuario[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [updatingId, setUpdatingId] = useState<string | null>(null);
@@ -162,41 +165,41 @@ export default function GestionUsuariosScreen() {
         const isUpdating = updatingId === item.id;
 
         return (
-            <View style={[styles.card, !item.is_active && styles.cardInactive]}>
-                <View style={styles.cardHeader}>
-                    <View style={styles.userInfo}>
-                        <View style={[styles.roleBadge, { backgroundColor: roleInfo.color + '20' }]}>
+            <View style={[s.card, !item.is_active && s.cardInactive]}>
+                <View style={s.cardHeader}>
+                    <View style={s.userInfo}>
+                        <View style={[s.roleBadge, { backgroundColor: roleInfo.color + '20' }]}>
                             <Ionicons name={roleInfo.icon as any} size={14} color={roleInfo.color} />
-                            <Text style={[styles.roleText, { color: roleInfo.color }]}>
+                            <Text style={[s.roleText, { color: roleInfo.color }]}>
                                 {roleInfo.label}
                             </Text>
                         </View>
-                        {isSelf && <Text style={styles.selfBadge}>Tú</Text>}
-                        {!item.is_active && <Text style={styles.inactiveBadge}>Inactivo</Text>}
+                        {isSelf && <Text style={s.selfBadge}>Tú</Text>}
+                        {!item.is_active && <Text style={s.inactiveBadge}>Inactivo</Text>}
                     </View>
                 </View>
 
-                <Text style={styles.userName}>
+                <Text style={s.userName}>
                     {item.first_name || item.username}
                     {item.last_name ? ` ${item.last_name}` : ''}
                 </Text>
-                <Text style={styles.userEmail}>{item.email}</Text>
+                <Text style={s.userEmail}>{item.email}</Text>
 
-                <View style={styles.rolesRow}>
+                <View style={s.rolesRow}>
                     {ROLES.map((r) => (
                         <TouchableOpacity
                             key={r.key}
                             style={[
-                                styles.roleBtn,
+                                s.roleBtn,
                                 item.role === r.key && { backgroundColor: r.color, borderColor: r.color },
-                                isUpdating && styles.roleBtnDisabled,
+                                isUpdating && s.roleBtnDisabled,
                             ]}
                             onPress={() => handleChangeRole(item, r.key)}
                             disabled={isUpdating || isSelf}
                         >
                             <Text style={[
-                                styles.roleBtnText,
-                                item.role === r.key && styles.roleBtnTextActive,
+                                s.roleBtnText,
+                                item.role === r.key && s.roleBtnTextActive,
                             ]}>
                                 {r.label}
                             </Text>
@@ -205,20 +208,20 @@ export default function GestionUsuariosScreen() {
                 </View>
 
                 <TouchableOpacity
-                    style={[styles.toggleBtn, !item.is_active && styles.toggleBtnActivate]}
+                    style={[s.toggleBtn, !item.is_active && s.toggleBtnActivate]}
                     onPress={() => handleToggleActive(item)}
                     disabled={isUpdating || isSelf}
                 >
                     {isUpdating ? (
-                        <ActivityIndicator size="small" color="#666" />
+                        <ActivityIndicator size="small" color={colors.textMuted} />
                     ) : (
                         <>
                             <Ionicons
                                 name={item.is_active ? 'ban-outline' : 'checkmark-circle-outline'}
                                 size={16}
-                                color={item.is_active ? '#F44333' : '#4CAF50'}
+                                color={item.is_active ? colors.danger : colors.success}
                             />
-                            <Text style={[styles.toggleText, !item.is_active && styles.toggleTextActivate]}>
+                            <Text style={[s.toggleText, !item.is_active && s.toggleTextActivate]}>
                                 {item.is_active ? 'Desactivar' : 'Activar'}
                             </Text>
                         </>
@@ -229,47 +232,47 @@ export default function GestionUsuariosScreen() {
     };
 
     return (
-        <SafeAreaView style={styles.container}>
-            <View style={styles.header}>
-                <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-                    <Ionicons name="arrow-back" size={24} color="#262626" />
+        <SafeAreaView style={s.container}>
+            <View style={s.header}>
+                <TouchableOpacity onPress={() => router.back()} style={s.backBtn}>
+                    <Ionicons name="arrow-back" size={24} color={colors.text} />
                 </TouchableOpacity>
-                <Text style={styles.headerTitle}>Gestión de Usuarios</Text>
-                <TouchableOpacity onPress={cargarUsuarios} style={styles.refreshBtn}>
-                    <Ionicons name="refresh" size={22} color="#262626" />
+                <Text style={s.headerTitle}>Gestión de Usuarios</Text>
+                <TouchableOpacity onPress={cargarUsuarios} style={s.refreshBtn}>
+                    <Ionicons name="refresh" size={22} color={colors.text} />
                 </TouchableOpacity>
             </View>
 
             {isLoading ? (
-                <ActivityIndicator size="large" color="#D4AF37" style={styles.loader} />
+                <ActivityIndicator size="large" color={colors.goldDark} style={s.loader} />
             ) : (
                 <>
-                    <View style={styles.searchContainer}>
-                        <View style={styles.searchBar}>
-                            <Ionicons name="search-outline" size={18} color="#8E8E8E" />
+                    <View style={s.searchContainer}>
+                        <View style={s.searchBar}>
+                            <Ionicons name="search-outline" size={18} color={colors.textMuted} />
                             <TextInput
-                                style={styles.searchInput}
+                                style={s.searchInput}
                                 placeholder="Buscar por nombre, usuario o email..."
-                                placeholderTextColor="#B0B0B0"
+                                placeholderTextColor={colors.gray500}
                                 value={busqueda}
                                 onChangeText={setBusqueda}
                                 autoCapitalize="none"
                             />
                             {busqueda.length > 0 && (
                                 <TouchableOpacity onPress={() => setBusqueda('')}>
-                                    <Ionicons name="close-circle" size={18} color="#8E8E8E" />
+                                    <Ionicons name="close-circle" size={18} color={colors.textMuted} />
                                 </TouchableOpacity>
                             )}
                         </View>
                     </View>
 
-                    <View style={styles.filtersContainer}>
-                        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filtersScroll}>
+                    <View style={s.filtersContainer}>
+                        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.filtersScroll}>
                             <TouchableOpacity
-                                style={[styles.filterBtn, filtroRole === null && styles.filterBtnActive]}
+                                style={[s.filterBtn, filtroRole === null && s.filterBtnActive]}
                                 onPress={() => setFiltroRole(null)}
                             >
-                                <Text style={[styles.filterText, filtroRole === null && styles.filterTextActive]}>
+                                <Text style={[s.filterText, filtroRole === null && s.filterTextActive]}>
                                     Todos ({usuarios.length})
                                 </Text>
                             </TouchableOpacity>
@@ -279,14 +282,14 @@ export default function GestionUsuariosScreen() {
                                     <TouchableOpacity
                                         key={r.key}
                                         style={[
-                                            styles.filterBtn,
+                                            s.filterBtn,
                                             filtroRole === r.key && { backgroundColor: r.color, borderColor: r.color },
                                         ]}
                                         onPress={() => setFiltroRole(filtroRole === r.key ? null : r.key)}
                                     >
                                         <Text style={[
-                                            styles.filterText,
-                                            filtroRole === r.key && styles.filterTextActive,
+                                            s.filterText,
+                                            filtroRole === r.key && s.filterTextActive,
                                         ]}>
                                             {r.label} ({count})
                                         </Text>
@@ -296,29 +299,29 @@ export default function GestionUsuariosScreen() {
                         </ScrollView>
                     </View>
 
-                    <View style={styles.filtersContainer}>
-                        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filtersScroll}>
+                    <View style={s.filtersContainer}>
+                        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.filtersScroll}>
                             <TouchableOpacity
-                                style={[styles.filterBtn, filtroActivo === 'all' && styles.filterBtnActive]}
+                                style={[s.filterBtn, filtroActivo === 'all' && s.filterBtnActive]}
                                 onPress={() => setFiltroActivo('all')}
                             >
-                                <Text style={[styles.filterText, filtroActivo === 'all' && styles.filterTextActive]}>
+                                <Text style={[s.filterText, filtroActivo === 'all' && s.filterTextActive]}>
                                     Todos
                                 </Text>
                             </TouchableOpacity>
                             <TouchableOpacity
-                                style={[styles.filterBtn, filtroActivo === 'active' && { backgroundColor: '#22C55E', borderColor: '#22C55E' }]}
+                                style={[s.filterBtn, filtroActivo === 'active' && { backgroundColor: colors.success, borderColor: colors.success }]}
                                 onPress={() => setFiltroActivo(filtroActivo === 'active' ? 'all' : 'active')}
                             >
-                                <Text style={[styles.filterText, filtroActivo === 'active' && styles.filterTextActive]}>
+                                <Text style={[s.filterText, filtroActivo === 'active' && s.filterTextActive]}>
                                     Activos ({usuarios.filter(u => u.is_active).length})
                                 </Text>
                             </TouchableOpacity>
                             <TouchableOpacity
-                                style={[styles.filterBtn, filtroActivo === 'inactive' && { backgroundColor: '#EF4444', borderColor: '#EF4444' }]}
+                                style={[s.filterBtn, filtroActivo === 'inactive' && { backgroundColor: colors.danger, borderColor: colors.danger }]}
                                 onPress={() => setFiltroActivo(filtroActivo === 'inactive' ? 'all' : 'inactive')}
                             >
-                                <Text style={[styles.filterText, filtroActivo === 'inactive' && styles.filterTextActive]}>
+                                <Text style={[s.filterText, filtroActivo === 'inactive' && s.filterTextActive]}>
                                     Inactivos ({usuarios.filter(u => !u.is_active).length})
                                 </Text>
                             </TouchableOpacity>
@@ -329,9 +332,9 @@ export default function GestionUsuariosScreen() {
                         data={usuariosFiltrados}
                         keyExtractor={(item) => item.id}
                         renderItem={renderUsuario}
-                        contentContainerStyle={styles.list}
+                        contentContainerStyle={s.list}
                         ListEmptyComponent={
-                            <Text style={styles.emptyText}>
+                            <Text style={s.emptyText}>
                                 {busqueda || filtroRole || filtroActivo !== 'all' ? 'No se encontraron usuarios' : 'No hay usuarios registrados'}
                             </Text>
                         }
@@ -342,10 +345,10 @@ export default function GestionUsuariosScreen() {
     );
 }
 
-const styles = StyleSheet.create({
+const styles = (c: ReturnType<typeof useTheme>['colors']) => StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#FAFAFA',
+        backgroundColor: c.background,
     },
     header: {
         flexDirection: 'row',
@@ -353,9 +356,9 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         paddingHorizontal: 16,
         paddingVertical: 14,
-        backgroundColor: '#FFF',
+        backgroundColor: c.card,
         borderBottomWidth: 1,
-        borderBottomColor: '#EFEFEF',
+        borderBottomColor: c.border,
     },
     backBtn: {
         padding: 4,
@@ -363,7 +366,7 @@ const styles = StyleSheet.create({
     headerTitle: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: '#262626',
+        color: c.text,
     },
     refreshBtn: {
         padding: 4,
@@ -376,28 +379,28 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         paddingTop: 12,
         paddingBottom: 4,
-        backgroundColor: '#FAFAFA',
+        backgroundColor: c.background,
     },
     searchBar: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#FFF',
+        backgroundColor: c.card,
         borderRadius: 10,
         paddingHorizontal: 12,
         paddingVertical: 10,
         borderWidth: 1,
-        borderColor: '#EFEFEF',
+        borderColor: c.border,
         gap: 8,
     },
     searchInput: {
         flex: 1,
         fontSize: 14,
-        color: '#262626',
+        color: c.text,
         padding: 0,
     },
     filtersContainer: {
         paddingVertical: 10,
-        backgroundColor: '#FAFAFA',
+        backgroundColor: c.background,
     },
     filtersScroll: {
         paddingHorizontal: 16,
@@ -408,31 +411,31 @@ const styles = StyleSheet.create({
         paddingVertical: 6,
         borderRadius: 8,
         borderWidth: 1.5,
-        borderColor: '#E0E0E0',
-        backgroundColor: '#FFF',
+        borderColor: c.gray200,
+        backgroundColor: c.card,
     },
     filterBtnActive: {
-        backgroundColor: '#262626',
-        borderColor: '#262626',
+        backgroundColor: c.text,
+        borderColor: c.text,
     },
     filterText: {
         fontSize: 12,
         fontWeight: '600',
-        color: '#8E8E8E',
+        color: c.textMuted,
     },
     filterTextActive: {
-        color: '#FFF',
+        color: c.card,
     },
     list: {
         padding: 16,
         gap: 12,
     },
     card: {
-        backgroundColor: '#FFF',
+        backgroundColor: c.card,
         borderRadius: 12,
         padding: 16,
         borderWidth: 1,
-        borderColor: '#EFEFEF',
+        borderColor: c.border,
     },
     cardInactive: {
         opacity: 0.6,
@@ -462,8 +465,8 @@ const styles = StyleSheet.create({
     selfBadge: {
         fontSize: 10,
         fontWeight: '700',
-        color: '#D4AF37',
-        backgroundColor: '#FFF8E1',
+        color: c.goldDark,
+        backgroundColor: c.goldLight,
         paddingHorizontal: 6,
         paddingVertical: 2,
         borderRadius: 4,
@@ -472,7 +475,7 @@ const styles = StyleSheet.create({
     inactiveBadge: {
         fontSize: 10,
         fontWeight: '700',
-        color: '#F44333',
+        color: c.danger,
         backgroundColor: '#FFEBEE',
         paddingHorizontal: 6,
         paddingVertical: 2,
@@ -482,12 +485,12 @@ const styles = StyleSheet.create({
     userName: {
         fontSize: 16,
         fontWeight: '600',
-        color: '#262626',
+        color: c.text,
         marginBottom: 2,
     },
     userEmail: {
         fontSize: 13,
-        color: '#8E8E8E',
+        color: c.textMuted,
         marginBottom: 12,
     },
     rolesRow: {
@@ -500,9 +503,9 @@ const styles = StyleSheet.create({
         paddingVertical: 8,
         borderRadius: 8,
         borderWidth: 1.5,
-        borderColor: '#E0E0E0',
+        borderColor: c.gray200,
         alignItems: 'center',
-        backgroundColor: '#FFF',
+        backgroundColor: c.card,
     },
     roleBtnDisabled: {
         opacity: 0.5,
@@ -510,10 +513,10 @@ const styles = StyleSheet.create({
     roleBtnText: {
         fontSize: 12,
         fontWeight: '600',
-        color: '#8E8E8E',
+        color: c.textMuted,
     },
     roleBtnTextActive: {
-        color: '#FFF',
+        color: c.card,
     },
     toggleBtn: {
         flexDirection: 'row',
@@ -524,7 +527,7 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         borderWidth: 1,
         borderColor: '#FFCDD2',
-        backgroundColor: '#FFF',
+        backgroundColor: c.card,
     },
     toggleBtnActivate: {
         borderColor: '#C8E6C9',
@@ -532,14 +535,14 @@ const styles = StyleSheet.create({
     toggleText: {
         fontSize: 13,
         fontWeight: '600',
-        color: '#F44333',
+        color: c.danger,
     },
     toggleTextActivate: {
-        color: '#4CAF50',
+        color: c.success,
     },
     emptyText: {
         textAlign: 'center',
-        color: '#8E8E8E',
+        color: c.textMuted,
         marginTop: 40,
         fontSize: 15,
     },

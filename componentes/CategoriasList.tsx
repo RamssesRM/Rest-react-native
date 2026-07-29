@@ -1,6 +1,7 @@
 import { useTheme } from "@/hooks/use-theme";
-import { useFilterStore } from "@/hooks/use-filterstore";
 import { getLocalCategorias } from "@/src/db/menuService";
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -21,8 +22,8 @@ type CategoriaLocal = {
 export const CategoriasList = () => {
   const [categorias, setCategorias] = useState<CategoriaLocal[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const { categories, setFilters, clearFilters } = useFilterStore();
   const { colors } = useTheme();
+  const router = useRouter();
 
   useEffect(() => {
     const cargarCategorias = async () => {
@@ -38,22 +39,13 @@ export const CategoriasList = () => {
     cargarCategorias();
   }, []);
 
-  const toggleCategory = (nombre: string) => {
-    if (categories.length === 1 && categories[0] === nombre) {
-      clearFilters();
-    } else {
-      setFilters({ categories: [nombre], price: null, sort: "recommended" });
-    }
-  };
-
   const s = styles(colors);
 
   const renderCategory = ({ item }: { item: CategoriaLocal }) => {
-    const isActive = categories.length === 1 && categories[0] === item.nombre;
     return (
       <TouchableOpacity
-        style={[s.categoryCard, isActive && s.categoryCardActive]}
-        onPress={() => toggleCategory(item.nombre)}
+        style={s.categoryCard}
+        onPress={() => router.push(`/(app)/(auth)/(tabs)/comidas/${item.id}`)}
       >
         <View style={s.categoryImageContainer}>
           {item.imagen ? (
@@ -63,10 +55,13 @@ export const CategoriasList = () => {
           )}
         </View>
         <View style={s.categoryInfo}>
-          <Text style={[s.categoryName, isActive && s.categoryNameActive]}>
+          <Text style={s.categoryName}>
             {item.nombre}
           </Text>
-          <Text style={s.categoryPlaces}>Ver menú</Text>
+          <View style={s.categoryLink}>
+            <Text style={s.categoryLinkText}>Ver menú</Text>
+            <Ionicons name="chevron-forward" size={14} color={colors.goldDark} />
+          </View>
         </View>
       </TouchableOpacity>
     );
@@ -84,11 +79,6 @@ export const CategoriasList = () => {
     <View style={s.categoriesSection}>
       <View style={s.categoriesHeader}>
         <Text style={s.categoriesTitle}>Categorías</Text>
-        {categories.length > 0 && (
-          <TouchableOpacity style={s.seeAllButton} onPress={clearFilters}>
-            <Text style={s.seeAll}>Ver todo</Text>
-          </TouchableOpacity>
-        )}
       </View>
       <FlatList
         horizontal
@@ -119,17 +109,6 @@ const styles = (c: ReturnType<typeof useTheme>['colors']) => StyleSheet.create({
     marginVertical: 6,
     color: c.text,
   },
-  seeAll: {
-    fontSize: 14,
-    color: c.secondary,
-    fontWeight: "500",
-  },
-  seeAllButton: {
-    padding: 8,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    backgroundColor: c.primaryLight,
-  },
   categoriesList: {
     gap: 12,
     paddingHorizontal: 16,
@@ -147,10 +126,6 @@ const styles = (c: ReturnType<typeof useTheme>['colors']) => StyleSheet.create({
     shadowRadius: 4,
     borderWidth: 2,
     borderColor: "transparent",
-  },
-  categoryCardActive: {
-    borderColor: c.gold,
-    backgroundColor: c.goldLight,
   },
   categoryImageContainer: {
     padding: 12,
@@ -177,15 +152,18 @@ const styles = (c: ReturnType<typeof useTheme>['colors']) => StyleSheet.create({
   categoryName: {
     fontSize: 14,
     fontWeight: "600",
-    marginBottom: 2,
+    marginBottom: 4,
     color: c.text,
   },
-  categoryNameActive: {
-    fontWeight: "700",
+  categoryLink: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 2,
   },
-  categoryPlaces: {
+  categoryLinkText: {
     fontSize: 12,
-    color: c.textMuted,
+    color: c.goldDark,
+    fontWeight: "500",
   },
 });
 

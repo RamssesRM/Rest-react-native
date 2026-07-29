@@ -1,5 +1,5 @@
-//pantalla de login de helus
 import { loginUser } from '@/app/api/authApi';
+import { useTheme } from '@/hooks/use-theme';
 import useUserStore from '@/hooks/use-userstore';
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { LinearGradient } from "expo-linear-gradient";
@@ -24,6 +24,8 @@ export default function HelusLogin() {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const { setUser } = useUserStore();
+  const { colors } = useTheme();
+  const s = styles(colors);
 
   const handleLogin = async () => {
     if (!email.trim() || !password.trim()) {
@@ -55,45 +57,45 @@ export default function HelusLogin() {
 
   return (
     <KeyboardAvoidingView
-      style={styles.container}
+      style={s.container}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
-      <LinearGradient colors={["#382f2f", "#2a2222"]} style={styles.gradient}>
+      <LinearGradient colors={[colors.brandDark, colors.surface]} style={s.gradient}>
         <ScrollView
-          contentContainerStyle={styles.scrollContent}
+          contentContainerStyle={s.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-          <View style={styles.header}>
+          <View style={s.header}>
             <TouchableOpacity
               onPress={() => router.back()}
-              style={styles.backButton}
+              style={s.backButton}
             >
-              <Ionicons name="arrow-back" size={28} color="#fff" />
+              <Ionicons name="arrow-back" size={28} color={colors.text} />
             </TouchableOpacity>
           </View>
 
-          <View style={styles.titleContainer}>
-            <View style={styles.logoContainer}>
-              <Text style={styles.logoText}>HL</Text>
+          <View style={s.titleContainer}>
+            <View style={s.logoContainer}>
+              <Text style={s.logoText}>HL</Text>
             </View>
-            <Text style={styles.title}>Inicio de Sesión</Text>
-            <Text style={styles.subtitle}>
+            <Text style={s.title}>Inicio de Sesión</Text>
+            <Text style={s.subtitle}>
               Accede con tu cuenta de empleado Helus
             </Text>
           </View>
 
-          <View style={styles.formContainer}>
-            <View style={styles.inputContainer}>
+          <View style={s.formContainer}>
+            <View style={s.inputContainer}>
               <Ionicons
                 name="person-outline"
                 size={22}
-                color="#999"
-                style={styles.inputIcon}
+                color={colors.textMuted}
+                style={s.inputIcon}
               />
               <TextInput
-                style={styles.input}
+                style={s.input}
                 placeholder="Correo o usuario"
-                placeholderTextColor="#666"
+                placeholderTextColor={colors.textMuted}
                 value={email}
                 onChangeText={setEmail}
                 autoCapitalize="none"
@@ -101,69 +103,69 @@ export default function HelusLogin() {
               />
             </View>
 
-            <View style={styles.inputContainer}>
+            <View style={s.inputContainer}>
               <Ionicons
                 name="lock-closed-outline"
                 size={22}
-                color="#999"
-                style={styles.inputIcon}
+                color={colors.textMuted}
+                style={s.inputIcon}
               />
               <TextInput
-                style={styles.input}
+                style={s.input}
                 placeholder="Contraseña"
-                placeholderTextColor="#666"
+                placeholderTextColor={colors.textMuted}
                 value={password}
                 onChangeText={setPassword}
                 secureTextEntry={!showPassword}
               />
               <TouchableOpacity
                 onPress={() => setShowPassword(!showPassword)}
-                style={styles.eyeButton}
+                style={s.eyeButton}
               >
                 <Ionicons
                   name={showPassword ? "eye-off-outline" : "eye-outline"}
                   size={22}
-                  color="#999"
+                  color={colors.textMuted}
                 />
               </TouchableOpacity>
             </View>
 
             <TouchableOpacity
-              style={styles.forgotPasswordContainer}
+              style={s.forgotPasswordContainer}
               onPress={() => router.push("./forgot-password")}
             >
-              <Text style={styles.forgotPasswordText}>
+              <Text style={s.forgotPasswordText}>
                 ¿Olvidaste tu contraseña?
               </Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               style={[
-                styles.loginButton,
-                isLoading && styles.loginButtonDisabled,
+                s.loginButton,
+                isLoading && s.loginButtonDisabled,
               ]}
               onPress={handleLogin}
               disabled={isLoading}
             >
               {isLoading ? (
-                <Text style={styles.loginButtonText}>Iniciando...</Text>
+                <Text style={s.loginButtonText}>Iniciando...</Text>
               ) : (
-                <Text style={styles.loginButtonText}>Iniciar Sesión</Text>
+                <Text style={s.loginButtonText}>Iniciar Sesión</Text>
               )}
             </TouchableOpacity>
 
-            <View style={styles.separatorContainer}>
-              <View style={styles.separatorLine} />
-              <Text style={styles.separatorText}>o</Text>
-              <View style={styles.separatorLine} />
+            <View style={s.separatorContainer}>
+              <View style={s.separatorLine} />
+              <Text style={s.separatorText}>o</Text>
+              <View style={s.separatorLine} />
             </View>
 
             <TouchableOpacity
-              style={styles.registerButton}
+              style={s.registerButton}
               onPress={() => router.push("./helus-registro")}
             >
-              <Ionicons name="person-add-outline" size={22} color="#f4d642" />
-              <Text style={styles.registerButtonText}>
+              <Ionicons name="person-add-outline" size={22} color={colors.brandYellow} />
+              <Text style={s.registerButtonText}>
                 Crear cuenta de Helus Usuario
               </Text>
             </TouchableOpacity>
@@ -176,7 +178,7 @@ export default function HelusLogin() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = (c: ReturnType<typeof useTheme>['colors']) => StyleSheet.create({
   container: {
     flex: 1,
   },
@@ -194,7 +196,7 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
-    backgroundColor: "rgba(255,255,255,0.1)",
+    backgroundColor: c.inputBg,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -206,7 +208,7 @@ const styles = StyleSheet.create({
     width: 70,
     height: 70,
     borderRadius: 16,
-    backgroundColor: "#f4d642",
+    backgroundColor: c.brandYellow,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 20,
@@ -214,17 +216,17 @@ const styles = StyleSheet.create({
   logoText: {
     fontSize: 28,
     fontWeight: "bold",
-    color: "#382f2f",
+    color: c.brandDark,
   },
   title: {
     fontSize: 28,
     fontWeight: "bold",
-    color: "#fff",
+    color: c.text,
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
-    color: "#999",
+    color: c.textMuted,
     textAlign: "center",
   },
   formContainer: {
@@ -233,12 +235,12 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "rgba(255,255,255,0.08)",
+    backgroundColor: c.inputBg,
     borderRadius: 14,
     paddingHorizontal: 16,
     height: 58,
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.1)",
+    borderColor: c.inputBorder,
   },
   inputIcon: {
     marginRight: 12,
@@ -246,7 +248,7 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     fontSize: 16,
-    color: "#fff",
+    color: c.text,
     height: "100%",
   },
   eyeButton: {
@@ -257,11 +259,11 @@ const styles = StyleSheet.create({
     marginRight: 4,
   },
   forgotPasswordText: {
-    color: "#f4d642",
+    color: c.brandYellow,
     fontSize: 14,
   },
   loginButton: {
-    backgroundColor: "#f4d642",
+    backgroundColor: c.brandYellow,
     height: 58,
     borderRadius: 14,
     alignItems: "center",
@@ -274,7 +276,7 @@ const styles = StyleSheet.create({
   loginButtonText: {
     fontSize: 18,
     fontWeight: "600",
-    color: "#382f2f",
+    color: c.brandDark,
   },
   separatorContainer: {
     flexDirection: "row",
@@ -284,10 +286,10 @@ const styles = StyleSheet.create({
   separatorLine: {
     flex: 1,
     height: 1,
-    backgroundColor: "rgba(255,255,255,0.2)",
+    backgroundColor: c.border,
   },
   separatorText: {
-    color: "#666",
+    color: c.textMuted,
     paddingHorizontal: 16,
     fontSize: 14,
   },
@@ -295,16 +297,16 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "rgba(244, 214, 66, 0.1)",
+    backgroundColor: c.brandYellowLight,
     height: 58,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: "rgba(244, 214, 66, 0.3)",
+    borderColor: c.brandYellowBorder,
     gap: 10,
   },
   registerButtonText: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#f4d642",
+    color: c.brandYellow,
   },
 });

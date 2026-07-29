@@ -11,6 +11,14 @@ const _layout = () => {
         headerLargeTitle: true,
         headerTransparent: true
       }} />
+      <Stack.Screen 
+        name="[categoryId]" 
+        options={{ 
+          headerShown: false,
+          presentation: 'card',
+          animation: 'slide_from_right'
+        }} 
+      />
     </Stack>
   );
 };

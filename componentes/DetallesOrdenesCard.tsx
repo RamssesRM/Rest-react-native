@@ -1,5 +1,6 @@
 import { eliminarDetalleOrden, patchDetalleOrden, tomarDetallesPorOrden } from '@/app/api/detallesOrdenesApi';
 import { cambiarEstadoOrden, registrarPago, getProductos } from '@/app/api/ordenesApi';
+import { useTheme } from '@/hooks/use-theme';
 import useUserStore from '@/hooks/use-userstore';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import BottomSheet, { BottomSheetBackdrop, BottomSheetScrollView } from '@gorhom/bottom-sheet';
@@ -43,6 +44,8 @@ type DetallesOrdenesCardProps = {
 const DetallesOrdenesCard = forwardRef<BottomSheet, DetallesOrdenesCardProps>(
     ({ orden, role, onDismiss, onEstadoCambiado }, ref) => {
         const { user } = useUserStore();
+        const { colors } = useTheme();
+        const s = styles(colors);
         const [detalles, setDetalles] = useState<DetalleOrden[]>([]);
         const [isLoading, setIsLoading] = useState(false);
         const [detallesEditados, setDetallesEditados] = useState<Map<string, number>>(new Map());
@@ -369,64 +372,63 @@ TOTAL: $${Number(orden!.monto_total || 0).toFixed(2)}
                 onChange={handleSheetChanges}
                 enablePanDownToClose
                 backdropComponent={renderBackdrop}
-                backgroundStyle={styles.background}
-                handleIndicatorStyle={styles.indicator}
+                backgroundStyle={s.background}
+                handleIndicatorStyle={s.indicator}
             >
-                <BottomSheetScrollView contentContainerStyle={styles.content}>
+                <BottomSheetScrollView contentContainerStyle={s.content}>
                     {!orden ? (
-                        <Text style={styles.loadingText}>Selecciona una orden</Text>
+                        <Text style={s.loadingText}>Selecciona una orden</Text>
                     ) : (
                     <>
-                    <View style={styles.header}>
-                        <View style={styles.headerLeft}>
-                            <Text style={styles.mesaTitle}>Mesa {orden.mesa_info?.numero_mesa || 'N/A'}</Text>
-                            <View style={[styles.statusBadge, { backgroundColor: getStatusColor(orden.estatus) + '20' }]}>
-                                <Text style={[styles.statusText, { color: getStatusColor(orden.estatus) }]}>
+                    <View style={s.header}>
+                        <View style={s.headerLeft}>
+                            <Text style={s.mesaTitle}>Mesa {orden.mesa_info?.numero_mesa || 'N/A'}</Text>
+                            <View style={[s.statusBadge, { backgroundColor: getStatusColor(orden.estatus) + '20' }]}>
+                                <Text style={[s.statusText, { color: getStatusColor(orden.estatus) }]}>
                                     {orden.estatus.toUpperCase()}
                                 </Text>
                             </View>
                         </View>
-                        <TouchableOpacity onPress={onDismiss} style={styles.closeBtn}>
-                            <Ionicons name="close" size={24} color="#666" />
+                        <TouchableOpacity onPress={onDismiss} style={s.closeBtn}>
+                            <Ionicons name="close" size={24} color={colors.textMuted} />
                         </TouchableOpacity>
                     </View>
 
-                    <View style={styles.infoSection}>
-                        <InfoRow label="Cliente" value={orden.cliente_info?.first_name || orden.cliente_info?.email || 'N/A'} />
+                    <View style={s.infoSection}>
+                        <InfoRow colors={colors} label="Cliente" value={orden.cliente_info?.first_name || orden.cliente_info?.email || 'N/A'} />
                         {(role === 'admin' || orden.mesero_info) && (
-                            <InfoRow label="Mesero" value={orden.mesero_info?.first_name || 'N/A'} />
+                            <InfoRow colors={colors} label="Mesero" value={orden.mesero_info?.first_name || 'N/A'} />
                         )}
-                        <InfoRow label="Fecha" value={new Date(orden.fecha_creacion).toLocaleString()} />
+                        <InfoRow colors={colors} label="Fecha" value={new Date(orden.fecha_creacion).toLocaleString()} />
                     </View>
 
-                    {/* Info de pago solo para admin */}
                     {role === 'admin' && (
-                        <View style={styles.pagoSection}>
-                            <Text style={styles.sectionTitle}>Información de Pago</Text>
-                            <View style={styles.pagoInfo}>
+                        <View style={s.pagoSection}>
+                            <Text style={s.sectionTitle}>Información de Pago</Text>
+                            <View style={s.pagoInfo}>
                                 {orden.metodo_pago ? (
                                     <>
-                                        <InfoRow label="Método" value={orden.metodo_pago.charAt(0).toUpperCase() + orden.metodo_pago.slice(1)} />
+                                        <InfoRow colors={colors} label="Método" value={orden.metodo_pago.charAt(0).toUpperCase() + orden.metodo_pago.slice(1)} />
                                         {orden.referencia_pago ? (
-                                            <InfoRow label="Referencia" value={orden.referencia_pago} />
+                                            <InfoRow colors={colors} label="Referencia" value={orden.referencia_pago} />
                                         ) : null}
                                         {orden.comprobante_pago ? (
-                                            <View style={styles.comprobanteContainer}>
-                                                <Text style={styles.infoLabel}>Comprobante</Text>
-                                                <Image source={{ uri: orden.comprobante_pago }} style={styles.comprobanteImg} />
+                                            <View style={s.comprobanteContainer}>
+                                                <Text style={s.infoLabel}>Comprobante</Text>
+                                                <Image source={{ uri: orden.comprobante_pago }} style={s.comprobanteImg} />
                                             </View>
                                         ) : null}
                                     </>
                                 ) : (
-                                    <Text style={styles.pagoVacio}>Sin información de pago</Text>
+                                    <Text style={s.pagoVacio}>Sin información de pago</Text>
                                 )}
                             </View>
                         </View>
                     )}
 
-                    <Text style={styles.sectionTitle}>Productos</Text>
+                    <Text style={s.sectionTitle}>Productos</Text>
                     {isLoading ? (
-                        <Text style={styles.loadingText}>Cargando detalles...</Text>
+                        <Text style={s.loadingText}>Cargando detalles...</Text>
                     ) : (
                         detalles.map(detalle => {
                             const cantidadActual = detallesEditados.get(detalle.id) ?? detalle.cantidad;
@@ -434,37 +436,37 @@ TOTAL: $${Number(orden!.monto_total || 0).toFixed(2)}
                             const notaActual = notasEditadas.get(detalle.id) ?? detalle.nota ?? '';
 
                             return (
-                                <View key={detalle.id} style={[styles.productCard, editado && styles.productCardEdited]}>
-                                    <View style={styles.productInfo}>
-                                        <Text style={styles.productName} numberOfLines={1}>
+                                <View key={detalle.id} style={[s.productCard, editado && s.productCardEdited]}>
+                                    <View style={s.productInfo}>
+                                        <Text style={s.productName} numberOfLines={1}>
                                             {detalle.producto_info?.nombre || 'Producto'}
                                         </Text>
-                                        <Text style={styles.productPrice}>${Number(detalle.precio || 0).toFixed(2)} c/u</Text>
+                                        <Text style={s.productPrice}>${Number(detalle.precio || 0).toFixed(2)} c/u</Text>
                                     </View>
 
                                     {role === 'cliente' && orden.estatus === 'pidiendo' ? (
-                                        <View style={styles.quantityControls}>
+                                        <View style={s.quantityControls}>
                                             <TouchableOpacity
-                                                style={styles.qtyBtn}
+                                                style={s.qtyBtn}
                                                 onPress={() => handleCantidadChange(detalle.id, detalle.cantidad - 1)}
                                             >
-                                                <Ionicons name="remove-circle" size={28} color="#F44336" />
+                                                <Ionicons name="remove-circle" size={28} color={colors.danger} />
                                             </TouchableOpacity>
-                                            <Text style={[styles.qtyText, editado && styles.qtyTextEdited]}>
+                                            <Text style={[s.qtyText, editado && s.qtyTextEdited]}>
                                                 {cantidadActual}
                                             </Text>
                                             <TouchableOpacity
-                                                style={styles.qtyBtn}
+                                                style={s.qtyBtn}
                                                 onPress={() => handleCantidadChange(detalle.id, detalle.cantidad + 1)}
                                             >
-                                                <Ionicons name="add-circle" size={28} color="#4CAF50" />
+                                                <Ionicons name="add-circle" size={28} color={colors.success} />
                                             </TouchableOpacity>
                                         </View>
                                     ) : (
-                                        <Text style={styles.qtyText}>x{detalle.cantidad}</Text>
+                                        <Text style={s.qtyText}>x{detalle.cantidad}</Text>
                                     )}
 
-                                    <Text style={styles.subtotal}>
+                                    <Text style={s.subtotal}>
                                         ${(Number(detalle.precio || 0) * cantidadActual).toFixed(2)}
                                     </Text>
                                 </View>
@@ -473,17 +475,17 @@ TOTAL: $${Number(orden!.monto_total || 0).toFixed(2)}
                     )}
 
                     {role === 'mesero' && orden.estatus === 'pidiendo' && (
-                        <View style={styles.notaSection}>
-                            <Text style={styles.notaSectionTitle}>Notas de productos</Text>
+                        <View style={s.notaSection}>
+                            <Text style={s.notaSectionTitle}>Notas de productos</Text>
                             {detalles.map(detalle => (
-                                <View key={detalle.id} style={styles.notaItem}>
-                                    <Text style={styles.notaProductName}>
+                                <View key={detalle.id} style={s.notaItem}>
+                                    <Text style={s.notaProductName}>
                                         {detalle.producto_info?.nombre || 'Producto'}
                                     </Text>
                                     <TextInput
-                                        style={styles.notaInput}
+                                        style={s.notaInput}
                                         placeholder="Ej: sin cebolla, poco cocido..."
-                                        placeholderTextColor="#B0B0B0"
+                                        placeholderTextColor={colors.gray500}
                                         multiline
                                         numberOfLines={2}
                                         textAlignVertical="top"
@@ -497,36 +499,36 @@ TOTAL: $${Number(orden!.monto_total || 0).toFixed(2)}
                     )}
 
                     {role === 'mesero' && orden.estatus !== 'pidiendo' && detalles.some(d => d.nota) && (
-                        <View style={styles.notaSection}>
-                            <Text style={styles.notaSectionTitle}>Notas</Text>
+                        <View style={s.notaSection}>
+                            <Text style={s.notaSectionTitle}>Notas</Text>
                             {detalles.filter(d => d.nota).map(detalle => (
-                                <View key={detalle.id} style={styles.notaDisplayItem}>
-                                    <Text style={styles.notaDisplayProduct}>
+                                <View key={detalle.id} style={s.notaDisplayItem}>
+                                    <Text style={s.notaDisplayProduct}>
                                         {detalle.producto_info?.nombre || 'Producto'}:
                                     </Text>
-                                    <Text style={styles.notaDisplayText}>{detalle.nota}</Text>
+                                    <Text style={s.notaDisplayText}>{detalle.nota}</Text>
                                 </View>
                             ))}
                         </View>
                     )}
 
-                    <View style={styles.totalRow}>
-                        <Text style={styles.totalLabel}>Total</Text>
-                        <Text style={styles.totalAmount}>${Number(orden.monto_total || 0).toFixed(2)}</Text>
+                    <View style={s.totalRow}>
+                        <Text style={s.totalLabel}>Total</Text>
+                        <Text style={s.totalAmount}>${Number(orden.monto_total || 0).toFixed(2)}</Text>
                     </View>
 
-                    <View style={styles.actionsSection}>
+                    <View style={s.actionsSection}>
                         {role === 'cajero' && orden.estatus === 'finalizado' && (
-                            <TouchableOpacity style={styles.actionBtnSuccess} onPress={handleAbrirCobro}>
+                            <TouchableOpacity style={s.actionBtnSuccess} onPress={handleAbrirCobro}>
                                 <Ionicons name="cash-outline" size={20} color="#fff" />
-                                <Text style={styles.actionBtnText}>Cobrar</Text>
+                                <Text style={s.actionBtnText}>Cobrar</Text>
                             </TouchableOpacity>
                         )}
 
                         {role === 'cajero' && orden.estatus === 'cocinando' && (
-                            <TouchableOpacity style={styles.actionBtnPrimary} onPress={handleDescargarPDF}>
+                            <TouchableOpacity style={s.actionBtnPrimary} onPress={handleDescargarPDF}>
                                 <Ionicons name="print-outline" size={20} color="#fff" />
-                                <Text style={styles.actionBtnText}>Imprimir Comanda</Text>
+                                <Text style={s.actionBtnText}>Imprimir Comanda</Text>
                             </TouchableOpacity>
                         )}
 
@@ -534,42 +536,42 @@ TOTAL: $${Number(orden!.monto_total || 0).toFixed(2)}
                             <>
                                 {hayCambiosMesero && (
                                     <TouchableOpacity
-                                        style={[styles.actionBtnPrimary, isLoading && styles.actionBtnDisabled]}
+                                        style={[s.actionBtnPrimary, isLoading && s.actionBtnDisabled]}
                                         onPress={handleEnviarNotasMesero}
                                         disabled={isLoading}
                                     >
                                         <Ionicons name="save-outline" size={20} color="#fff" />
-                                        <Text style={styles.actionBtnText}>
+                                        <Text style={s.actionBtnText}>
                                             {isLoading ? 'Guardando...' : 'Guardar Notas'}
                                         </Text>
                                     </TouchableOpacity>
                                 )}
                                 <TouchableOpacity
-                                    style={[styles.actionBtnCook, isLoading && styles.actionBtnDisabled]}
+                                    style={[s.actionBtnCook, isLoading && s.actionBtnDisabled]}
                                     onPress={handleCocinar}
                                     disabled={isLoading}
                                 >
                                     <Ionicons name="flame-outline" size={20} color="#fff" />
-                                    <Text style={styles.actionBtnText}>Cocinar</Text>
+                                    <Text style={s.actionBtnText}>Cocinar</Text>
                                 </TouchableOpacity>
                             </>
                         )}
 
                         {role === 'mesero' && orden.estatus === 'cocinando' && (
-                            <TouchableOpacity style={styles.actionBtnSuccess} onPress={handleFinalizarOrden}>
+                            <TouchableOpacity style={s.actionBtnSuccess} onPress={handleFinalizarOrden}>
                                 <Ionicons name="checkmark-circle" size={20} color="#fff" />
-                                <Text style={styles.actionBtnText}>Finalizado</Text>
+                                <Text style={s.actionBtnText}>Finalizado</Text>
                             </TouchableOpacity>
                         )}
 
                         {role === 'cliente' && hayCambios && (
                             <TouchableOpacity
-                                style={[styles.actionBtnPrimary, isLoading && styles.actionBtnDisabled]}
+                                style={[s.actionBtnPrimary, isLoading && s.actionBtnDisabled]}
                                 onPress={handleEnviarModificaciones}
                                 disabled={isLoading}
                             >
                                 <Ionicons name="save-outline" size={20} color="#fff" />
-                                <Text style={styles.actionBtnText}>
+                                <Text style={s.actionBtnText}>
                                     {isLoading ? 'Guardando...' : 'Enviar Modificaciones'}
                                 </Text>
                             </TouchableOpacity>
@@ -586,23 +588,23 @@ TOTAL: $${Number(orden!.monto_total || 0).toFixed(2)}
                 animationType="fade"
                 onRequestClose={cerrarModalPago}
             >
-                <View style={styles.modalOverlay}>
-                    <View style={styles.modalContainer}>
-                        <View style={styles.modalHeader}>
-                            <Text style={styles.modalTitle}>Registrar Pago</Text>
+                <View style={s.modalOverlay}>
+                    <View style={s.modalContainer}>
+                        <View style={s.modalHeader}>
+                            <Text style={s.modalTitle}>Registrar Pago</Text>
                             <TouchableOpacity onPress={cerrarModalPago}>
-                                <Ionicons name="close" size={24} color="#666" />
+                                <Ionicons name="close" size={24} color={colors.textMuted} />
                             </TouchableOpacity>
                         </View>
 
                         <ScrollView showsVerticalScrollIndicator={false}>
-                            <View style={styles.modalResumen}>
-                                <Text style={styles.modalResumenLabel}>Mesa {ordenModal?.mesa_info?.numero_mesa || 'N/A'}</Text>
-                                <Text style={styles.modalResumenTotal}>${Number(ordenModal?.monto_total || 0).toFixed(2)}</Text>
+                            <View style={s.modalResumen}>
+                                <Text style={s.modalResumenLabel}>Mesa {ordenModal?.mesa_info?.numero_mesa || 'N/A'}</Text>
+                                <Text style={s.modalResumenTotal}>${Number(ordenModal?.monto_total || 0).toFixed(2)}</Text>
                             </View>
 
-                            <Text style={styles.modalLabel}>Método de pago *</Text>
-                            <View style={styles.modalPaymentMethods}>
+                            <Text style={s.modalLabel}>Método de pago *</Text>
+                            <View style={s.modalPaymentMethods}>
                                 {[
                                     { key: 'efectivo', icon: 'cash-outline', label: 'Efectivo' },
                                     { key: 'tarjeta', icon: 'card-outline', label: 'Tarjeta' },
@@ -611,44 +613,44 @@ TOTAL: $${Number(orden!.monto_total || 0).toFixed(2)}
                                 ].map((metodo) => (
                                     <TouchableOpacity
                                         key={metodo.key}
-                                        style={[styles.modalMethodBtn, metodoPago === metodo.key && styles.modalMethodActive]}
+                                        style={[s.modalMethodBtn, metodoPago === metodo.key && s.modalMethodActive]}
                                         onPress={() => setMetodoPago(metodo.key)}
                                     >
                                         <Ionicons
                                             name={metodo.icon as any}
                                             size={20}
-                                            color={metodoPago === metodo.key ? '#D4AF37' : '#8E8E8E'}
+                                            color={metodoPago === metodo.key ? colors.goldDark : colors.textMuted}
                                         />
-                                        <Text style={[styles.modalMethodText, metodoPago === metodo.key && styles.modalMethodTextActive]}>
+                                        <Text style={[s.modalMethodText, metodoPago === metodo.key && s.modalMethodTextActive]}>
                                             {metodo.label}
                                         </Text>
                                     </TouchableOpacity>
                                 ))}
                             </View>
 
-                            <Text style={styles.modalLabel}>Referencia / No. de transacción</Text>
+                            <Text style={s.modalLabel}>Referencia / No. de transacción</Text>
                             <TextInput
-                                style={styles.modalInput}
+                                style={s.modalInput}
                                 placeholder="Ej: 1234567890"
-                                placeholderTextColor="#8E8E8E"
+                                placeholderTextColor={colors.textMuted}
                                 value={referenciaPago}
                                 onChangeText={setReferenciaPago}
                             />
 
-                            <Text style={styles.modalLabel}>Comprobante de pago (opcional)</Text>
-                            <TouchableOpacity style={styles.modalUploadBtn} onPress={handleSeleccionarImagen}>
-                                <Ionicons name="camera-outline" size={22} color="#666" />
-                                <Text style={styles.modalUploadText}>
+                            <Text style={s.modalLabel}>Comprobante de pago (opcional)</Text>
+                            <TouchableOpacity style={s.modalUploadBtn} onPress={handleSeleccionarImagen}>
+                                <Ionicons name="camera-outline" size={22} color={colors.textMuted} />
+                                <Text style={s.modalUploadText}>
                                     {comprobanteUri ? 'Cambiar imagen' : 'Seleccionar comprobante'}
                                 </Text>
                             </TouchableOpacity>
                             {comprobanteUri && (
-                                <Image source={{ uri: comprobanteUri }} style={styles.modalPreview} />
+                                <Image source={{ uri: comprobanteUri }} style={s.modalPreview} />
                             )}
                         </ScrollView>
 
                         <TouchableOpacity
-                            style={[styles.modalConfirmBtn, isPaying && styles.actionBtnDisabled]}
+                            style={[s.modalConfirmBtn, isPaying && s.actionBtnDisabled]}
                             onPress={handleCobrar}
                             disabled={isPaying}
                         >
@@ -657,7 +659,7 @@ TOTAL: $${Number(orden!.monto_total || 0).toFixed(2)}
                             ) : (
                                 <>
                                     <Ionicons name="checkmark-circle-outline" size={20} color="#fff" />
-                                    <Text style={styles.modalConfirmText}>Confirmar Pago</Text>
+                                    <Text style={s.modalConfirmText}>Confirmar Pago</Text>
                                 </>
                             )}
                         </TouchableOpacity>
@@ -669,10 +671,10 @@ TOTAL: $${Number(orden!.monto_total || 0).toFixed(2)}
     }
 );
 
-const InfoRow = ({ label, value }: { label: string; value: string }) => (
-    <View style={styles.infoRow}>
-        <Text style={styles.infoLabel}>{label}</Text>
-        <Text style={styles.infoValue}>{value}</Text>
+const InfoRow = ({ label, value, colors }: { label: string; value: string; colors: any }) => (
+    <View style={styles(colors).infoRow}>
+        <Text style={styles(colors).infoLabel}>{label}</Text>
+        <Text style={styles(colors).infoValue}>{value}</Text>
     </View>
 );
 
@@ -689,14 +691,14 @@ const getStatusColor = (status: string) => {
     }
 };
 
-const styles = StyleSheet.create({
+const styles = (c: ReturnType<typeof useTheme>['colors']) => StyleSheet.create({
     background: {
-        backgroundColor: '#FAFAFA',
+        backgroundColor: c.background,
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
     },
     indicator: {
-        backgroundColor: '#D4AF37',
+        backgroundColor: c.goldDark,
         width: 40,
     },
     content: {
@@ -715,7 +717,7 @@ const styles = StyleSheet.create({
     mesaTitle: {
         fontSize: 22,
         fontWeight: 'bold',
-        color: '#262626',
+        color: c.text,
         marginBottom: 6,
     },
     statusBadge: {
@@ -732,12 +734,12 @@ const styles = StyleSheet.create({
         padding: 4,
     },
     infoSection: {
-        backgroundColor: '#FFF',
+        backgroundColor: c.card,
         borderRadius: 10,
         padding: 12,
         marginBottom: 16,
         borderWidth: 1,
-        borderColor: '#EFEFEF',
+        borderColor: c.border,
     },
     infoRow: {
         flexDirection: 'row',
@@ -746,22 +748,22 @@ const styles = StyleSheet.create({
     },
     infoLabel: {
         fontSize: 13,
-        color: '#8E8E8E',
+        color: c.textMuted,
     },
     infoValue: {
         fontSize: 13,
-        color: '#262626',
+        color: c.text,
         fontWeight: '500',
     },
     pagoSection: {
         marginBottom: 16,
     },
     pagoInfo: {
-        backgroundColor: '#FFF',
+        backgroundColor: c.card,
         borderRadius: 10,
         padding: 12,
         borderWidth: 1,
-        borderColor: '#EFEFEF',
+        borderColor: c.border,
     },
     comprobanteContainer: {
         marginTop: 8,
@@ -773,34 +775,34 @@ const styles = StyleSheet.create({
         marginTop: 6,
     },
     pagoVacio: {
-        color: '#8E8E8E',
+        color: c.textMuted,
         fontSize: 13,
         fontStyle: 'italic',
     },
     sectionTitle: {
         fontSize: 16,
         fontWeight: 'bold',
-        color: '#262626',
+        color: c.text,
         marginBottom: 10,
     },
     loadingText: {
         textAlign: 'center',
-        color: '#8E8E8E',
+        color: c.textMuted,
         paddingVertical: 20,
     },
     productCard: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#FFF',
+        backgroundColor: c.card,
         borderRadius: 10,
         padding: 12,
         marginBottom: 8,
         borderWidth: 1,
-        borderColor: '#EFEFEF',
+        borderColor: c.border,
     },
     productCardEdited: {
-        borderColor: '#D4AF37',
-        backgroundColor: '#FFFDF5',
+        borderColor: c.goldDark,
+        backgroundColor: c.goldLight,
     },
     productInfo: {
         flex: 1,
@@ -808,12 +810,12 @@ const styles = StyleSheet.create({
     productName: {
         fontSize: 14,
         fontWeight: '600',
-        color: '#262626',
+        color: c.text,
         marginBottom: 2,
     },
     productPrice: {
         fontSize: 12,
-        color: '#8E8E8E',
+        color: c.textMuted,
     },
     quantityControls: {
         flexDirection: 'row',
@@ -826,17 +828,17 @@ const styles = StyleSheet.create({
     qtyText: {
         fontSize: 16,
         fontWeight: 'bold',
-        color: '#262626',
+        color: c.text,
         minWidth: 24,
         textAlign: 'center',
     },
     qtyTextEdited: {
-        color: '#D4AF37',
+        color: c.goldDark,
     },
     subtotal: {
         fontSize: 14,
         fontWeight: 'bold',
-        color: '#262626',
+        color: c.text,
         marginLeft: 12,
     },
     totalRow: {
@@ -844,7 +846,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         borderTopWidth: 1,
-        borderTopColor: '#EFEFEF',
+        borderTopColor: c.border,
         paddingTop: 16,
         marginTop: 8,
         marginBottom: 20,
@@ -852,12 +854,12 @@ const styles = StyleSheet.create({
     totalLabel: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: '#262626',
+        color: c.text,
     },
     totalAmount: {
         fontSize: 20,
         fontWeight: 'bold',
-        color: '#D4AF37',
+        color: c.goldDark,
     },
     actionsSection: {
         gap: 10,
@@ -866,7 +868,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#2196F3',
+        backgroundColor: c.info,
         paddingVertical: 14,
         borderRadius: 12,
         gap: 8,
@@ -875,7 +877,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#4CAF50',
+        backgroundColor: c.success,
         paddingVertical: 14,
         borderRadius: 12,
         gap: 8,
@@ -884,7 +886,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#E65100',
+        backgroundColor: c.warning,
         paddingVertical: 14,
         borderRadius: 12,
         gap: 8,
@@ -904,7 +906,7 @@ const styles = StyleSheet.create({
     notaSectionTitle: {
         fontSize: 14,
         fontWeight: 'bold',
-        color: '#262626',
+        color: c.text,
         marginBottom: 8,
     },
     notaItem: {
@@ -913,49 +915,49 @@ const styles = StyleSheet.create({
     notaProductName: {
         fontSize: 13,
         fontWeight: '600',
-        color: '#555',
+        color: c.textSecondary,
         marginBottom: 4,
     },
     notaInput: {
         borderWidth: 1,
-        borderColor: '#E0E0E0',
+        borderColor: c.gray200,
         borderRadius: 8,
         paddingHorizontal: 12,
         paddingVertical: 8,
         fontSize: 13,
-        color: '#262626',
-        backgroundColor: '#FFF',
+        color: c.text,
+        backgroundColor: c.card,
         minHeight: 52,
     },
     notaDisplayItem: {
         flexDirection: 'row',
-        backgroundColor: '#FFF',
+        backgroundColor: c.card,
         borderRadius: 8,
         padding: 10,
         marginBottom: 6,
         borderWidth: 1,
-        borderColor: '#EFEFEF',
+        borderColor: c.border,
     },
     notaDisplayProduct: {
         fontSize: 13,
         fontWeight: '600',
-        color: '#262626',
+        color: c.text,
         marginRight: 6,
     },
     notaDisplayText: {
         fontSize: 13,
-        color: '#666',
+        color: c.textSecondary,
         flex: 1,
         fontStyle: 'italic',
     },
     modalOverlay: {
         flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.5)',
+        backgroundColor: c.overlay,
         justifyContent: 'center',
         paddingHorizontal: 24,
     },
     modalContainer: {
-        backgroundColor: '#FAFAFA',
+        backgroundColor: c.background,
         borderRadius: 16,
         padding: 20,
         maxHeight: '85%',
@@ -969,33 +971,33 @@ const styles = StyleSheet.create({
     modalTitle: {
         fontSize: 20,
         fontWeight: 'bold',
-        color: '#262626',
+        color: c.text,
     },
     modalResumen: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        backgroundColor: '#FFF',
+        backgroundColor: c.card,
         borderRadius: 10,
         padding: 14,
         marginBottom: 20,
         borderWidth: 1,
-        borderColor: '#EFEFEF',
+        borderColor: c.border,
     },
     modalResumenLabel: {
         fontSize: 16,
         fontWeight: '600',
-        color: '#262626',
+        color: c.text,
     },
     modalResumenTotal: {
         fontSize: 22,
         fontWeight: 'bold',
-        color: '#D4AF37',
+        color: c.goldDark,
     },
     modalLabel: {
         fontSize: 13,
         fontWeight: '600',
-        color: '#262626',
+        color: c.text,
         marginBottom: 8,
         marginTop: 4,
     },
@@ -1013,30 +1015,30 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
         borderRadius: 10,
         borderWidth: 1.5,
-        borderColor: '#EFEFEF',
-        backgroundColor: '#FFF',
+        borderColor: c.border,
+        backgroundColor: c.card,
     },
     modalMethodActive: {
-        borderColor: '#D4AF37',
-        backgroundColor: '#FFF8E1',
+        borderColor: c.goldDark,
+        backgroundColor: c.goldLight,
     },
     modalMethodText: {
-        color: '#8E8E8E',
+        color: c.textMuted,
         fontWeight: '600',
         fontSize: 13,
     },
     modalMethodTextActive: {
-        color: '#D4AF37',
+        color: c.goldDark,
     },
     modalInput: {
         borderWidth: 1,
-        borderColor: '#EFEFEF',
+        borderColor: c.border,
         borderRadius: 10,
         paddingHorizontal: 14,
         paddingVertical: 12,
         fontSize: 15,
-        color: '#262626',
-        backgroundColor: '#FFF',
+        color: c.text,
+        backgroundColor: c.card,
         marginBottom: 16,
     },
     modalUploadBtn: {
@@ -1044,15 +1046,15 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         gap: 8,
         borderWidth: 1,
-        borderColor: '#EFEFEF',
+        borderColor: c.border,
         borderStyle: 'dashed',
         borderRadius: 10,
         paddingVertical: 16,
         justifyContent: 'center',
-        backgroundColor: '#FFF',
+        backgroundColor: c.card,
     },
     modalUploadText: {
-        color: '#666',
+        color: c.textSecondary,
         fontSize: 14,
         fontWeight: '500',
     },
@@ -1066,7 +1068,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#4CAF50',
+        backgroundColor: c.success,
         paddingVertical: 15,
         borderRadius: 12,
         gap: 8,
