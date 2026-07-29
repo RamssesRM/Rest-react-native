@@ -2,15 +2,17 @@ import { useTheme } from "@/hooks/use-theme";
 import { Ionicons } from "@expo/vector-icons";
 import { Link, useRouter } from "expo-router";
 import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 
 interface ComidasHeaderProps {
   title: string;
+  onSync?: () => void;
+  isSyncing?: boolean;
 }
 
-const ComidasHeader = ({ title }: ComidasHeaderProps) => {
+const ComidasHeader = ({ title, onSync, isSyncing }: ComidasHeaderProps) => {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { colors } = useTheme();
@@ -34,6 +36,19 @@ const ComidasHeader = ({ title }: ComidasHeaderProps) => {
         <Text style={s.titleCenter}>{title}</Text>
 
         <View style={s.rightIcons}>
+          {onSync && (
+            <TouchableOpacity
+              style={s.iconButton}
+              onPress={onSync}
+              disabled={isSyncing}
+            >
+              {isSyncing ? (
+                <ActivityIndicator size={18} color={colors.text} />
+              ) : (
+                <Ionicons name="sync" size={20} color={colors.text} />
+              )}
+            </TouchableOpacity>
+          )}
           <Link href={"/(app)/(auth)/(modal)/filter"} asChild>
             <TouchableOpacity style={s.iconButton}>
               <Ionicons name="filter" size={20} color={colors.text} />

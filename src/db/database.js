@@ -39,6 +39,16 @@ const createTables = async (db) => {
                 imagen TEXT,
                 FOREIGN KEY (categoria_id) REFERENCES categorias (id) ON DELETE CASCADE
             );
+
+            CREATE TABLE IF NOT EXISTS pending_requests (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                method TEXT NOT NULL,
+                endpoint TEXT NOT NULL,
+                body TEXT,
+                image_uri TEXT,
+                created_at TEXT NOT NULL,
+                status TEXT DEFAULT 'pending'
+            );
         `);
         console.log("✅ Tablas creadas con éxito");
     } catch (error) {

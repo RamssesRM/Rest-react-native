@@ -1,4 +1,5 @@
 import { ThemeProvider } from "@/hooks/use-theme";
+import { useOfflineQueue } from "@/hooks/use-offline-sync";
 import { openDatabase } from "@/src/db/database";
 import { validateStoredTokens } from "@/utils/auth";
 import {
@@ -11,6 +12,7 @@ import { useFonts } from "expo-font";
 import { Slot } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import Toast from "react-native-toast-message";
 
 
 const queryClient = new QueryClient({
@@ -21,6 +23,11 @@ const queryClient = new QueryClient({
     }
   }
 });
+
+function OfflineSyncProvider({ children }: { children: React.ReactNode }) {
+  useOfflineQueue();
+  return <>{children}</>;
+}
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
@@ -56,7 +63,10 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <QueryClientProvider client={queryClient}>
         <ThemeProvider>
-          <Slot />
+          <OfflineSyncProvider>
+            <Slot />
+            <Toast />
+          </OfflineSyncProvider>
         </ThemeProvider>
       </QueryClientProvider>
     </GestureHandlerRootView>

@@ -58,3 +58,5 @@ npx expo install expo-image-picker
 
 Google logueo:
 npx expo install @react-native-google-signin/google-signin
+
+npx expo install @react-native-community/netinfo react-native-toast-message

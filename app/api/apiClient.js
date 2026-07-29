@@ -140,13 +140,12 @@ export const apiClientAuth = async (url, options = {}) => {
     return response;
 };
 
-export const apiClientFormData = async (url, formData) => {
+export const apiClientFormData = async (url, formData, method = 'PATCH') => {
     const token = await SecureStore.getItemAsync('jwt_access');
 
     const config = {
-        method: 'PATCH',
+        method,
         headers: {
-            'Content-Type': 'multipart/form-data',
             ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
         },
         body: formData,

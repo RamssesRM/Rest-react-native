@@ -124,6 +124,8 @@ export default function PerfilScreen() {
                   router.push('/gestion-usuarios');
                 } else if (item.target === 'auditoria') {
                   router.push('/auditoria');
+                } else if (item.target === 'pagos') {
+                  router.push('./perfil/pagos');
                 } else {
                   alert(`Ir a: ${item.text}`);
                 }
