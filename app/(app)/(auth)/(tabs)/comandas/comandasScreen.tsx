@@ -1,4 +1,5 @@
 import { cambiarEstadoOrden, getMisOrdenes, getOrdenesActivas, getOrdenesCajero, getTodasLasOrdenes, tomarEstatusOrdenes } from '@/app/api/ordenesApi';
+import { guardarDesdeOrden } from '@/app/api/comandasPersonalizadasApi';
 import DetallesOrdenesCard from '@/componentes/DetallesOrdenesCard';
 import GuestGuard from '@/componentes/GuestGuard';
 import { useTheme } from '@/hooks/use-theme';
@@ -7,7 +8,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import BottomSheet from '@gorhom/bottom-sheet';
 import { useFocusEffect, useRouter } from 'expo-router';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, Alert, FlatList, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, FlatList, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 const FALLBACK_COLORES: Record<string, string> = {
     pidiendo: '#FF9800',
@@ -88,6 +89,11 @@ export default function ComandasScreen() {
     const [estatusOrdenes, setEstatusOrdenes] = useState<{ value: string; label: string; color: string }[]>([]);
     const [coloresEstatus, setColoresEstatus] = useState<Record<string, string>>({});
 
+    const [modalGuardarVisible, setModalGuardarVisible] = useState(false);
+    const [nombreComanda, setNombreComanda] = useState('');
+    const [ordenParaGuardar, setOrdenParaGuardar] = useState(null);
+    const [guardandoComanda, setGuardandoComanda] = useState(false);
+
     const cargarDatos = async () => {
         if (!user || isGuest) {
             setIsLoading(false);
@@ -158,6 +164,32 @@ export default function ComandasScreen() {
     const handleEstadoCambiado = useCallback(() => {
         cargarDatos();
     }, [user, role, filtroAdmin, busquedaAdmin]);
+
+    const handleAbrirGuardarComanda = useCallback((orden) => {
+        setOrdenParaGuardar(orden);
+        setNombreComanda('');
+        setModalGuardarVisible(true);
+    }, []);
+
+    const handleGuardarComanda = useCallback(async () => {
+        if (!nombreComanda.trim()) {
+            Alert.alert('Error', 'Ingresa un nombre para la comanda');
+            return;
+        }
+        if (!ordenParaGuardar) return;
+        try {
+            setGuardandoComanda(true);
+            await guardarDesdeOrden(ordenParaGuardar.id, nombreComanda.trim());
+            setModalGuardarVisible(false);
+            setOrdenParaGuardar(null);
+            setNombreComanda('');
+            Alert.alert('Éxito', 'Comanda guardada en Mis Comandas');
+        } catch (error) {
+            Alert.alert('Error', 'No se pudo guardar la comanda');
+        } finally {
+            setGuardandoComanda(false);
+        }
+    }, [nombreComanda, ordenParaGuardar]);
 
     const RenderFiltrosFecha = () => (
         <View style={s.filtrosFechaContainer}>
@@ -271,6 +303,14 @@ export default function ComandasScreen() {
                                 <Text style={s.deleteText}>Cancelar</Text>
                             </TouchableOpacity>
                         )}
+                        {role === 'cliente' && (
+                            <TouchableOpacity
+                                style={s.saveBtn}
+                                onPress={(e) => { e.stopPropagation?.(); handleAbrirGuardarComanda(item); }}
+                            >
+                                <Ionicons name="bookmark-outline" size={18} color={colors.goldDark} />
+                            </TouchableOpacity>
+                        )}
                     </View>
                 </View>
             </TouchableOpacity>
@@ -294,7 +334,18 @@ export default function ComandasScreen() {
     return (
         <GuestGuard feature="tus comandas">
         <View style={s.container}>
-            <Text style={s.headerTitle}>Centro de Comandas</Text>
+            <View style={s.headerRow}>
+                <Text style={s.headerTitle}>Centro de Comandas</Text>
+                {role === 'cliente' && (
+                    <TouchableOpacity
+                        style={s.misComandasBtn}
+                        onPress={() => router.push('/comandas/mis-comandas')}
+                    >
+                        <Ionicons name="clipboard-outline" size={18} color={colors.brandDark} />
+                        <Text style={s.misComandasText}>Mis Comandas</Text>
+                    </TouchableOpacity>
+                )}
+            </View>
 
             <RenderFiltrosFecha />
 
@@ -319,6 +370,38 @@ export default function ComandasScreen() {
                 onEstadoCambiado={handleEstadoCambiado}
                 coloresEstatus={coloresEstatus}
             />
+
+            <Modal visible={modalGuardarVisible} transparent animationType="fade">
+                <View style={s.modalOverlay}>
+                    <View style={s.modalContent}>
+                        <Text style={s.modalTitle}>Guardar como comanda personalizada</Text>
+                        <Text style={s.modalSubtitle}>Dale un nombre a tu comanda para encontrarla después</Text>
+                        <TextInput
+                            style={s.modalInput}
+                            placeholder="Mi almuerzo favorito"
+                            placeholderTextColor={colors.muted}
+                            value={nombreComanda}
+                            onChangeText={setNombreComanda}
+                            autoFocus
+                        />
+                        <View style={s.modalActions}>
+                            <TouchableOpacity
+                                style={s.modalCancelBtn}
+                                onPress={() => { setModalGuardarVisible(false); setOrdenParaGuardar(null); }}
+                            >
+                                <Text style={s.modalCancelText}>Cancelar</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={[s.modalSaveBtn, guardandoComanda && { opacity: 0.5 }]}
+                                onPress={handleGuardarComanda}
+                                disabled={guardandoComanda}
+                            >
+                                <Text style={s.modalSaveText}>{guardandoComanda ? 'Guardando...' : 'Guardar'}</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
         </View>
         </GuestGuard>
     );
@@ -330,12 +413,33 @@ const styles = (c: ReturnType<typeof useTheme>['colors']) => StyleSheet.create({
         backgroundColor: c.background,
         paddingTop: 20
     },
+    headerRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingHorizontal: 20,
+        marginBottom: 12
+    },
     headerTitle: {
         fontSize: 24,
         fontWeight: 'bold',
         color: c.text,
-        paddingHorizontal: 20,
-        marginBottom: 12
+    },
+    misComandasBtn: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: c.brandYellowLight,
+        paddingHorizontal: 14,
+        paddingVertical: 8,
+        borderRadius: 20,
+        gap: 6,
+        borderWidth: 1,
+        borderColor: c.brandYellowBorder,
+    },
+    misComandasText: {
+        fontSize: 13,
+        fontWeight: '600',
+        color: c.brandDark,
     },
     list: {
         paddingHorizontal: 16,
@@ -539,10 +643,76 @@ const styles = (c: ReturnType<typeof useTheme>['colors']) => StyleSheet.create({
         color: c.danger,
         fontWeight: '700'
     },
+    saveBtn: {
+        backgroundColor: c.goldLight || c.chipBg,
+        width: 36,
+        height: 36,
+        borderRadius: 18,
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
     emptyText: {
         textAlign: 'center',
         color: c.textMuted,
         marginTop: 50,
         fontSize: 16
+    },
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    modalContent: {
+        backgroundColor: c.card,
+        borderRadius: 16,
+        padding: 24,
+        width: '85%',
+        maxWidth: 400
+    },
+    modalTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: c.text,
+        marginBottom: 4
+    },
+    modalSubtitle: {
+        fontSize: 13,
+        color: c.textSecondary || c.muted,
+        marginBottom: 16
+    },
+    modalInput: {
+        borderWidth: 1,
+        borderColor: c.border,
+        borderRadius: 10,
+        padding: 12,
+        fontSize: 15,
+        color: c.text,
+        backgroundColor: c.background,
+        marginBottom: 20
+    },
+    modalActions: {
+        flexDirection: 'row',
+        justifyContent: 'flex-end',
+        gap: 10
+    },
+    modalCancelBtn: {
+        paddingHorizontal: 16,
+        paddingVertical: 10,
+        borderRadius: 8
+    },
+    modalCancelText: {
+        color: c.textSecondary || c.muted,
+        fontWeight: '600'
+    },
+    modalSaveBtn: {
+        backgroundColor: c.goldDark,
+        paddingHorizontal: 20,
+        paddingVertical: 10,
+        borderRadius: 8
+    },
+    modalSaveText: {
+        color: '#fff',
+        fontWeight: '700'
     }
 });

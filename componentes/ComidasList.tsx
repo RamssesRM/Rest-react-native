@@ -1,11 +1,13 @@
 import { editarProducto, eliminarProducto, restaurarProducto } from '@/app/api/productosApi';
 import AdminProductModal from '@/componentes/AdminProductModal';
+import ProductDetailModal from '@/componentes/ProductDetailModal';
 import { useTheme } from '@/hooks/use-theme';
 import { useFilterStore } from '@/hooks/use-filterstore';
 import useUserStore from '@/hooks/use-userstore';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { getLocalCategorias, getLocalProductos, getLocalProductosInactivos, saveSingleProducto, deleteSingleProducto, reactivarProducto as reactivarLocal } from '@/src/db/menuService';
 import NetInfo from '@react-native-community/netinfo';
+import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
     ActivityIndicator,
@@ -51,6 +53,31 @@ const ComidasList = ({ refreshKey }: ComidasListProps) => {
     const { colors } = useTheme();
     const { user } = useUserStore();
     const isAdmin = user?.role === 'admin';
+
+    const [productoDetalle, setProductoDetalle] = useState<ProductoLocal | null>(null);
+    const [modalDetalleVisible, setModalDetalleVisible] = useState(false);
+    const router = useRouter();
+
+    const handleVerDetalle = (producto: ProductoLocal) => {
+        if (user?.role === 'cliente') {
+            setProductoDetalle(producto);
+            setModalDetalleVisible(true);
+        }
+    };
+
+    const handleEnviarAOrden = (producto: ProductoLocal) => {
+        setModalDetalleVisible(false);
+        setProductoDetalle(null);
+        router.push({
+            pathname: '/comandas/nuevaOrden',
+            params: {
+                productoId: producto.id,
+                productoNombre: producto.nombre,
+                productoPrecio: String(producto.precio),
+                productoImagen: producto.imagen || '',
+            }
+        });
+    };
 
     const cargarDatos = async () => {
         try {
@@ -284,7 +311,9 @@ const ComidasList = ({ refreshKey }: ComidasListProps) => {
             )}
 
             {sortedProducts.map((item) => (
-                <TouchableOpacity key={item.id} style={[s.card, showInactivos && { opacity: 0.7 }]} activeOpacity={0.8}>
+                <TouchableOpacity key={item.id} style={[s.card, showInactivos && { opacity: 0.7 }]} activeOpacity={0.8}
+                    onPress={!isAdmin ? () => handleVerDetalle(item) : undefined}
+                >
                     {isAdmin && (
                         <View style={s.adminActions}>
                             {showInactivos ? (
@@ -349,6 +378,14 @@ const ComidasList = ({ refreshKey }: ComidasListProps) => {
                 onSave={handleSave}
                 producto={productoSeleccionado}
                 categorias={categorias}
+            />
+
+            <ProductDetailModal
+                visible={modalDetalleVisible}
+                producto={productoDetalle}
+                onClose={() => { setModalDetalleVisible(false); setProductoDetalle(null); }}
+                onEnviarAOrden={handleEnviarAOrden}
+                role={user?.role}
             />
         </View>
     );

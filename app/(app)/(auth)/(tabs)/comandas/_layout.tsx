@@ -21,6 +21,20 @@ const ComandasLayout = () => {
         }} 
       />
 
+      <Stack.Screen 
+        name="mis-comandas" 
+        options={{ 
+          animation: 'slide_from_right',
+        }} 
+      />
+
+      <Stack.Screen 
+        name="nueva-comanda-personalizada" 
+        options={{ 
+          animation: 'slide_from_right',
+        }} 
+      />
+
     </Stack>
   );
 };

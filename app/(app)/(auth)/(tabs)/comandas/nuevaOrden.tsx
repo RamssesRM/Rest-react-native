@@ -3,9 +3,16 @@ import GuestGuard from '@/componentes/GuestGuard';
 import { useTheme } from '@/hooks/use-theme';
 import useUserStore from '@/hooks/use-userstore';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, FlatList, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+
+type NuevaOrdenParams = {
+    productoId?: string;
+    productoNombre?: string;
+    productoPrecio?: string;
+    productoImagen?: string;
+};
 
 export default function NuevaOrdenScreen() {
     const router = useRouter();
@@ -13,12 +20,14 @@ export default function NuevaOrdenScreen() {
     const { colors } = useTheme();
     const s = styles(colors);
     
+    const params = useLocalSearchParams<NuevaOrdenParams>();
     const [mesas, setMesas] = useState([]);
     const [selectedMesa, setSelectedMesa] = useState(null);
     const [categorias, setCategorias] = useState([]);
     const [selectedCat, setSelectedCat] = useState('');
     const [productos, setProductos] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [preloaded, setPreloaded] = useState(false);
     
     const [carrito, setCarrito] = useState([]);
 
@@ -42,6 +51,19 @@ export default function NuevaOrdenScreen() {
         };
         if (user) initData();
     }, [user]);
+
+    useEffect(() => {
+        if (!isLoading && params.productoId && params.productoNombre && params.productoPrecio && !preloaded) {
+            const productoPreCargado = {
+                id: params.productoId,
+                nombre: params.productoNombre,
+                precio: parseFloat(params.productoPrecio),
+                imagen: params.productoImagen || null,
+            };
+            addToCart(productoPreCargado);
+            setPreloaded(true);
+        }
+    }, [isLoading, params, preloaded]);
 
     const addToCart = (producto) => {
         setCarrito(prev => {
@@ -98,7 +120,7 @@ export default function NuevaOrdenScreen() {
             }
 
             Alert.alert('¡Éxito!', 'Orden enviada a cocina');
-            router.back();
+            router.replace('/comandas');
         } catch (error) {
             Alert.alert('Error', 'No se pudo crear la orden');
         } finally {
