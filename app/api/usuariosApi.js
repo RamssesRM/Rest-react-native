@@ -59,3 +59,9 @@ export const tomarStatsUsuario = async (userId) => {
 };
 
 export const tomarStatsConUsuario = tomarStatsUsuario;
+
+export const tomarPlatoFavorito = async (userId) => {
+    const response = await apiClient(`/usuarios/${userId}/plato_favorito/`);
+    if (!response.ok) throw new Error('Error al traer plato favorito');
+    return await response.json();
+};

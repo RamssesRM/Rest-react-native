@@ -124,10 +124,18 @@ export default function PerfilScreen() {
                   router.push('/gestion-usuarios');
                 } else if (item.target === 'auditoria') {
                   router.push('/auditoria');
+                } else if (item.target === 'historial') {
+                  router.push('./perfil/historial');
+                } else if (item.target === 'favoritos') {
+                  router.push('./perfil/favoritos');
                 } else if (item.target === 'pagos') {
                   router.push('./perfil/pagos');
-                } else {
-                  alert(`Ir a: ${item.text}`);
+                } else if (item.target === 'ajustes') {
+                  router.push('./perfil/ajustes');
+                } else if (item.target === 'notificaciones') {
+                  router.push('./perfil/notificaciones');
+                } else if (item.target === 'ayuda') {
+                  router.push('./perfil/ayuda');
                 }
               }}
             >
